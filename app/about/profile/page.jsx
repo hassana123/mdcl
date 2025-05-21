@@ -18,7 +18,7 @@ export default function CompanyProfile() {
             </Link>{" "}
             /{" "}
             <Link
-              href="/about/company-profile"
+              href="/about/profile"
               className="hover:underline text-white font-bold"
             >
               Company Profile

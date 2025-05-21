@@ -1,6 +1,7 @@
-import { redirect } from "next/navigation";
-
+//import { redirect } from "next/navigation";
+import CompanyProfile from "./profile/page";
 export default function About() {
-  redirect("/about/profile");
-  return null;
+ return (
+    <CompanyProfile/>
+  );
 }

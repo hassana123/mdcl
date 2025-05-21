@@ -41,12 +41,12 @@ const Navbar = () => {
 
   const navItems = [
     { label: "Home", href: "/" },
-    { label: "About Us", href: "/about", hasDropdown: true },
+    { label: "About Us", href: "/about/profile", hasDropdown: true },
     { label: "Our Solutions", href: "/solutions" },
     { label: "Projects & Programmes", href: "/projects", hasDropdown: true },
     { label: "Gallery", href: "/gallery" },
     { label: "Blogs", href: "/blogs" },
-    { label: "Resources", href: "/resources", hasDropdown:true },
+    { label: "Resources", href: "/resources/newsletter", hasDropdown:true },
     { label: "Contact Us", href: "/contact" },
   ];
 

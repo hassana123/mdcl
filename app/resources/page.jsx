@@ -1,6 +1,7 @@
-import { redirect } from "next/navigation";
 
+import Newsletter from "./newsletter/page";
 export default function Resources() {
-  redirect("/resources/others");
-  return null;
+ return (
+    <Newsletter/>
+  );
 }
