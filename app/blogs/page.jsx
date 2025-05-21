@@ -47,7 +47,7 @@ export default function BlogPage() {
   subtitle={
     <span className="text-center font-medium text-white/70">
       <Link href="/" className="hover:underline ">Home</Link> /{" "}
-      <Link className="text-white font-bold text-white hover:underline ">Blog</Link>
+      <Link href="/blog" className="text-white font-bold text-white hover:underline ">Blog</Link>
     </span>
   }
   image="/mdcl/g1.jpg"
