@@ -199,7 +199,7 @@ export default function OurTeam() {
                   alt={member.name}
                   width={144}
                   height={170}
-                  className="w-full h-[40vh]"
+                  className="w-full h-[35vh] lg:h-[30vh]"
                 />
               </div>
               <div className="font-bold text-[13px] uppercase text-center mb-1 text-[var(--color-title-text)]">
