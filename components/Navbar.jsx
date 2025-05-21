@@ -178,7 +178,7 @@ if (label === "Resources") {
                     >
                       <ChevronDown
                         size={20}
-                        className={`transition-transform ${projectsOpen ? "rotate-180" : "rotate-0"}`}
+                        className={`transition-transform ${resourceOpen ? "rotate-180" : "rotate-0"}`}
                       />
                     </button>
                   </div>

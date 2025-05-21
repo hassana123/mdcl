@@ -1,5 +1,5 @@
 import ProjectDisplay from "@/components/ProjectDisplay";
-
+import Link from "next/link";
 const researchProjects = [
   {
     id: "cbn-microfinance",
@@ -30,8 +30,21 @@ const researchProjects = [
 export default function ResearchProjectsPage() {
   return (
     <ProjectDisplay
-      title="Research"
-      subtitle={<span className="text-base font-medium">Home / Projects / Research</span>}
+      title="Projects"
+      subtitle={ <span className="text-base font-medium text-white/70">
+          <Link href={"/"} className="hover:underline">
+            Home{" "}/{" "}
+          </Link>
+          <Link href={"/projects"} className="hover:underline">
+            Projects{" "}/ {" "}
+          </Link>
+          <Link
+            href={"/projects/research"}
+            className="hover:underline text-white font-bold"
+          >
+            Research{" "}
+          </Link>
+        </span>}
       description="We believe in driving evidence-based policy through actionable research. By supporting organizations to conduct studies, gathering data, and turning insights into impactful programs and reports."
       projects={researchProjects}
       category="research"

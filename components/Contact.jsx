@@ -1,6 +1,6 @@
 import React from "react";
 import Image from "next/image";
-
+import { Twitter, Linkedin, Instagram, Facebook } from "lucide-react";
 const Contact = () => {
   return (
     <section className="w-full max-w-6xl bg-white mx-auto py-16 px-4 flex flex-col md:flex-row items-center justify-between">
@@ -27,11 +27,12 @@ const Contact = () => {
 </svg> */}
 
         </div>
+         <span className="text-white  text-sm">Follow us on:</span><br/>
         <div className="mt-2 flex items-center gap-2">
-          <span className="text-white text-sm">Follow us on:</span>
-          <a href="#" className="w-8 h-8 flex items-center justify-center rounded-full bg-white text-[color:var(--color-primary-olive)] hover:bg-gray-100 transition"><svg width="20" height="20" fill="currentColor"><circle cx="10" cy="10" r="8" /></svg></a>
-          <a href="#" className="w-8 h-8 flex items-center justify-center rounded-full bg-white text-[color:var(--color-primary-olive)] hover:bg-gray-100 transition"><svg width="20" height="20" fill="currentColor"><rect x="4" y="4" width="12" height="12" rx="3" /></svg></a>
-          <a href="#" className="w-8 h-8 flex items-center justify-center rounded-full bg-white text-[color:var(--color-primary-olive)] hover:bg-gray-100 transition"><svg width="20" height="20" fill="currentColor"><path d="M10 4a6 6 0 100 12A6 6 0 0010 4zm0 2a4 4 0 110 8 4 4 0 010-8z" /></svg></a>
+          <a href="#" className="w-8 h-8 flex items-center justify-center rounded-full bg-white text-[color:var(--color-primary-olive)] hover:bg-gray-100 transition"><Twitter/></a>
+          <a href="#" className="w-8 h-8 flex items-center justify-center rounded-full bg-white text-[color:var(--color-primary-olive)] hover:bg-gray-100 transition"><Facebook/></a>
+          <a href="#" className="w-8 h-8 flex items-center justify-center rounded-full bg-white text-[color:var(--color-primary-olive)] hover:bg-gray-100 transition"><Instagram/></a>
+          <a href="#" className="w-8 h-8 flex items-center justify-center rounded-full bg-white text-[color:var(--color-primary-olive)] hover:bg-gray-100 transition"><Linkedin/></a>
         </div>
 
         
