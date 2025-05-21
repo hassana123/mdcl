@@ -9,9 +9,9 @@ import {
 
 const Footer = () => {
   return (
-    <footer className="w-full text-[17px] bg-[var(--color-primary-light-olive)]">
+    <footer className="w-full text-[16px] py-2 bg-[var(--color-primary-light-olive)]">
       {/* Top Row: Email and Phone */}
-      <div className="flex justify-between items-center max-w-6xl mx-auto w-full mb-2 px-2">
+      <div className="flex justify-between items-center max-w-6xl mx-auto w-full mb-2 ">
         <span className="">info@microdevelopmentng.com</span>
         <span className="">
           Phone Number: +234(0)92920265, +234(0)8052026025
@@ -20,7 +20,7 @@ const Footer = () => {
 
       {/* Blue Dotted Divider */}
       <div className="w-full flex justify-center mb-2">
-        <div className="border-t-1 border- border-[#000] w-full max-w-2xl" />
+        <div className="border-t-1 border-[#000] w-full max-w-2xl" />
       </div>
 
       {/* Copyright and Socials */}
