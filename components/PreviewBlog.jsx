@@ -29,14 +29,14 @@ const PreviewBlog = () => {
   return (
     <section className="w-full max-w-6xl mx-auto py-16 px-4 flex flex-col items-center">
       {/* Section Title */}
-      <h2 className="text-2xl md:text-3xl font-bold text-[var(--color-title-text)] text-center mb-2">
+      <h2 className="text-2xl md:text-3xl font-bold text-[var(--color-title-text)] text-center mb-5">
        Blog Posts
       </h2>
-      <p className="text-base text-gray-700 text-center mb-6 max-w-xl">
+      {/* <p className="text-base text-gray-700 text-center mb-6 max-w-xl">
         Here's a quick glance over our  blog posts and media articles
-      </p>
-      <button className="mb-10 bg-[color:var(--color-primary-brown)] text-white px-6 py-2 rounded-lg font-semibold shadow hover:bg-[color:var(--color-primary-brown)]/90 transition">
-        View Blogs
+      </p> */}
+      <button className="mb-10 bg-[var(--color-primary-light-brown)] text-white px-6 py-2 rounded-lg font-semibold shadow hover:bg-[color:var(--color-primary-brown)]/90 transition">
+        View Blog
       </button>
 
       {/* Blog Cards */}

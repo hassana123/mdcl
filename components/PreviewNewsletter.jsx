@@ -19,8 +19,8 @@ const PreviewNewsletter = () => {
   return (
     <section className="w-full min-h-[600px] bg-[color:var(--color-primary-olive)]/20 py-16 px-2 flex flex-col items-center justify-center">
       {/* Heading and Description */}
-      <h2 className="text-2xl md:text-3xl font-bold text-center mb-2 text-[color:var(--color-primary-olive)]">
-        Subscribe our newsletter
+      <h2 className="text-2xl uppercase md:text-3xl font-bold text-center mb-2 text-[color:var(--color-primary-olive)]">
+        Subscribe to our newsletter
       </h2>
       <p className="text-base text-gray-700 text-center mb-8 max-w-2xl">
         Apart from our website and social media activities, our quarterly newsletter MicroDevelopment Matters is a major medium through which we engage with actors in the development world, disseminating information at a micro-level. We also interview entrepreneurs running businesses, and disseminate information relevant to different sector.
@@ -50,7 +50,7 @@ const PreviewNewsletter = () => {
             </div>
             <a
               href={nl.link}
-              className="bg-[color:var(--color-primary-brown)]/90 text-white px-6 py-2 rounded font-semibold text-sm shadow hover:bg-[color:var(--color-primary-brown)] transition"
+              className="bg-[color:var(--color-primary-light-brown)]/90 text-white px-6 py-2 rounded font-semibold text-sm shadow hover:bg-[color:var(--color-primary-brown)] transition"
             >
               View Newsletter
             </a>

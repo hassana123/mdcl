@@ -13,9 +13,11 @@ const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [aboutOpen, setAboutOpen] = useState(false);
   const [projectsOpen, setProjectsOpen] = useState(false);
+  const [resourceOpen, setResourceOpen] = useState(false);
 
   const aboutRef = useRef(null);
   const projectsRef = useRef(null);
+  const resourcesRef = useRef(null);
 
   // Close dropdowns on outside click
   useEffect(() => {
@@ -44,7 +46,7 @@ const Navbar = () => {
     { label: "Projects & Programmes", href: "/projects", hasDropdown: true },
     { label: "Gallery", href: "/gallery" },
     { label: "Blogs", href: "/blogs" },
-    { label: "Newsletter", href: "/newsletter" },
+    { label: "Resources", href: "/resources", hasDropdown:true },
     { label: "Contact Us", href: "/contact" },
   ];
 
@@ -63,7 +65,7 @@ const Navbar = () => {
   return (
     <header className="bg-white shadow-sm">
       {/* Top bar */}
-      <div className="bg-[var(--color-primary-olive)] py-3 text-white text-[14px]">
+      <div className="bg-[var(--color-primary-fuchia)] py-3 text-black text-[17px]">
         <div className="flex justify-between w-[90%] mx-auto">
           <small className="underline">info@microdevelopmentng.com</small>
           <small>Phone Numbers: +234(0)92920265, +234(0)8052026025</small>
@@ -148,10 +150,48 @@ const Navbar = () => {
                       {renderDropdown(
                         [
                           { href: "/projects/research", label: "Research Projects" },
-                          { href: "/projects/management", label: "Project Management" },
-                          { href: "/projects/capacity", label: "Capacity Development" },
+                          { href: "/projects/project-management", label: "Project Management" },
+                          { href: "/projects/capacity-development", label: "Capacity Development" },
                         ],
                         () => setProjectsOpen(false)
+                      )}
+                    </div>
+                  )}
+                </li>
+              );
+            }
+if (label === "Resources") {
+              return (
+                <li key={label} ref={resourcesRef} className="relative">
+                  <div className="flex items-center gap-1 cursor-pointer">
+                    <Link
+                      href={href}
+                      className={`transition-colors ${
+                        isActive ? "text-[var(--color-primary-olive)] font-bold" : ""
+                      }`}
+                    >
+                      {label}
+                    </Link>
+                    <button
+                      onClick={() => setResourceOpen((prev) => !prev)}
+                      className="focus:outline-none"
+                    >
+                      <ChevronDown
+                        size={20}
+                        className={`transition-transform ${projectsOpen ? "rotate-180" : "rotate-0"}`}
+                      />
+                    </button>
+                  </div>
+
+                  {resourceOpen && (
+                    <div className="absolute left-0 mt-2 w-56 bg-white border rounded shadow-lg z-50">
+                      {renderDropdown(
+                        [
+                          { href: "/resources/newsletter", label: "Newsletter" },
+                          { href: "/resources/others", label: "Others" },
+                         
+                        ],
+                        () => resourceOpen(false)
                       )}
                     </div>
                   )}
@@ -231,6 +271,32 @@ const Navbar = () => {
                             { href: "/projects/research", label: "Research Projects" },
                             { href: "/projects/management", label: "Project Management" },
                             { href: "/projects/capacity", label: "Capacity Development" },
+                          ],
+                          () => setMobileOpen(false)
+                        )}
+                      </div>
+                    )}
+                  </li>
+                );
+              }
+              if (label === "Resources") {
+                return (
+                  <li key={label} className="relative" ref={projectsRef}>
+                    <div className="flex justify-between items-center">
+                      <Link href={href} onClick={() => setMobileOpen(false)}>
+                        {label}
+                      </Link>
+                      <button onClick={() => setResourceOpen((prev) => !prev)}>
+                        <ChevronDown className={`${resourceOpen ? "rotate-180" : ""} transition-transform`} />
+                      </button>
+                    </div>
+                    {projectsOpen && (
+                      <div className="mt-1 ml-4 border-l pl-3">
+                        {renderDropdown(
+                          [
+                            { href: "/resources/newsletter", label: "Newsletter" },
+                            { href: "/resources/other", label: "Others" },
+                            
                           ],
                           () => setMobileOpen(false)
                         )}

@@ -65,7 +65,7 @@ const Contact = () => {
         />
         <button
           type="submit"
-          className="bg-[color:var(--color-primary-brown)] text-white px-8 py-2 rounded font-semibold text-base shadow hover:bg-[color:var(--color-primary-brown)]/90 transition self-start"
+          className="bg-[color:var(--color-primary-light-brown)] text-white px-8 py-2 rounded font-semibold text-base shadow hover:bg-[color:var(--color-primary-brown)]/90 transition self-start"
         >
           Submit
         </button>

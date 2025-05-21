@@ -108,7 +108,7 @@ import Image from "next/image";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay } from "swiper/modules";
 import "swiper/css";
-
+import Link from "next/link";
 const heroImages = Array.from({ length: 20 }, (_, i) => `/mdcl/gallery/g (${i + 1}).jpg`);
 
 
@@ -177,9 +177,9 @@ const HeroSection = () => {
         <p className="text-base md:text-lg text-gray-700 max-w-5xl mb-6">
           {heroSubtitle}
         </p>
-        <button className="bg-[color:var(--color-primary-brown)] text-white px-8 py-3 rounded-xl text-lg font-semibold shadow hover:bg-[color:var(--color-primary-brown)]/90 transition mb-8">
+        <Link href={"/about"} className="bg-[color:var(--color-primary-light-brown)] text-white px-8 py-3 rounded-xl text-lg font-semibold shadow hover:bg-[color:var(--color-primary-brown)]/90 transition mb-8">
           Learn More
-        </button>
+        </Link>
       </div>
 
       {/* Slider */}

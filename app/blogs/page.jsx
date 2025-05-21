@@ -42,11 +42,11 @@ export default function BlogPage() {
     <main className="bg-white min-h-screen w-full">
       {/* Banner */}
      <Banner
-  title="Blogs"
+  title="Blog"
   subtitle={
     <span className="text-center font-medium text-white/70">
       <Link href="/" className="hover:underline ">Home</Link> /{" "}
-      <span className="text-white font-bold text-white">Blogs</span>
+      <Link className="text-white font-bold text-white hover:underline ">Blog</Link>
     </span>
   }
   image="/mdcl/g1.jpg"

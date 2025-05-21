@@ -5,21 +5,28 @@ import Link from "next/link";
 export default function CompanyProfile() {
   return (
     <main className="bg-white">
-  
-
-<Banner
-  title="About Us"
-  subtitle={
-    <span className="text-center font-medium text-white/70">
-      <Link href="/" className="hover:underline">Home</Link> /{" "}
-      <Link href="/about" className="hover:underline ">About Us</Link> /{" "}
-      <Link href="/about/company-profile" className="hover:underline text-white font-bold">
-        Company Profile
-      </Link>
-    </span>
-  }
-  image="/mdcl/g4.jpg"
-/>
+      <Banner
+        title="About Us"
+        subtitle={
+          <span className="text-center font-medium text-white/70">
+            <Link href="/" className="hover:underline">
+              Home
+            </Link>{" "}
+            /{" "}
+            <Link href="/about" className="hover:underline ">
+              About Us
+            </Link>{" "}
+            /{" "}
+            <Link
+              href="/about/company-profile"
+              className="hover:underline text-white font-bold"
+            >
+              Company Profile
+            </Link>
+          </span>
+        }
+        image="/mdcl/g4.jpg"
+      />
 
       <Deco />
       {/* Intro Section - Figma layout */}
@@ -27,22 +34,24 @@ export default function CompanyProfile() {
         <div className="flex items-center justify-between">
           {/* Left: Heading and text */}
           <div className="w-[50%]">
-            <h2 className="text-2xl font-bold mb-4 uppercase text-[var(--color-title-text)]">
+            {/* <h2 className="text-2xl font-bold mb-4 uppercase text-[var(--color-title-text)]">
               MICRODEVELOPMENT CONSULTING LIMITED
-            </h2>
+            </h2> */}
             <div className="flex gap-2">
               <span className="block w-[25px] h-[55px] bg-[var(--color-primary-olive)]"></span>
               <p className="text-justify text-[18px] text-gray-700 mb-6">
-                MicroDevelopment Consulting Limited (MDCL) is a Centre for
-                Management Development (CMD) accredited multidisciplinary
-                consulting firm that focuses on research, project management and
-                capacity development. Registered in 2009 by its founder and CEO,
-                it has a team of permanent employees and associate consultants
-                that are proficient in their fields, including: economics,
-                conflict and crisis management, agriculture, rural development,
-                development management, finance and accounting, training
-                practice, management development, organizational development,
-                communication and change management.
+                Established in 2009 by its founder and Chairman/Chief Executive
+                Officer, Furera Isma Jumare, MicroDevelopment Consulting Limited
+                (MDCL) began as a multidisciplinary firm offering research,
+                project management, and capacity development solutions to
+                address complex development challenges in Nigeria, across
+                different sectors.
+                <br /> <br /> In 2025, MDCL refined its strategic
+                focus—transforming into a specialised consulting firm committed
+                to advancing women’s empowerment in agriculture. By narrowing
+                its scope to agricultural systems and value chains, MDCL bridges
+                the gap in the delivery of tailored, impact-driven solutions
+                that yield measurable outcomes.
               </p>
             </div>
           </div>
@@ -72,16 +81,16 @@ export default function CompanyProfile() {
             <span className="block w-[25px] h-[55px] bg-[var(--color-primary-olive)]"></span>
 
             <p className="text-justify text-[18px] text-gray-700 mb-4">
-              Established in 2009 by its founder and Chairman/Chief Executive
-              Officer, Furera Isma Jumare, MicroDevelopment Consulting Limited
-              (MDCL) began as a multidisciplinary firm offering research,
-              project management and capacity development solutions to address
-              complex development challenges in Nigeria, across different
-              sectors. In 2025, MDCL refined its strategic focus—transforming
-              into a specialised consulting firm committed to advancing women's
-              empowerment in agriculture. By narrowing its scope to agricultural
-              systems and value chains, MDCL bridges the gap in the delivery of
-              tailored, impact-driven solutions that yield measurable outcomes.
+              Our approach is grounded in strengthening institutions, fostering
+              innovation, and building inclusive systems that amplify women’s
+              voices and leadership in agriculture. We are dedicated to
+              equipping women in agriculture with the tools, knowledge, and
+              opportunities needed to thrive—economically, socially, and
+              professionally.<br/> <br/> While Northern Nigeria remains our foundational
+              base, MDCL’s ambition is continental. We are steadfast in our
+              commitment to supporting women across Africa, unlocking their
+              potential as changemakers in agriculture and sustainable
+              development.
             </p>
           </div>
         </div>
@@ -104,12 +113,12 @@ export default function CompanyProfile() {
       {/* WHAT WE ARE */}
       <section className="bg-[fbfbfd] py-10">
         <div className="max-w-6xl mx-auto px-4">
-        <div className="flex space-x-3 mb-6 ">
-          <span className="block w-[2px] h-[30px] bg-[var(--color-primary-olive)]"></span>
+          <div className="flex space-x-3 mb-6 ">
+            <span className="block w-[2px] h-[30px] bg-[var(--color-primary-olive)]"></span>
             <h3 className="text-xl font-bold  uppercase text-[var(--color-title-text)]">
-            WHAT WE ARE
-          </h3>
-        </div>
+              WHAT WE ARE
+            </h3>
+          </div>
           <div className="grid md:grid-cols-3 gap-6">
             <div className="bg-[url('/mdcl/bg4.png')] h-[195px] font-bold text-[var(--color-primary-olive)] bg-cover bg-center rounded-[20px] p-6 shadow flex flex-col items-start">
               <span className=" text-[14px]  mb-5">

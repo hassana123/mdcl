@@ -18,7 +18,7 @@ export default function ProjectsPage() {
         image="/mdcl/g4.jpg"
       />
       <Deco />
-      <div className="mt-20 mb-10 text-center">
+      <div className="mt-20 mb-20 text-center">
         <h1 className="uppercase text-2xl mb-5 font-bold text-[var(--color-title-text)]">Projects</h1>
         <p className="text-md text-gray-700">Our services are designed to meet the evolving needs of development actors.</p>
       </div>
