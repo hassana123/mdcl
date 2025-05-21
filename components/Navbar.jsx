@@ -82,7 +82,8 @@ const Navbar = () => {
         {/* Desktop nav */}
         <ul className="hidden lg:flex gap-6 items-center text-[var(--color-link-inactive)]">
           {navItems.map(({ label, href, hasDropdown }) => {
-            const isActive = pathname === href || pathname.startsWith(href);
+            const isActive = pathname === href || (href !== "/" && pathname.startsWith(href));
+
 
             if (label === "About Us") {
               return (
