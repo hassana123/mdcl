@@ -151,7 +151,7 @@ export default function CompanyProfile() {
       </section>
 
       {/* OUR ASPIRATION & WHAT WE COMMIT TO */}
-      <section className="max-w-6xl mx-auto px-4 py-10 grid md:grid-cols-2 gap-8 items-center">
+      <section className="max-w-6xl mx-auto relative  py-20 grid md:grid-cols-2 gap-20 items-center">
         <div>
           <div className="relative z-0">
             <div className="absolute -top-8 -left-9 z-[-1]">
@@ -170,7 +170,7 @@ export default function CompanyProfile() {
               OUR ASPIRATION
             </h4>
           </div>
-          <p className="text-gray-700 mb-4">
+          <p className=" mb-4 text-[20px]">
             To be a trusted partner in empowering women across Africa to
             participate meaningfully and thrive in agricultural systems and
             value chains.
@@ -199,19 +199,26 @@ export default function CompanyProfile() {
               WHAT WE COMMIT TO
             </h4>
           </div>
-          <p className="text-gray-700">
+          <p className="text-[20px]">
             Through research, project management, and capacity development, we
             are dedicated to equipping women with the knowledge, skills, and
             opportunities that enhance their participation, amplify their
             voices, and empower them to thrive in agriculture.
           </p>
         </div>
-        <div className="flex justify-center">
-          <Image
+        <div className="absolute top-[45%] left-[47%] ">
+            <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+<circle cx="15" cy="15" r="15" fill="#F4B767"/>
+</svg>
+
+          </div>
+
+        <div className="flex w-[100%] justify-center">
+                    <Image
             src="/mdcl/w1.png"
             alt="Women in Agriculture"
-            width={320}
-            height={220}
+            width={1000}
+            height={1000}
             className="rounded-xl object-cover"
           />
         </div>
