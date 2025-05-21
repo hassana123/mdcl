@@ -95,7 +95,7 @@ export default function CompanyProfile() {
           </div>
         </div>
         {/* Approach paragraph full width */}
-        <div className="mt-6">
+        {/* <div className="mt-6">
           <p className="text-justify text-[18px] text-gray-700">
             Our approach is grounded in strengthening institutions, fostering
             innovation, and building inclusive systems that amplify women's
@@ -107,11 +107,11 @@ export default function CompanyProfile() {
             across Africa, unlocking their potential as changemakers in
             agriculture and sustainable development.
           </p>
-        </div>
+        </div> */}
       </section>
 
       {/* WHAT WE ARE */}
-      <section className="bg-[fbfbfd] py-10">
+      <section className="bg-[#fbfbfd] py-10">
         <div className="max-w-6xl mx-auto px-4">
           {/* <div className="flex space-x-3 mb-6 ">
             <span className="block w-[2px] h-[30px] bg-[var(--color-primary-olive)]"></span>
