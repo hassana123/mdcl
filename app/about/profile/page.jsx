@@ -38,7 +38,7 @@ export default function CompanyProfile() {
               MICRODEVELOPMENT CONSULTING LIMITED
             </h2> */}
             <div className="flex gap-2">
-              <span className="block w-[25px] h-[55px] bg-[var(--color-primary-olive)]"></span>
+              <span className="block w-[10px] h-[55px] bg-[var(--color-primary-olive)]"></span>
               <p className="text-justify text-[18px] text-gray-700 mb-6">
                 Established in 2009 by its founder and Chairman/Chief Executive
                 Officer, Furera Isma Jumare, MicroDevelopment Consulting Limited
@@ -56,29 +56,29 @@ export default function CompanyProfile() {
             </div>
           </div>
           {/* Right: Two stacked images */}
-          <div className="">
+          <div className="w-[45%]">
             <Image
               src="/mdcl/g2.png"
               alt="About MDCL"
-              width={420}
-              height={100}
+              width={1000}
+              height={1000}
               className="rounded-xl object-cover mb-2"
             />
           </div>
         </div>
         {/* Below: Image left, text right */}
         <div className="flex justify-between items-center my-10">
-          <div className="">
+          <div className=" w-[45%]">
             <Image
               src="/mdcl/g7.jpg"
               alt="MDCL Engagement"
-              width={420}
-              height={100}
+              width={1000}
+              height={1000}
               className="rounded-xl object-cover mb-2"
             />
           </div>
           <div className=" w-[50%] flex gap-2">
-            <span className="block w-[25px] h-[55px] bg-[var(--color-primary-olive)]"></span>
+            <span className="block w-[10px] h-[55px] bg-[var(--color-primary-olive)]"></span>
 
             <p className="text-justify text-[18px] text-gray-700 mb-4">
               Our approach is grounded in strengthening institutions, fostering
