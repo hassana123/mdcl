@@ -28,14 +28,14 @@ const projects = {
       title: "Leadership Workshop for Women in Agriculture",
       summary: "Workshop to build leadership capacity among women in agricultural value chains.",
       description: `Workshop to build leadership capacity among women in agricultural value chains.\n\nParticipants engaged in hands-on activities, group discussions, and mentorship sessions.`,
-      images: ["/mdcl/g5.jpg"]
+      images: ["/mdcl/g5.png"]
     },
     {
       id: "mentorship-programme",
       title: "Mentorship Programme for Young Entrepreneurs",
       summary: "Mentorship and coaching for young entrepreneurs in the agricultural sector.",
       description: `Mentorship and coaching for young entrepreneurs in the agricultural sector.\n\nThe program matched experienced mentors with aspiring entrepreneurs for six months.`,
-      images: ["/mdcl/g6.jpg"]
+      images: ["/mdcl/g6.png"]
     }
   ],
   "project-management": [
