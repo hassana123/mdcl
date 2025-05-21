@@ -12,7 +12,7 @@ export default function ProjectsPage() {
         subtitle={
           <span className="text-center font-medium text-white/70">
             <Link href="/" className="hover:underline">Home</Link> /{" "}
-            <Link href="/project" className="hover:underline text-white font-bold">Projects</Link>
+            <Link href="/projects" className="hover:underline text-white font-bold">Projects</Link>
           </span>
         }
         image="/mdcl/g4.jpg"
