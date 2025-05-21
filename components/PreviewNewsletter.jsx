@@ -17,7 +17,7 @@ const newsletters = [
 
 const PreviewNewsletter = () => {
   return (
-    <section className="w-full min-h-[600px] bg-[color:var(--color-primary-olive)]/20 py-16 px-2 flex flex-col items-center justify-center">
+    <section className="w-full min-h-[600px] bg-[color:var(--color-primary-olive)]/20 py-16 flex flex-col items-center justify-center">
       {/* Heading and Description */}
       <h2 className="text-2xl uppercase md:text-3xl font-bold text-center mb-2 text-[color:var(--color-primary-olive)]">
         Subscribe to our newsletter

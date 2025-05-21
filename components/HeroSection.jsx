@@ -183,12 +183,13 @@ const HeroSection = () => {
       </div>
 
       {/* Slider */}
-      <div className="relative w-full z-10">
+      <div className="relative w-full overflow-hidden z-10">
         <Swiper
           modules={[Autoplay]}
           slidesPerView={5}
           centeredSlides
           loop
+         
           autoplay={{ delay: 3500 }}
           onSlideChange={(swiper) => setActiveIndex(swiper.realIndex)}
           className="w-full overflow-hidden"
@@ -196,11 +197,11 @@ const HeroSection = () => {
           {heroImages.map((src, index) => (
             <SwiperSlide
               key={index}
-              className="flex justify-center items-center"
+              className=""
             >
               <div
-                className={`relative w-[200px] h-[240px] md:w-[260px] md:h-[300px] transition-transform duration-500 rounded-[20px] overflow-hidden shadow-md
-                ${index === activeIndex ? "scale-108  z-20 " : "scale-80 z-10"}
+                className={`relative transition-transform w-[300px] h-[450px] duration-500 rounded-[20px] overflow-hidden shadow-md
+                ${index === activeIndex ? "scale-100  z-20 " : "scale-80 z-10"}
               `}
               >
                 <Image

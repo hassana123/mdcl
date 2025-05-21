@@ -9,7 +9,7 @@ const Slideshow = () => {
 const eventImages = Array.from({ length: 20 }, (_, i) => `/mdcl/gallery/g (${i + 1}).jpg`);
 
   return (
-      <section className="w-full px-4 py-8 bg-white mt-10">
+      <section className="w-full py-8 bg-white mt-10">
       
       <Swiper
         modules={[Autoplay]}

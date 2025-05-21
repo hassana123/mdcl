@@ -59,7 +59,7 @@ export default function BlogPage() {
          Blog Posts
         </h2>
         <p className="text-base text-gray-700 text-center mb-8 max-w-xl">
-          Here's a quick glance over our  blog posts and media articles
+          Here's a quick glance over our  blog posts 
         </p>
       </section>
 

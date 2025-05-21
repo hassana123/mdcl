@@ -3,7 +3,7 @@ import Image from "next/image";
 import { Twitter, Linkedin, Instagram, Facebook } from "lucide-react";
 const Contact = () => {
   return (
-    <section className="w-full max-w-6xl bg-white mx-auto py-16 px-4 flex flex-col md:flex-row items-center justify-between">
+    <section className="w-[85%] mx-auto bg-white mx-auto py-16 px-4 flex flex-col md:flex-row items-center justify-between">
       {/* Left: Contact Info Card */}
       <div className="bg-[url('/mdcl/bg1.png')] bg-cover bg-center text-white  rounded-xl shadow-lg p-6 flex-1 max-w-md relative overflow-hidden">
         <h2 className="text-lg font-semibold mb-6">Contact Information</h2>

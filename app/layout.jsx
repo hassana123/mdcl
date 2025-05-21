@@ -12,7 +12,7 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body
         suppressHydrationWarning
-        className="bg-white leading-relaxed min-h-screen flex flex-col font-segoe antialiased"
+        className="bg-white overflow-x-hidden leading-relaxed min-h-screen flex flex-col font-segoe antialiased"
         style={{ fontFamily: 'Segoe UI, system-ui, Arial, sans-serif' }}
       >
         <Navbar />

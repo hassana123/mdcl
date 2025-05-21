@@ -27,7 +27,7 @@ const blogs = [
 
 const PreviewBlog = () => {
   return (
-    <section className="w-full max-w-6xl mx-auto py-16 px-4 flex flex-col items-center">
+    <section className="w-[85%] mx-auto mx-auto py-16  flex flex-col items-center">
       {/* Section Title */}
       <h2 className="text-2xl md:text-3xl font-bold text-[var(--color-title-text)] text-center mb-5">
        Blog Posts
