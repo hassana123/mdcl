@@ -104,9 +104,12 @@ export default function CompanyProfile() {
       {/* WHAT WE ARE */}
       <section className="bg-[fbfbfd] py-10">
         <div className="max-w-6xl mx-auto px-4">
-          <h3 className="text-xl font-bold mb-6 uppercase text-[var(--color-title-text)]">
+        <div className="flex space-x-3 mb-6 ">
+          <span className="block w-[2px] h-[30px] bg-[var(--color-primary-olive)]"></span>
+            <h3 className="text-xl font-bold  uppercase text-[var(--color-title-text)]">
             WHAT WE ARE
           </h3>
+        </div>
           <div className="grid md:grid-cols-3 gap-6">
             <div className="bg-[url('/mdcl/bg4.png')] h-[195px] font-bold text-[var(--color-primary-olive)] bg-cover bg-center rounded-[20px] p-6 shadow flex flex-col items-start">
               <span className=" text-[14px]  mb-5">

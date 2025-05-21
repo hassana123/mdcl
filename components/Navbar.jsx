@@ -5,27 +5,37 @@ import Image from "next/image";
 import logo from "../public/mdcl/logo.jpg";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Menu, X } from "lucide-react";
 
 const Navbar = () => {
   const pathname = usePathname();
-  const [aboutOpen, setAboutOpen] = useState(false);
-  const aboutRef = useRef(null);
 
-  // Close dropdown on outside click
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [aboutOpen, setAboutOpen] = useState(false);
+  const [projectsOpen, setProjectsOpen] = useState(false);
+
+  const aboutRef = useRef(null);
+  const projectsRef = useRef(null);
+
+  // Close dropdowns on outside click
   useEffect(() => {
-    function handleClick(e) {
-      if (aboutRef.current && !aboutRef.current.contains(e.target)) {
+    function handleClickOutside(e) {
+      if (
+        aboutRef.current &&
+        !aboutRef.current.contains(e.target) &&
+        projectsRef.current &&
+        !projectsRef.current.contains(e.target)
+      ) {
         setAboutOpen(false);
+        setProjectsOpen(false);
       }
     }
-    if (aboutOpen) {
-      document.addEventListener("mousedown", handleClick);
-    } else {
-      document.removeEventListener("mousedown", handleClick);
-    }
-    return () => document.removeEventListener("mousedown", handleClick);
-  }, [aboutOpen]);
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const toggleMobile = () => setMobileOpen((prev) => !prev);
 
   const navItems = [
     { label: "Home", href: "/" },
@@ -38,87 +48,201 @@ const Navbar = () => {
     { label: "Contact Us", href: "/contact" },
   ];
 
+  const renderDropdown = (items, onClose) =>
+    items.map(({ href, label }) => (
+      <Link
+        key={href}
+        href={href}
+        className="block px-4 py-2 text-sm hover:bg-[var(--color-primary-olive)]/10 transition"
+        onClick={onClose}
+      >
+        {label}
+      </Link>
+    ));
+
   return (
     <header className="bg-white shadow-sm">
-      <div className="bg-[var(--color-primary-olive)] py-3 text-white text-[20px]">
-        <div className="flex justify-between w-[85%] mx-auto">
+      {/* Top bar */}
+      <div className="bg-[var(--color-primary-olive)] py-3 text-white text-[14px]">
+        <div className="flex justify-between w-[90%] mx-auto">
           <small className="underline">info@microdevelopmentng.com</small>
           <small>Phone Numbers: +234(0)92920265, +234(0)8052026025</small>
         </div>
       </div>
 
-      <nav className="flex w-[85%] mx-auto items-center justify-between">
-        <div className="logo">
+      {/* Navbar */}
+      <nav className="w-[90%] mx-auto flex items-center justify-between ">
+        {/* Logo */}
+        <div>
           <Image src={logo} alt="Logo" width={100} height={50} />
         </div>
 
-        <div className="links">
-          <ul className="flex text-[var(--color-link-inactive)] justify-center gap-4">
-            {navItems.map(({ label, href, hasDropdown }) => {
-              const isActive = pathname === href || (label === "About Us" && pathname.startsWith("/about"));
-              if (label === "About Us") {
-                return (
-                  <li
-                    key={href}
-                    className="relative"
-                    ref={aboutRef}
-                    onMouseEnter={() => setAboutOpen(true)}
-                    onMouseLeave={() => setAboutOpen(false)}
-                  >
-                    <button
-                      className={`flex items-center transition-colors focus:outline-none ${
-                        isActive
-                          ? "text-[var(--color-primary-olive)] font-bold"
-                          : "text-[var(--color-link-inactive)]"
+        {/* Desktop nav */}
+        <ul className="hidden lg:flex gap-6 items-center text-[var(--color-link-inactive)]">
+          {navItems.map(({ label, href, hasDropdown }) => {
+            const isActive = pathname === href || pathname.startsWith(href);
+
+            if (label === "About Us") {
+              return (
+                <li key={label} ref={aboutRef} className="relative">
+                  <div className="flex items-center gap-1 cursor-pointer">
+                    <Link
+                      href={href}
+                      className={`transition-colors ${
+                        isActive ? "text-[var(--color-primary-olive)] font-bold" : ""
                       }`}
-                      onClick={() => setAboutOpen((v) => !v)}
-                      aria-haspopup="true"
-                      aria-expanded={aboutOpen}
-                      type="button"
                     >
                       {label}
+                    </Link>
+                    <button
+                      onClick={() => setAboutOpen((prev) => !prev)}
+                      className="focus:outline-none"
+                    >
                       <ChevronDown
-                        strokeWidth={0.8}
                         size={20}
-                        className={`ml-1 transition-transform ${aboutOpen ? "rotate-180" : "rotate-0"}`}
+                        className={`transition-transform ${aboutOpen ? "rotate-180" : "rotate-0"}`}
                       />
                     </button>
-                    {/* Dropdown */}
+                  </div>
+
+                  {aboutOpen && (
+                    <div className="absolute left-0 mt-2 w-48 bg-white border rounded shadow-lg z-50">
+                      {renderDropdown(
+                        [
+                          { href: "/about/profile", label: "Company Profile" },
+                          { href: "/about/team", label: "Our Team" },
+                        ],
+                        () => setAboutOpen(false)
+                      )}
+                    </div>
+                  )}
+                </li>
+              );
+            }
+
+            if (label === "Projects & Programmes") {
+              return (
+                <li key={label} ref={projectsRef} className="relative">
+                  <div className="flex items-center gap-1 cursor-pointer">
+                    <Link
+                      href={href}
+                      className={`transition-colors ${
+                        isActive ? "text-[var(--color-primary-olive)] font-bold" : ""
+                      }`}
+                    >
+                      {label}
+                    </Link>
+                    <button
+                      onClick={() => setProjectsOpen((prev) => !prev)}
+                      className="focus:outline-none"
+                    >
+                      <ChevronDown
+                        size={20}
+                        className={`transition-transform ${projectsOpen ? "rotate-180" : "rotate-0"}`}
+                      />
+                    </button>
+                  </div>
+
+                  {projectsOpen && (
+                    <div className="absolute left-0 mt-2 w-56 bg-white border rounded shadow-lg z-50">
+                      {renderDropdown(
+                        [
+                          { href: "/projects/research", label: "Research Projects" },
+                          { href: "/projects/management", label: "Project Management" },
+                          { href: "/projects/capacity", label: "Capacity Development" },
+                        ],
+                        () => setProjectsOpen(false)
+                      )}
+                    </div>
+                  )}
+                </li>
+              );
+            }
+
+            return (
+              <li key={href}>
+                <Link
+                  href={href}
+                  className={`transition-colors ${
+                    isActive ? "text-[var(--color-primary-olive)] font-bold" : ""
+                  }`}
+                >
+                  {label}
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+
+        {/* Hamburger */}
+        <div className="lg:hidden">
+          <button onClick={toggleMobile}>
+            {mobileOpen ? <X size={28} /> : <Menu size={28} />}
+          </button>
+        </div>
+      </nav>
+
+      {/* Mobile Menu */}
+      {mobileOpen && (
+        <div className="lg:hidden bg-white px-6 pb-6 pt-2 border-t shadow-md">
+          <ul className="flex flex-col gap-4 text-[var(--color-link-inactive)]">
+            {navItems.map(({ label, href, hasDropdown }) => {
+              if (label === "About Us") {
+                return (
+                  <li key={label} className="relative" ref={aboutRef}>
+                    <div className="flex justify-between items-center">
+                      <Link href={href} onClick={() => setMobileOpen(false)}>
+                        {label}
+                      </Link>
+                      <button onClick={() => setAboutOpen((prev) => !prev)}>
+                        <ChevronDown className={`${aboutOpen ? "rotate-180" : ""} transition-transform`} />
+                      </button>
+                    </div>
                     {aboutOpen && (
-                      <div className="absolute left-0 top-full mt-2 w-48 bg-white border border-gray-100 rounded shadow-lg z-50 animate-fade-in">
-                        <Link
-                          href="/about/profile"
-                          className={`block px-4 py-2 text-sm hover:bg-[var(--color-primary-olive)]/10 transition ${{
-                            true: "font-bold text-[var(--color-primary-olive)]",
-                          }[pathname === "/about/profile"]}`}
-                          onClick={() => setAboutOpen(false)}
-                        >
-                          Company Profile
-                        </Link>
-                        <Link
-                          href="/about/team"
-                          className={`block px-4 py-2 text-sm hover:bg-[var(--color-primary-olive)]/10 transition ${{
-                            true: "font-bold text-[var(--color-primary-olive)]",
-                          }[pathname === "/about/team"]}`}
-                          onClick={() => setAboutOpen(false)}
-                        >
-                          Our Team
-                        </Link>
+                      <div className="mt-1 ml-4 border-l pl-3">
+                        {renderDropdown(
+                          [
+                            { href: "/about/profile", label: "Company Profile" },
+                            { href: "/about/team", label: "Our Team" },
+                          ],
+                          () => setMobileOpen(false)
+                        )}
                       </div>
                     )}
                   </li>
                 );
               }
+
+              if (label === "Projects & Programmes") {
+                return (
+                  <li key={label} className="relative" ref={projectsRef}>
+                    <div className="flex justify-between items-center">
+                      <Link href={href} onClick={() => setMobileOpen(false)}>
+                        {label}
+                      </Link>
+                      <button onClick={() => setProjectsOpen((prev) => !prev)}>
+                        <ChevronDown className={`${projectsOpen ? "rotate-180" : ""} transition-transform`} />
+                      </button>
+                    </div>
+                    {projectsOpen && (
+                      <div className="mt-1 ml-4 border-l pl-3">
+                        {renderDropdown(
+                          [
+                            { href: "/projects/research", label: "Research Projects" },
+                            { href: "/projects/management", label: "Project Management" },
+                            { href: "/projects/capacity", label: "Capacity Development" },
+                          ],
+                          () => setMobileOpen(false)
+                        )}
+                      </div>
+                    )}
+                  </li>
+                );
+              }
+
               return (
                 <li key={href}>
-                  <Link
-                    href={href}
-                    className={`flex items-center transition-colors ${
-                      isActive
-                        ? "text-[var(--color-primary-olive)] font-bold"
-                        : "text-[var(--color-link-inactive)]"
-                    }`}
-                  >
+                  <Link href={href} onClick={() => setMobileOpen(false)}>
                     {label}
                   </Link>
                 </li>
@@ -126,7 +250,7 @@ const Navbar = () => {
             })}
           </ul>
         </div>
-      </nav>
+      )}
     </header>
   );
 };
