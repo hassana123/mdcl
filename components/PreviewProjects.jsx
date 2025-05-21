@@ -15,21 +15,21 @@ const PreviewProjects = () => {
       title: "Research",
       link: "/projects/research",
       description:
-        "We believe in driving evidence-based policy through actionable research. By supporting organizations to conduct studies, gathering data, and turning insights into impactful programs and reports.",
+        "We promote evidence-based policy and practice through rigorous research. By collecting and analysing data, we generate knowledge that informs and strengthens the design and implementation of sustainable development initiatives.",
     },
     {
       src: "/mdcl/p1.svg",
       title: "Project Management",
       link: "/projects/project-management",
       description:
-        "Good planning and evaluation lead to successful, lasting projects. At MDCL, we support development agencies in designing, managing, and assessing social impact projects for better outcomes.",
+        "Effective planning, monitoring, and evaluation are key to successful, goal-oriented, and sustainable project and programme outcomes.",
     },
     {
       src: "/mdcl/p2.svg",
       title: "Capacity Development",
       link: "/projects/capacity-development",
       description:
-        "Strong institutions drive sustainable impact. MDCL helps organizations build capacity through needs assessments, training, mentorship, and tailored workshops to improve service delivery.",
+        "trengthening the skills and capabilities of institutions and personnel is essential for improving service delivery and ensuring the long-term success of development efforts.",
     },
   ];
 
