@@ -37,7 +37,7 @@ const ProjectDisplay = ({
             <div key={proj.id} className="flex flex-col">
               <div className="relative w-full h-60 rounded-xl overflow-hidden mb-3">
                 <Image
-                  src={proj.image}
+                  src={proj.images[0]}
                   alt={proj.title}
                   fill
                   className="object-cover rounded-xl"
@@ -45,14 +45,14 @@ const ProjectDisplay = ({
                 />
               </div>
               <Link
-                href={`/project/${category}/${proj.id}`}
+                href={`/projects/${category}/${proj.id}`}
                 className="font-semibold underline text-[var(--color-title-text)] mb-2 hover:text-[var(--color-primary-olive)]"
               >
                 {proj.title}
               </Link>
               <p className="text-sm text-gray-700 mb-2">{proj.summary}</p>
               <Link
-                href={`/project/${category}/${proj.id}`}
+                href={`/projects/${category}/${proj.id}`}
                 className="text-[var(--color-primary-brown)] text-sm font-semibold hover:underline mt-auto flex items-center gap-1"
               >
                 Read More <span className="text-lg">→</span>

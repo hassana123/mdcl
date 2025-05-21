@@ -201,7 +201,7 @@ const HeroSection = () => {
             >
               <div
                 className={`relative transition-transform w-[300px] h-[450px] duration-500 rounded-[20px] overflow-hidden shadow-md
-                ${index === activeIndex ? "scale-100  z-20 " : "scale-80 z-10"}
+                ${index === activeIndex ? "scale-90  z-20 " : "scale-70 z-10"}
               `}
               >
                 <Image

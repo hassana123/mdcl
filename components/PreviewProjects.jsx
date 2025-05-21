@@ -29,7 +29,7 @@ const PreviewProjects = () => {
       title: "Capacity Development",
       link: "/projects/capacity-development",
       description:
-        "trengthening the skills and capabilities of institutions and personnel is essential for improving service delivery and ensuring the long-term success of development efforts.",
+        "Strengthening the skills and capabilities of institutions and personnel is essential for improving service delivery and ensuring the long-term success of development efforts.",
     },
   ];
 
