@@ -101,7 +101,7 @@ export default function CompanyProfile() {
             innovation, and building inclusive systems that amplify women's
             voices and leadership in agriculture. We are dedicated to equipping
             women in agriculture with the tools, knowledge, and opportunities
-            needed to thrive—economically, socially, and professionally. While
+            needed to thrive—economically, socially, and professionally. <br/><br/>While
             Northern Nigeria remains our foundational base, MDCL's ambition is
             continental. We are steadfast in our commitment to supporting women
             across Africa, unlocking their potential as changemakers in
@@ -121,27 +121,27 @@ export default function CompanyProfile() {
           </div>
           <div className="grid md:grid-cols-3 gap-6">
             <div className="bg-[url('/mdcl/bg4.png')] h-[195px] font-bold text-[var(--color-primary-olive)] bg-cover bg-center rounded-[20px] p-6 shadow flex flex-col items-start">
-              <span className=" text-[14px]  mb-5">
-                INNOVATION & CAPACITY BUILDERS
+              <span className=" text-[14px] text-[var(--color-title-text)] mb-5">
+                INNOVATION & CAPACITY BUILDING
               </span>
-              <p className="text-[13.5px]">
+              <p className="text-[20px] w-[82%]">
                 We deliver training and tools that help women in agriculture
                 thrive.
               </p>
             </div>
             <div className="bg-[url('/mdcl/bg3.png')] font-bold text-[var(--color-primary-brown)] bg-cover bg-center rounded-[20px] p-6 shadow flex flex-col items-start">
-              <span className="font-bold text-[14px]  mb-5">
+              <span className="font-bold  text-[14px]  text-[var(--color-title-text)] mb-5">
                 WOMEN-FOCUSED AGRI-CATALYSTS
               </span>
-              <p className="text-[13.5px]">
+              <p className="text-[20px] w-[82%]">
                 We design programs that turn women farmers into market leaders.
               </p>
             </div>
             <div className="bg-[url('/mdcl/bg2.png')] font-bold text-[var(--color-primary-magenta)] bg-cover bg-center rounded-[20px] p-6 shadow flex flex-col items-start">
-              <span className="text-[14px] mb-5">
+              <span className="text-[14px] mb-5  text-[var(--color-title-text)]">
                 NORTHERN ROOTS, PAN-AFRICAN VISION
               </span>
-              <p className="text-[13.5px]">
+              <p className="text-[20px] w-[82%]">
                 From Northern Nigeria, we scale women-led solutions across
                 Africa.
               </p>
