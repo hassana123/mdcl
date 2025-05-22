@@ -55,7 +55,7 @@ Mr. Jumare has a Bachelor of Arts degree in International Business and has atten
     image: "/mdcl/team/hafsah.jpg",
     profile: "#",
     intro:
-      "Hafsah Jumare is a behavioural economist and social entrepreneur focused on transforming traditional agricultural markets across Africa through digital infrastructure and inclusive solutions.",
+      "Hafsah Jumare is a behavioural economist and social entrepreneur focused on transforming traditional agricultural markets across Africa. She is the Founder and CEO of CoAmana, a company building digital infrastructure to support informal trade—connecting farmers and agri-traders to pricing data, credit, insurance, and procurement tools. CoAmana works in close partnership with development agencies, financial institutions, and research organizations to deepen its impact and scale inclusive solutions across rural economies.",
     bio: `She holds a Master’s degree in Applied Economics (with Distinction) from the University of Cape Town, where her research on farmer adoption of technology and financial services led to multiple publications and earned her the Commerce Faculty’s Award of Excellence in Environmental Policy.
 
 Hafsah leads operations in Nigeria and Kenya, working across rural and semi-urban hubs. Through CoAmana’s flagship platforms; Amana Market and Amana Insights, she equips market actors with offline-first tools like USSD and call centers, helping them digitize trade, access finance, and build resilience in low-connectivity environments.
@@ -158,7 +158,7 @@ function TeamProfileModal({ member, onClose }) {
           {member.bio}
         </div>
         {/* Social Links */}
-        {member.socials?.length > 0 && (
+        {/* {member.socials?.length > 0 && (
           <div className="mt-6">
             <div className="font-semibold text-gray-700 mb-2">Social Media Handles</div>
             <div className="flex gap-4">
@@ -181,7 +181,7 @@ function TeamProfileModal({ member, onClose }) {
               })}
             </div>
           </div>
-        )}
+        )} */}
       </div>
     </div>
   );
