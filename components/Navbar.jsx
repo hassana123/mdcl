@@ -63,7 +63,7 @@ const Navbar = () => {
     ));
 
   return (
-    <header className="bg-white shadow-sm">
+    <header className="bg-white border-b  border-[var(--color-primary-fuchia)] ">
       {/* Top bar */}
       {/* <div className="bg-[var(--color-primary-fuchia)] py-3 text-black text-[17px]">
         <div className="flex justify-between w-[90%] mx-auto">
@@ -73,7 +73,7 @@ const Navbar = () => {
       </div> */}
 
       {/* Navbar */}
-      <nav className="w-[90%] mx-auto flex items-center justify-between ">
+      <nav className="w-[90%]   mx-auto flex items-center justify-between ">
         {/* Logo */}
         <div>
           <Image src={logo} alt="Logo" width={100} height={50} />

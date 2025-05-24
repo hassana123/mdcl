@@ -123,7 +123,7 @@ const HeroSection = () => {
   const [activeIndex, setActiveIndex] = useState(0);
 
   return (
-    <section className="relative  w-full mx-auto flex flex-col items-center justify-center overflow-hidden">
+    <section className="relative mt-10  w-full mx-auto flex flex-col items-center justify-center overflow-hidden">
       {/* Decorative background shape */}
       <div className="absolute -left-5 -top-5">
         <svg
@@ -166,7 +166,7 @@ const HeroSection = () => {
         </svg>
       </div>
       {/* Centered Text */}
-      <div className=" flex flex-col items-center z-10 text-center">
+      <div className=" w-[60%] flex flex-col items-center z-10 text-center">
         <h1 className="text-2xl md:text-3xl font-bold text-[var(--color-title-text)] leading-snug mb-4">
           {heroTitle.map((line, idx) => (
             <span key={idx} className="block">
@@ -174,10 +174,10 @@ const HeroSection = () => {
             </span>
           ))}
         </h1>
-        <p className="text-base md:text-lg text-gray-700 max-w-5xl mb-6">
+        <p className="text-base md:text-lg text-gray-700 max-w-5xl mb-4">
           {heroSubtitle}
         </p>
-        <Link href={"/about"} className="bg-[color:var(--color-primary-light-brown)] text-white px-8 py-3 rounded-xl text-lg font-semibold shadow hover:bg-[color:var(--color-primary-brown)]/90 transition mb-8">
+        <Link href={"/about"} className="bg-[color:var(--color-primary-light-brown)] text-white px-8 py-3 rounded-xl text-lg font-semibold shadow hover:bg-[color:var(--color-primary-brown)]/90 transition mb-4">
           Learn More
         </Link>
       </div>
@@ -200,7 +200,7 @@ const HeroSection = () => {
               className=""
             >
               <div
-                className={`relative transition-transform w-[300px] h-[450px] duration-500 rounded-[20px] overflow-hidden shadow-md
+                className={`relative transition-transform w-[300px] h-[350px] duration-500 rounded-[20px] overflow-hidden shadow-md
                 ${index === activeIndex ? "scale-90  z-20 " : "scale-70 z-10"}
               `}
               >
