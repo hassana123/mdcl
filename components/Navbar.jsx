@@ -65,12 +65,12 @@ const Navbar = () => {
   return (
     <header className="bg-white shadow-sm">
       {/* Top bar */}
-      <div className="bg-[var(--color-primary-fuchia)] py-3 text-black text-[17px]">
+      {/* <div className="bg-[var(--color-primary-fuchia)] py-3 text-black text-[17px]">
         <div className="flex justify-between w-[90%] mx-auto">
           <small className="underline">info@microdevelopmentng.com</small>
           <small>Phone Numbers: +234(0)92920265, +234(0)8052026025</small>
         </div>
-      </div>
+      </div> */}
 
       {/* Navbar */}
       <nav className="w-[90%] mx-auto flex items-center justify-between ">

@@ -123,7 +123,7 @@ const HeroSection = () => {
   const [activeIndex, setActiveIndex] = useState(0);
 
   return (
-    <section className="relative mt-20 w-full mx-auto flex flex-col items-center justify-center overflow-hidden">
+    <section className="relative  w-full mx-auto flex flex-col items-center justify-center overflow-hidden">
       {/* Decorative background shape */}
       <div className="absolute -left-5 -top-5">
         <svg
