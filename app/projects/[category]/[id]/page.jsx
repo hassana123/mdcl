@@ -17,13 +17,13 @@ export default function ProjectDetailsPage({ params }) {
   }
 
   return (
-    <main className="bg-white md:w-[85%] w-[95%] mx-auto">
+    <main className="bg-white ">
       <Banner
         title="Projects"
         subtitle={<span className="text-base font-medium">Home / Projects / {category.charAt(0).toUpperCase() + category.slice(1)}</span>}
         image="/mdcl/g4.jpg"
       />
-      <div className="py-12">
+      <div className="py-12 md:w-[85%] w-[95%] mx-auto">
         <Link href={`/projects/${category}`} className="text-[var(--color-primary-olive)] font-semibold mb-6 inline-block">&larr; Back</Link>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-start mt-4">
           {/* Left: Text */}
