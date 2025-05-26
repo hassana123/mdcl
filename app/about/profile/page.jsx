@@ -28,9 +28,9 @@ export default function CompanyProfile() {
         image="/mdcl/g4.jpg"
       />
 
-    <div className="lg:block hidden md:w-[85%] mx-auto">
-    <Deco/>
-   </div>
+      <div className="lg:block hidden md:w-[85%] mx-auto">
+        <Deco />
+      </div>
       {/* Intro Section - Figma layout */}
       <section className="max-w-6xl mx-auto  my-20">
         <div className="md:flex items-center justify-between">
@@ -88,7 +88,8 @@ export default function CompanyProfile() {
               voices and leadership in agriculture. We are dedicated to
               equipping women in agriculture with the tools, knowledge, and
               opportunities needed to thrive—economically, socially, and
-              professionally.<br/> <br/> While Northern Nigeria remains our foundational
+              professionally.
+              <br /> <br /> While Northern Nigeria remains our foundational
               base, MDCL’s ambition is continental. We are steadfast in our
               commitment to supporting women across Africa, unlocking their
               potential as changemakers in agriculture and sustainable
@@ -104,7 +105,6 @@ export default function CompanyProfile() {
               className="rounded-xl object-cover mb-2"
             />
           </div>
-       
         </div>
         {/* Approach paragraph full width */}
         {/* <div className="mt-6">
@@ -218,15 +218,20 @@ export default function CompanyProfile() {
             voices, and empower them to thrive in agriculture.
           </p>
         </div>
-        <div className="absolute top-[45%] left-[47%] ">
-            <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
-<circle cx="15" cy="15" r="15" fill="#F4B767"/>
-</svg>
-
-          </div>
+        <div className="absolute md:block hidden top-[45%] left-[47%] ">
+          <svg
+            width="30"
+            height="30"
+            viewBox="0 0 30 30"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <circle cx="15" cy="15" r="15" fill="#F4B767" />
+          </svg>
+        </div>
 
         <div className="flex w-[100%] justify-center">
-                    <Image
+          <Image
             src="/mdcl/w1.png"
             alt="Women in Agriculture"
             width={1000}
