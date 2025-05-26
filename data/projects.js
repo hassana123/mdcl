@@ -12,7 +12,7 @@ const projects = {
       title: "Kaduna State Ministry of Business, Innovation and Technology (MBIT): Impact assessment of Kaduna State Government's Entrepreneurship Programmes",
       summary: "Impact assessment of entrepreneurship programmes in Kaduna State.",
       description: `In October 2019, our firm was commissioned by the Kaduna State Ministry of Business, Innovation and Technology (MBIT) to assess the impact of the state's entrepreneurship programmes.\n\nOverview\nWe were to assess the effectiveness and impact of Kaduna State's entrepreneurship programmes. The assessment focused on programme alignment, economic outcomes, and areas for improvement.\n\nObjectives\n• Evaluate alignment with programme missions and goals\n• Assess financial and economic impact on beneficiaries and the state\n• Identify implementation gaps and recommend reforms\n• Propose actionable improvement strategies\n\nMethodology\n• Target Population: 83,442\n• Sample Size: 3,969 respondents\n\nTools:\n• 3,428 questionnaires\n• 12 key informant interviews\n• 6 focus group discussions\n\nSome of the programmes Assessed\n• KADSTEP\n• COSDEC\n• GIZ\n• OCP\n• KADCABS\n\nThe results provided evidence-based insights to support programme optimisation and policy refinement for entrepreneurship development in Kaduna State.`,
-      images: ["/mdcl/g2.png", "/mdcl/g3.jpg", "/mdcl/w1.png"]
+      images: ["/mdcl/g2.png", "/mdcl/g3.jpg", "/mdcl/gallery/g (5).jpg"]
     }
   ],
   "capacity-development": [

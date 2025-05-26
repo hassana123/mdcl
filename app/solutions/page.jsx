@@ -40,11 +40,13 @@ const Solutions = () => {
         }
         image="/mdcl/g4.jpg"
       />
-      <Deco />
-      <div className='mt-20 mb-10 text-center'>
+  <div className="lg:block hidden md:w-[85%] mx-auto">
+    <Deco/>
+   </div>
+      <div className='mt-20 mb-10 md:w-[85%] w-[95%] mx-auto text-center'>
         <h1 className='uppercase text-2xl mb-3 font-bold text-[var(--color-primary-olive)]'>THE SOLUTIONS WE OFFER</h1>
         <p className='text-md text-gray-700 mb-10'>Our services are designed to meet the evolving needs of development actors.</p>
-        <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 text-left">
+        <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 text-justify">
           <div className="space-y-8">
             <div>
               <div className="font-bold text-[17px] mb-1">Consulting and Advisory Services</div>

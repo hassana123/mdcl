@@ -9,7 +9,7 @@ export default function ProjectDetailsPage({ params }) {
 
   if (!project) {
     return (
-      <main className="max-w-4xl mx-auto py-20 px-4 text-center">
+      <main className="md:w-[85%] w-[95%] mx-auto py-20  text-center">
         <h1 className="text-2xl font-bold mb-4">Project Not Found</h1>
         <Link href="/projects" className="text-[var(--color-primary-olive)] underline">Back to Projects</Link>
       </main>
@@ -17,13 +17,13 @@ export default function ProjectDetailsPage({ params }) {
   }
 
   return (
-    <main className="bg-white min-h-screen">
+    <main className="bg-white md:w-[85%] w-[95%] mx-auto">
       <Banner
         title="Projects"
         subtitle={<span className="text-base font-medium">Home / Projects / {category.charAt(0).toUpperCase() + category.slice(1)}</span>}
         image="/mdcl/g4.jpg"
       />
-      <div className="max-w-6xl mx-auto px-4 py-12">
+      <div className="py-12">
         <Link href={`/projects/${category}`} className="text-[var(--color-primary-olive)] font-semibold mb-6 inline-block">&larr; Back</Link>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-start mt-4">
           {/* Left: Text */}

@@ -56,8 +56,8 @@ const PreviewProjects = () => {
       <section className="grid md:grid-cols-3 gap-10">
         {items.map((item, index) => (
           <div className="space-y-5" key={index}>
-            <div className="bg-[var(--color-primary-olive)] rounded-full flex justify-center items-center w-24 h-24">
-              <Image src={item.src} alt={item.title} width={65} height={50} />
+            <div className="bg-[var(--color-primary-olive)] rounded-full flex justify-center items-center w-18 h-18">
+              <Image src={item.src} alt={item.title} width={45} height={30} />
             </div>
             <h4 className="mt-4 font-semibold text-[#323539] text-[26px]">
               {item.title}

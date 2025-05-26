@@ -58,7 +58,7 @@ export default function CompanyProfile() {
           {/* Right: Two stacked images */}
           <div className="w-[45%]">
             <Image
-              src="/mdcl/g2.png"
+              src="/mdcl/gallery/g (2).jpg"
               alt="About MDCL"
               width={1000}
               height={1000}
@@ -70,7 +70,7 @@ export default function CompanyProfile() {
         <div className="flex justify-between items-center my-10">
           <div className=" w-[45%]">
             <Image
-              src="/mdcl/g7.jpg"
+              src="/mdcl/gallery/g (5).jpg"
               alt="MDCL Engagement"
               width={1000}
               height={1000}
@@ -320,8 +320,8 @@ export default function CompanyProfile() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6  text-center">
             {/* Row 1 */}
-            <div className="bg-white rounded-xl shadow flex flex-col items-start border border-gray-100">
-              <div className="w-full py-3 text-white  rounded-t-xl bg-[var(--color-primary-brown)] mb-3">
+            <div className="bg-white rounded-xl shadow-m flex flex-col items-start border-3 border-[var(--color-primary-light-brown)]">
+              <div className="w-full py-3 text-white  bg-[var(--color-primary-light-brown)] mb-3">
                 <span className="font-bold  mb-2 px-4 pt-2">
                   Institutional Capacity Development
                 </span>
@@ -331,8 +331,8 @@ export default function CompanyProfile() {
                 agriculture.
               </p>
             </div>
-            <div className="bg-white rounded-xl shadow flex flex-col items-start border border-gray-100">
-              <div className="w-full py-3 rounded-t-xl text-white bg-[var(--color-primary-olive)] mb-3">
+            <div className="bg-white rounded-xl border-3 border-[var(--color-primary-olive)] shadow flex flex-col items-start ">
+              <div className="w-full py-3  text-white bg-[var(--color-primary-olive)] mb-3">
                 <span className="font-bold  mb-2 px-4 pt-2">
                   Women's Empowerment in Agriculture
                 </span>
@@ -342,8 +342,8 @@ export default function CompanyProfile() {
                 agriculture.
               </p>
             </div>
-            <div className="bg-white rounded-xl shadow flex flex-col items-start border border-gray-100">
-              <div className="w-full py-3 text-white rounded-t-xl bg-[var(--color-primary-brown)] mb-3">
+            <div className="bg-white rounded-xl border-3 border-[var(--color-primary-light-brown)] shadow flex flex-col items-start ">
+              <div className="w-full py-3 text-white  bg-[var(--color-primary-light-brown)] mb-3">
                 <span className="font-bold  mb-2 px-4 pt-2">
                   Research and Innovation
                 </span>
@@ -355,8 +355,8 @@ export default function CompanyProfile() {
               </p>
             </div>
             {/* Row 2 */}
-            <div className="bg-white rounded-xl shadow flex flex-col items-start border border-gray-100">
-              <div className="w-full py-3 text-white rounded-t-xl bg-[var(--color-primary-brown)] mb-3">
+            <div className="bg-white border-3 border-[var(--color-primary-light-brown)] rounded-xl shadow flex flex-col items-start ">
+              <div className="w-full py-3 text-white  bg-[var(--color-primary-light-brown)] mb-3">
                 <span className="font-bold  mb-2 px-4 pt-2">
                   Sustainable Agribusiness Development
                 </span>
@@ -367,8 +367,8 @@ export default function CompanyProfile() {
                 sustainably—preserving both livelihoods and the environment.
               </p>
             </div>
-            <div className="bg-white rounded-xl shadow flex flex-col items-start border border-gray-100">
-              <div className="w-full py-3 text-white rounded-t-xl bg-[var(--color-primary-olive)] mb-3">
+            <div className="bg-white rounded-xl shadow flex flex-col items-start border-3 border-[var(--color-primary-olive)]">
+              <div className="w-full py-3 text-white  bg-[var(--color-primary-olive)] mb-3">
                 <span className="font-bold  mb-2 px-4 pt-2">
                   Strategic Partnerships and Advocacy
                 </span>
@@ -378,8 +378,8 @@ export default function CompanyProfile() {
                 women's roles in agriculture.
               </p>
             </div>
-            <div className="bg-white rounded-xl shadow flex flex-col items-start border border-gray-100">
-              <div className="w-full py-3 text-white rounded-t-xl bg-[var(--color-primary-brown)] mb-3">
+            <div className="bg-white rounded-xl shadow flex flex-col items-start border-3 border-[var(--color-primary-light-brown)]">
+              <div className="w-full py-3 text-white  bg-[var(--color-primary-light-brown)] mb-3">
                 <span className="font-bold  mb-2 px-4 pt-2">
                   Research and Innovation
                 </span>

@@ -6,7 +6,7 @@ import Link from "next/link";
 
 export default function ProjectsPage() {
   return (
-    <main className="bg-white min-h-screen">
+    <main className="bg-white ">
       <Banner
         title="Projects"
         subtitle={
@@ -17,7 +17,11 @@ export default function ProjectsPage() {
         }
         image="/mdcl/g4.jpg"
       />
-      <Deco />
+   <div className="lg:block hidden md:w-[85%] mx-auto">
+ <div className="lg:block hidden md:w-[85%] mx-auto">
+    <Deco/>
+   </div>
+   </div>
       <div className="mt-20 mb-20 text-center">
         <h1 className="uppercase text-2xl mb-5 font-bold text-[var(--color-title-text)]">Projects</h1>
         <p className="text-md text-gray-700">Our services are designed to meet the evolving needs of development actors.</p>

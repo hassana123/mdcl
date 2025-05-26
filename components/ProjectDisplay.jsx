@@ -18,7 +18,9 @@ const ProjectDisplay = ({
         subtitle={subtitle}
         image={bannerImage}
       />
-      <Deco/>
+     <div className="lg:block hidden md:w-[85%] mx-auto">
+    <Deco/>
+   </div>
       {/* Floating Chat Button */}
       {/* <div className="fixed right-8 top-[340px] z-30 flex flex-col items-center">
         <button className="bg-[color:var(--color-primary-olive)] text-white w-14 h-14 rounded-full flex flex-col items-center justify-center shadow-lg">

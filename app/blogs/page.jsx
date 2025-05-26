@@ -52,7 +52,9 @@ export default function BlogPage() {
   }
   image="/mdcl/g1.jpg"
 />
+<div className="lg:block hidden md:w-[85%] mx-auto">
     <Deco/>
+   </div>
       {/* Section Title and Subtitle */}
       <section className="max-w-6xl mx-auto px-4 mt-20 mb-10 flex flex-col items-center">
         <h2 className="text-2xl md:text-3xl font-bold text-[var(--color-title-text)] text-center mb-2">

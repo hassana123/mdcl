@@ -16,7 +16,7 @@ export default function RootLayout({ children }) {
         style={{ fontFamily: 'Segoe UI, system-ui, Arial, sans-serif' }}
       >
         <Navbar />
-        <main className="flex-1">{children}</main>
+        <main className="flex-1 overflow-x-hidden">{children}</main>
         <Footer />
       </body>
     </html>

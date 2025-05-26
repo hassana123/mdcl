@@ -9,10 +9,10 @@ const PreviewAboutUs = () => {
         About Us
       </h3>
       <div className="flex justify-between items-center">
-        <div className="text-[var(--color-title-text)]  w-[65%] space-y-5 ">
+        <div className="text-[var(--color-title-text)]  w-[45%] space-y-5 ">
           <div className="flex gap-2">
             <div className="bg-[color:var(--color-primary-olive)] w-[8px] h-[55px] my-2"></div>
-            <p className="text-[16px] text-justify">
+            <p className="text-[16px] text-justify mb-5">
               Established in 2009 by its founder and Chairman/Chief Executive
               Officer, Furera Isma Jumare, MicroDevelopment Consulting Limited
               (MDCL) began as a multidisciplinary firm offering research,
@@ -32,9 +32,9 @@ const PreviewAboutUs = () => {
             Learn More
           </Link>
         </div>
-      <div className="w-[30%]">
+      <div className="w-[40%]">
           <Image
-          src={"/mdcl/g1.jpg"}
+          src={"/mdcl/gallery/g (10).jpg"}
           alt="About Us"
           width={1000}
           height={1000}

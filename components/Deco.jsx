@@ -2,7 +2,7 @@ import React from 'react'
 
 const Deco = () => {
   return (
-    <div><div className="absolute  top-[55%]">
+    <div><div className="absolute left-0 top-[55%]">
             <svg
               width="100"
               height="366"

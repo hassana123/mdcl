@@ -11,9 +11,9 @@ const Footer = () => {
   return (
     <footer className="w-full text-[16px] py-2 bg-[var(--color-primary-light-olive)]">
       {/* Top Row: Email and Phone */}
-      <div className="flex justify-between items-center max-w-6xl mx-auto w-full mb-2 ">
-        <span className="">info@microdevelopmentng.com</span>
-        <span className="">
+      <div className="md:flex space-y-5 justify-between items-center max-w-6xl mx-auto w-full mb-2 ">
+        <span className="block">info@microdevelopmentng.com</span>
+        <span className=" block">
           Phone Number: +234(0)92920265, +234(0)8052026025
         </span>
       </div>
