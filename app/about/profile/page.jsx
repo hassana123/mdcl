@@ -28,12 +28,14 @@ export default function CompanyProfile() {
         image="/mdcl/g4.jpg"
       />
 
-      <Deco />
+    <div className="lg:block hidden md:w-[85%] mx-auto">
+    <Deco/>
+   </div>
       {/* Intro Section - Figma layout */}
       <section className="max-w-6xl mx-auto  my-20">
-        <div className="flex items-center justify-between">
+        <div className="md:flex items-center justify-between">
           {/* Left: Heading and text */}
-          <div className="w-[50%]">
+          <div className="md:px-0 px-2 md:w-[50%]">
             {/* <h2 className="text-2xl font-bold mb-4 uppercase text-[var(--color-title-text)]">
               MICRODEVELOPMENT CONSULTING LIMITED
             </h2> */}
@@ -56,7 +58,7 @@ export default function CompanyProfile() {
             </div>
           </div>
           {/* Right: Two stacked images */}
-          <div className="w-[45%]">
+          <div className="md:w-[45%] w-[80%] md:mx-0 mx-auto ">
             <Image
               src="/mdcl/gallery/g (2).jpg"
               alt="About MDCL"
@@ -67,8 +69,8 @@ export default function CompanyProfile() {
           </div>
         </div>
         {/* Below: Image left, text right */}
-        <div className="flex justify-between items-center my-10">
-          <div className=" w-[45%]">
+        <div className=" md:flex  justify-between items-center my-10">
+          <div className=" md:block hidden  md:w-[45%] w-[80%] md:mx-0 mx-auto">
             <Image
               src="/mdcl/gallery/g (5).jpg"
               alt="MDCL Engagement"
@@ -77,7 +79,7 @@ export default function CompanyProfile() {
               className="rounded-xl object-cover mb-2"
             />
           </div>
-          <div className=" w-[50%] flex gap-2">
+          <div className=" md:w-[50%] md:px-0 px-3 flex gap-2">
             <span className="block w-[10px] h-[55px] bg-[var(--color-primary-olive)]"></span>
 
             <p className="text-justify text-[18px] text-gray-700 mb-4">
@@ -93,6 +95,16 @@ export default function CompanyProfile() {
               development.
             </p>
           </div>
+          <div className=" md:hiden block  md:w-[45%] w-[80%] md:mx-0 mx-auto">
+            <Image
+              src="/mdcl/gallery/g (5).jpg"
+              alt="MDCL Engagement"
+              width={1000}
+              height={1000}
+              className="rounded-xl object-cover mb-2"
+            />
+          </div>
+       
         </div>
         {/* Approach paragraph full width */}
         {/* <div className="mt-6">
@@ -151,7 +163,7 @@ export default function CompanyProfile() {
       </section>
 
       {/* OUR ASPIRATION & WHAT WE COMMIT TO */}
-      <section className="max-w-6xl mx-auto relative  py-20 grid md:grid-cols-2 gap-20 items-center">
+      <section className="md:w-[85%] w-[95%] mx-auto relative text-justify  py-20 grid md:grid-cols-2 gap-20 items-center">
         <div>
           <div className="relative z-0">
             <div className="absolute -top-8 -left-9 z-[-1]">
