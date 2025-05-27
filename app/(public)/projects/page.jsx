@@ -1,4 +1,4 @@
-import Banner from "../../components/Banner";
+import Banner from "@/components/Banner";
 import Deco from "@/components/Deco";
 import PreviewProjects from "@/components/PreviewProjects";
 import Partners from "@/components/Partners";

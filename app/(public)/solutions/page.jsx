@@ -1,5 +1,5 @@
 import React from 'react'
-import Banner from "../../components/Banner";
+import Banner from '@/components/Banner';
 import Deco from "@/components/Deco";
 import Partners from '@/components/Partners';
 import Link from 'next/link';
@@ -57,7 +57,7 @@ const Solutions = () => {
           {solutions.slice(0, 3).map((solution, index) => (
             <div key={index} className="bg-white border-l-[4px] border-[var(--color-primary-light-brown)] p-6 rounded-lg shadow-md flex flex-col items-center text-center">
               {/* Icon Placeholder */}
-              <Image className='mx-auto mb-5' src={solution.icon} width={100} height={100} />
+              <Image alt='icon' className='mx-auto mb-5' src={solution.icon} width={100} height={100} />
               {/* <div className="w-12 h-12 bg-gray-200 rounded-full mb-4"></div> */}
               <div className="font-bold text-[17px] mb-2">{solution.title}</div>
               <div className="text-gray-700 text-[15px]">{solution.desc}</div>
@@ -67,7 +67,7 @@ const Solutions = () => {
         <div className="max-w-3xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 text-left">
           {solutions.slice(3).map((solution, index) => (
             <div key={index} className="bg-white border-l-[4px] border-[var(--color-primary-light-brown)] p-6 rounded-lg shadow-md flex flex-col items-center text-center">
-             <Image className='mx-auto mb-5' src={solution.icon} width={100} height={100} />
+             <Image alt='icon' className='mx-auto mb-5' src={solution.icon} width={100} height={100} />
               {/* <div className="w-12 h-12 bg-gray-200 rounded-full mb-4"></div> */}
             
               <div className="font-bold text-[17px] mb-2">{solution.title}</div>

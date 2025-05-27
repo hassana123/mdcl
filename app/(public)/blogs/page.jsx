@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import Banner from "../../components/Banner";
+import Banner from "@/components/Banner";
 import Image from "next/image";
 import Deco from "@/components/Deco";
 import Link from "next/link"; 
