@@ -124,7 +124,7 @@ const ProjectList = ({ projects, onProjectDeleted }) => {
             onChange={(e) => handleCategoryChange(e.target.value)}
           >
             {categories.map(category => (
-              <option key={category} value={category}>{category}</option>
+              <option className='capitalize' key={category} value={category}>{category}</option>
             ))}
           </select>
         </div>
@@ -149,7 +149,7 @@ const ProjectList = ({ projects, onProjectDeleted }) => {
           <button 
             key={category}
             onClick={() => handleCategoryChange(category)}
-            className={`px-4 my-2 text-gray-700 ${
+            className={`px-4 my-2 text-gray-700 capitalize ${
               selectedCategory === category ? 'border-b rounded-lg border-b-green-700' : ''
             }`}
           >

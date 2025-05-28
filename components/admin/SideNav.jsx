@@ -13,7 +13,7 @@ const SideNav = () => {
     const sidebarLinks = [
         { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
         { href: "/admin/projects", label: "Projects & Programmes", icon: FolderOpen },
-        { href: "/admin/blog", label: "Blog", icon: FileText },
+        { href: "/admin/blogs", label: "Blog", icon: FileText },
         { href: "/admin/gallery", label: "Gallery", icon: ImageIcon },
         { href: "/admin/resources", label: "Resources", icon: BookOpen },
     ];

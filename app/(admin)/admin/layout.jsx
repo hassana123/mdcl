@@ -13,7 +13,7 @@ function getHeaderTitle(pathname) {
   const titles = {
     'dashboard': 'Dashboard',
     'projects': 'Projects & Programmes',
-    'blog': 'Blog',
+    'blogs': 'Blog',
     'gallery': 'Gallery',
     'resources': 'Resources',
     'login': 'Login'
