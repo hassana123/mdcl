@@ -2,16 +2,18 @@
 import React, { useState, useEffect } from 'react';
 import { collection, getDocs, query, orderBy } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
+import { useAuth } from '../AuthProvider';
 import ProjectList from '@/components/admin/projects/ProjectList';
 import AddProjectModal from '@/components/admin/projects/AddProjectModal';
-import { useAuth } from '../AuthProvider';
+import AddCategoryModal from '@/components/admin/projects/AddCategoryModal';
 
 const AdminProjectsPage = () => {
   const { user } = useAuth();
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
+  const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
 
   useEffect(() => {
     fetchProjects();
@@ -40,12 +42,25 @@ const AdminProjectsPage = () => {
   };
 
   const handleAddProjectClick = () => {
-    setIsModalOpen(true);
+    setIsProjectModalOpen(true);
   };
 
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
+  const handleAddCategoryClick = () => {
+    setIsCategoryModalOpen(true);
+  };
+
+  const handleCloseProjectModal = () => {
+    setIsProjectModalOpen(false);
     fetchProjects(); // Refresh projects after adding new one
+  };
+
+  const handleCloseCategoryModal = () => {
+    setIsCategoryModalOpen(false);
+  };
+
+  const handleCategoryAdded = () => {
+    // This will be passed to AddCategoryModal to refresh categories
+    setIsCategoryModalOpen(false);
   };
 
   if (!user) {
@@ -70,10 +85,12 @@ const AdminProjectsPage = () => {
           >
             Add New Project
           </button>
-           {/* Add New Category button if needed based on UI */}
-           <button className="bg-gray-300 text-gray-800 py-2 px-4 rounded-md hover:bg-gray-400 transition-colors">
-             Add New Category
-           </button>
+          <button 
+            className="bg-gray-300 text-gray-800 py-2 px-4 rounded-md hover:bg-gray-400 transition-colors"
+            onClick={handleAddCategoryClick}
+          >
+            Add New Category
+          </button>
         </div>
       </div>
 
@@ -93,7 +110,14 @@ const AdminProjectsPage = () => {
         <ProjectList projects={projects} />
       )}
 
-      {isModalOpen && <AddProjectModal onClose={handleCloseModal} />}
+      {isProjectModalOpen && <AddProjectModal onClose={handleCloseProjectModal} />}
+      {isCategoryModalOpen && (
+        <AddCategoryModal 
+          isOpen={isCategoryModalOpen}
+          onClose={handleCloseCategoryModal}
+          onCategoryAdded={handleCategoryAdded}
+        />
+      )}
     </div>
   );
 };

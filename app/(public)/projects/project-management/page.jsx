@@ -10,7 +10,7 @@ export default function ProjectManagementPage() {
             Home{" "}/ {" "} 
           </Link>
           <Link href={"/projects"} className="hover:underline">
-            Projects{" "}/ {" "}
+            Projects{" "}/
           </Link>
           <Link
             href={"/projects/project-management"}

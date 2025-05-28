@@ -96,7 +96,7 @@ export default function CompanyProfile() {
               development.
             </p>
           </div>
-          <div className=" md:hidden block  md:w-[45%] w-[80%] md:mx-0 mx-auto">
+          <div className=" md:hidden block w-[80%]  mx-auto">
             <Image
               src="/mdcl/gallery/g (5).jpg"
               alt="MDCL Engagement"

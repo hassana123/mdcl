@@ -4,7 +4,7 @@ import Link from "next/link";
 export default function ResearchProjectsPage() {
   return (
     <ProjectDisplay
-      title="Projects"
+      title="Research"
        subtitle={ <span className="text-base font-medium text-white/70">
           <Link href={"/"} className="hover:underline">
             Home{" "}/{" "}

@@ -1,15 +1,16 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { storage, db } from '@/lib/firebase';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { collection, addDoc } from 'firebase/firestore';
+import { collection, addDoc, getDocs } from 'firebase/firestore';
 import { useAuth } from '@/app/(admin)/admin/AuthProvider';
 
 const AddProjectModal = ({ onClose }) => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [categories, setCategories] = useState([]);
   const [formData, setFormData] = useState({
     category: '',
     title: '',
@@ -21,6 +22,22 @@ const AddProjectModal = ({ onClose }) => {
   }]);
   const [files, setFiles] = useState([]);
   const [uploadProgress, setUploadProgress] = useState(0);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const categoriesRef = collection(db, 'categories');
+        const querySnapshot = await getDocs(categoriesRef);
+        const categoriesList = querySnapshot.docs.map(doc => doc.data().name);
+        setCategories(categoriesList);
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+        setError('Failed to load categories');
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   const handleAddSection = () => {
     setSections([...sections, { 
@@ -194,9 +211,11 @@ const AddProjectModal = ({ onClose }) => {
               required
             >
               <option value="">Select Category</option>
-              <option value="Research">Research</option>
-              <option value="Project Management">Project Management</option>
-              <option value="Capacity Development">Capacity Development</option>
+              {categories.map((category, index) => (
+                <option key={index} value={category}>
+                  {category}
+                </option>
+              ))}
             </select>
           </div>
 

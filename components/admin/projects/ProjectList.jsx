@@ -1,14 +1,29 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 
 const ProjectList = ({ projects }) => {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
+  const [categories, setCategories] = useState(['All']);
 
-  // Get unique categories from projects, but only show All and Research initially
-  const defaultCategories = ['All', 'Research'];
-  const allCategories = ['All', ...new Set(projects.map(project => project.category))];
-  const categories = allCategories.filter(cat => defaultCategories.includes(cat));
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const categoriesRef = collection(db, 'categories');
+        const querySnapshot = await getDocs(categoriesRef);
+        const categoriesList = ['All', ...querySnapshot.docs.map(doc => doc.data().name)];
+        setCategories(categoriesList);
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+        // Fallback to default categories if fetch fails
+        setCategories(['All', 'Research', 'Project Management', 'Capacity Development']);
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   // Filter projects based on category and search query
   const filteredProjects = projects.filter(project => {
