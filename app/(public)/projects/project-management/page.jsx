@@ -22,7 +22,7 @@ export default function ProjectManagementPage() {
     description="Effective planning, monitoring, and evaluation are key to successful, goal-oriented, and sustainable project and programme outcomes."
       projects={projects["project-management"]}
       category="project-management"
-      bannerImage="/mdcl/g4.jpg"
+     
     />
   );
 } 

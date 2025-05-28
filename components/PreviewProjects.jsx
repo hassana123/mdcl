@@ -34,10 +34,10 @@ const PreviewProjects = () => {
   ];
 
   return (
-    <div className="w-[85%] mx-auto">
+    <div className="md:w-[85%] w-[90%] mx-auto">
       {/* Conditionally show header and button only on /phones */}
       {pathname === "/" && (
-        <div className="flex justify-between items-center my-10">
+        <div className="md:flex md:space-y-0 space-y-10 justify-between items-center my-10">
           <div>
             <h3 className="text-[var(--color-primary-olive)] text-[30px] font-bold my-3">
               PROJECTS & PROGRAMMES

@@ -25,7 +25,7 @@ export default function CompanyProfile() {
             </Link>
           </span>
         }
-        image="/mdcl/g4.jpg"
+       
       />
 
       <div className="lg:block hidden md:w-[85%] mx-auto">

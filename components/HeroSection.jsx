@@ -1,107 +1,3 @@
-// "use client";
-// import React, { useState } from "react";
-// import Image from "next/image";
-// import { Swiper, SwiperSlide } from "swiper/react";
-// import { Autoplay } from "swiper/modules";
-// import "swiper/css";
-
-// const heroImages = [
-//   "/mdcl/g1.jpg",
-//   "/mdcl/g2.png",
-//   "/mdcl/g3.jpg",
-//   "/mdcl/g4.jpg",
-//   "/mdcl/g5.png",
-//   "/mdcl/g6.png",
-// ];
-
-// const HeroSection = () => {
-//   const [activeIndex, setActiveIndex] = useState(0);
-
-//   return (
-//     <section className="relative w-[85%] my-10 mx-auto flex flex-col md:flex-row items-center justify-between overflow-visible min-h-[420px]">
-//       {/* Left Side: Text */}
-//       <div className="flex-1 space-y-6 z-10">
-//         <h1 className="text-3xl md:text-4xl font-semibold leading-relaxed text-[var(--color-title-text)]">
-//           Empowering{" "}
-//           <span
-//             className="font-bold px-2 py-1 rounded-[50px]"
-//             style={{
-//               backgroundColor: "rgba(255,0,255,0.12)",
-//               color: "var(--color-primary-magenta)",
-//             }}
-//           >
-//             Development
-//           </span>
-//           <br />
-//           Through{" "}
-//           <span
-//             className="font-bold px-2 py-1 rounded-[50px]"
-//             style={{
-//               backgroundColor: "rgba(200,200,0,0.18)",
-//               color: "var(--color-primary-olive)",
-//             }}
-//           >
-//             Innovation
-//           </span>
-//           <br />
-//           and{" "}
-//           <span
-//             className="font-bold px-2 py-1 rounded-[50px]"
-//             style={{
-//               backgroundColor: "rgba(92,64,51,0.10)",
-//               color: "var(--color-primary-brown)",
-//             }}
-//           >
-//             Insight
-//           </span>
-//         </h1>
-//         <p className="text-lg text-gray-700 w-[45%]">
-//           We partner with organizations to deliver sustainable solutions through research, capacity building, and policy advisory.
-//         </p>
-//         <button className="bg-[color:var(--color-primary-brown)] text-white px-8 py-3 rounded-xl text-lg font-semibold shadow hover:bg-[color:var(--color-primary-brown)]/90 transition">
-//           Learn More
-//         </button>
-//       </div>
-
-//       {/* Right Side: Slider Overflows Right */}
-//       <div className="relative  mt-8 md:mt-0 z-10 w-full md:w-auto md:absolute md:right-[-100px]">
-//         <Swiper
-//           modules={[Autoplay]}
-//           slidesPerView={2.3}
-//           loop
-//           autoplay={{ delay: 3000 }}
-//           onSlideChange={(swiper) => setActiveIndex(swiper.realIndex)}
-//           className="w-[600px]  "
-//         >
-//           {heroImages.map((src, index) => (
-//             <SwiperSlide key={index} className="">
-//               <div
-//                 className={`relative  rounded-[20px] transition-all duration-300 overflow-hidden ${
-//                   index === activeIndex
-//                     ? "w-[250px] h-[400px]"
-//                     : "w-[250px] h-[300px] my-10"
-//                 }`}
-//               >
-//                 <Image
-//                   src={src}
-//                   alt={`Hero Slide ${index + 1}`}
-//                   fill
-//                   className="object-cover  rounded-[20px]"
-//                   priority={index === 0}
-//                 />
-//               </div>
-//             </SwiperSlide>
-//           ))}
-//         </Swiper>
-//       </div>
-
-//       {/* Decorative background shape */}
-//       <div className="absolute -left-32 top-1/2 -translate-y-1/2 w-72 h-72 bg-yellow-100 rounded-full opacity-30 z-0" />
-//     </section>
-//   );
-// };
-
-// export default HeroSection;
 "use client";
 import React, { useState } from "react";
 import Image from "next/image";
@@ -110,7 +6,6 @@ import { Autoplay } from "swiper/modules";
 import "swiper/css";
 import Link from "next/link";
 const heroImages = Array.from({ length: 20 }, (_, i) => `/mdcl/gallery/g (${i + 1}).jpg`);
-
 
 const heroTitle = [
   "Empowering Women. Transforming Agriculture.",
@@ -123,9 +18,9 @@ const HeroSection = () => {
   const [activeIndex, setActiveIndex] = useState(0);
 
   return (
-    <section className="relative mt-10  w-full mx-auto flex flex-col items-center justify-center overflow-hidden">
+    <section className="relative mt-10 w-full mx-auto flex flex-col items-center justify-center overflow-hidden">
       {/* Decorative background shape */}
-      <div className="absolute -left-5 -top-5">
+      <div className="absolute -left-5 -top-5 lg:block hidden">
         <svg
           width="152"
           height="366"
@@ -140,7 +35,7 @@ const HeroSection = () => {
           />
         </svg>
       </div>
-      <div className="absolute -right-5 -top-10">
+      <div className="absolute -right-5 -top-10 lg:block hidden">
         <svg
           width="202"
           height="325"
@@ -166,7 +61,7 @@ const HeroSection = () => {
         </svg>
       </div>
       {/* Centered Text */}
-      <div className=" w-[60%] flex flex-col items-center z-10 text-center">
+      <div className="lg:w-[60%] md:w-[85%] md:px-0 px-3 flex flex-col items-center z-10 text-center">
         <h1 className="text-2xl md:text-3xl font-bold text-[var(--color-title-text)] leading-snug mb-4">
           {heroTitle.map((line, idx) => (
             <span key={idx} className="block">
@@ -186,13 +81,35 @@ const HeroSection = () => {
       <div className="relative w-full overflow-hidden z-10">
         <Swiper
           modules={[Autoplay]}
-          slidesPerView={5}
+          spaceBetween={0}
+          slidesPerView={2}
           centeredSlides
           loop
-         
           autoplay={{ delay: 3500 }}
           onSlideChange={(swiper) => setActiveIndex(swiper.realIndex)}
           className="w-full overflow-hidden"
+          breakpoints={{
+            // when window width is >= 640px
+            640: {
+              slidesPerView: 2,
+              spaceBetween: 10,
+            },
+            // when window width is >= 768px
+            768: {
+              slidesPerView: 3,
+              spaceBetween: 10,
+            },
+            // when window width is >= 1024px
+            1024: {
+              slidesPerView: 4,
+              spaceBetween: 10,
+            },
+            // when window width is >= 1280px
+            1280: {
+              slidesPerView: 6,
+              spaceBetween: 5,
+            },
+          }}
         >
           {heroImages.map((src, index) => (
             <SwiperSlide
@@ -200,9 +117,9 @@ const HeroSection = () => {
               className=""
             >
               <div
-                className={`relative transition-transform w-[300px] h-[350px] duration-500 rounded-[20px] overflow-hidden shadow-md
-                ${index === activeIndex ? "scale-90  z-20 " : "scale-70 z-10"}
-              `}
+                className={`relative transition-transform w-full h-[350px] duration-500 rounded-[20px] overflow-hidden shadow-md
+                ${index === activeIndex ? "scale-90 z-20" : "scale-70 z-10"}
+                `}
               >
                 <Image
                   src={src}
@@ -210,6 +127,7 @@ const HeroSection = () => {
                   fill
                   className="object-cover rounded-[20px] transition-all"
                   priority={index === 0}
+                  quality={100}
                 />
               </div>
             </SwiperSlide>

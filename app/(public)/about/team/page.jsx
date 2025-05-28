@@ -136,6 +136,8 @@ function TeamProfileModal({ member, onClose }) {
                 alt={member.name}
                 width={1000}
                 height={1000}
+                loading="lazy"
+                quality={100}
                 className="rounded-xl"
               />
             </div>
@@ -211,7 +213,7 @@ export default function OurTeam() {
             </Link>
           </span>
         }
-        image="/mdcl/g4.jpg"
+       
       />
       <Deco />
       <section className="max-w-6xl mx-auto px-4 py-16">

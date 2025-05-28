@@ -75,7 +75,7 @@ const ProjectDisplay = ({
       <Banner
         title={title}
         subtitle={subtitle}
-        image={bannerImage}
+       
       />
       <div className="lg:block hidden md:w-[85%] mx-auto">
         <Deco/>
@@ -115,6 +115,8 @@ const ProjectDisplay = ({
                           src={proj.images[0]}
                           alt={proj.title}
                           fill
+                          loading="lazy"
+                          quality={100}
                           className="object-cover rounded-xl"
                           sizes="(max-width: 768px) 100vw, 33vw"
                         />

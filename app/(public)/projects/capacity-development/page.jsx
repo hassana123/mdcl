@@ -23,7 +23,7 @@ export default function CapacityDevelopmentPage() {
       } description="Strengthening the skills and capabilities of institutions and personnel is essential for improving service delivery and ensuring the long-term success of development efforts."
       projects={projects["capacity-development"]}
       category="capacity-development"
-      bannerImage="/mdcl/g4.jpg"
+     
     />
   );
 }

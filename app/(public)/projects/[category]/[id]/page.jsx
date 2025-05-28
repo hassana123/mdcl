@@ -151,6 +151,7 @@ export default function ProjectDetailsPage({ params }) {
                   src={img}
                   alt={project.title + ' image ' + (idx + 1)}
                   fill
+                  loading="lazy"
                   className="object-cover rounded-xl"
                   sizes="(max-width: 768px) 100vw, 50vw"
                 />

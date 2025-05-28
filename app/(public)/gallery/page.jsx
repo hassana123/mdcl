@@ -134,7 +134,7 @@ export default function GalleryPage() {
             </Link>{" "}
           </span>
         }
-        image="/mdcl/g4.jpg"
+        
       />
       {/* Gallery Content */}
       <section className="py-16 bg-background">
@@ -179,6 +179,7 @@ export default function GalleryPage() {
                   className="border-none rounded-lg overflow-hidden shadow-md"
                 >
                   <img
+                  loading="lazy"
                     src={item.images[0]}
                     alt={item.title}
                     className="w-full h-48 object-cover"

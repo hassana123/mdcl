@@ -15,7 +15,7 @@ const Newsletter = () => {
                 <Link href="/newsletter" className="hover:underline text-white font-bold">Newsletter</Link>
             </span>
             }
-            image="/mdcl/g4.jpg"
+           
         />
         <Deco />
         <PreviewNewsletter />

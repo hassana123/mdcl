@@ -50,7 +50,7 @@ export default function BlogPage() {
       <Link href="/blog" className="text-white font-bold text-white hover:underline ">Blog</Link>
     </span>
   }
-  image="/mdcl/g1.jpg"
+  
 />
 <div className="lg:block hidden md:w-[85%] mx-auto">
     <Deco/>
@@ -77,9 +77,11 @@ export default function BlogPage() {
                 src={blog.image}
                 alt={blog.title}
                 fill
+                loading="lazy"
+                quality={100}
                 className="object-cover"
                 sizes="(max-width: 768px) 100vw, 33vw"
-                priority={idx === 0}
+               
               />
             </div>
             <div className="p-5 flex flex-col flex-1">

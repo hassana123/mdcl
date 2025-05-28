@@ -4,12 +4,12 @@ import Link from "next/link";
 
 const PreviewAboutUs = () => {
   return (
-    <section className="w-[85%]  mx-auto my-20">
+    <section className="md:w-[85%] w-[95%]   mx-auto my-20">
       <h3 className="bg-[var(--color-title-text)]/30 my-5 rounded-[10px] text-black inline-block px-5 py-3">
         About Us
       </h3>
-      <div className="flex justify-between items-center">
-        <div className="text-[var(--color-title-text)]  w-[45%] space-y-5 ">
+      <div className="md:flex justify-between md:space-y-0 space-y-10 items-center">
+        <div className="text-[var(--color-title-text)]  md:w-[45%] space-y-5 ">
           <div className="flex gap-2">
             <div className="bg-[color:var(--color-primary-olive)] w-[8px] h-[55px] my-2"></div>
             <p className="text-[16px] text-justify mb-5">
@@ -32,7 +32,7 @@ const PreviewAboutUs = () => {
             Learn More
           </Link>
         </div>
-      <div className="w-[40%]">
+      <div className="md:w-[40%]">
           <Image
           src={"/mdcl/gallery/g (10).jpg"}
           alt="About Us"

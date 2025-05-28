@@ -63,6 +63,10 @@ const AdminProjectsPage = () => {
     setIsCategoryModalOpen(false);
   };
 
+  const handleProjectDeleted = () => {
+    fetchProjects();
+  };
+
   if (!user) {
     return (
       <div className="p-8">
@@ -107,7 +111,7 @@ const AdminProjectsPage = () => {
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-700"></div>
         </div>
       ) : (
-        <ProjectList projects={projects} />
+        <ProjectList projects={projects} onProjectDeleted={handleProjectDeleted} />
       )}
 
       {isProjectModalOpen && <AddProjectModal onClose={handleCloseProjectModal} />}

@@ -34,7 +34,7 @@ const Contact = () => {
   };
 
   return (
-    <section className="w-[85%] mx-auto bg-white py-16 px-4 flex flex-col md:flex-row items-center justify-between">
+    <section className="md:w-[85%] w-[90%] mx-auto bg-white py-16 px-4 space-y-10 md:space-y-0 md:flex items-center justify-between">
       {/* Left: Contact Info Card */}
       <div className="bg-[url('/mdcl/bg1.png')] bg-cover bg-center text-white  rounded-xl shadow-lg p-6 flex-1 max-w-md relative overflow-hidden">
         <h2 className="text-lg font-semibold mb-6">Contact Information</h2>

@@ -57,7 +57,7 @@ const Contact = () => {
             </Link>
           </span>
         }
-        image="/mdcl/g1.jpg"
+       
       />
       <section className="max-w-4xl mx-auto px-4 py-12">
         <form className="bg-white rounded-lg shadow-none mb-12" onSubmit={handleSubmit}>

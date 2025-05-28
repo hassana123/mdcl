@@ -32,13 +32,13 @@ const solutions = [
 
 const PreviewSolutions = () => {
   return (
-    <section className="w-[85%] mx-auto my-10">
-      <div className="grid grid-cols-2 space-y-8">
-        <h3 className="text-[40px] uppercase w-[60%] font-bold text-[var(--color-primary-olive)]">
+    <section className="md:w-[85%] w-[90%] mx-auto my-10">
+      <div className="grid md:grid-cols-2 space-y-8">
+        <h3 className="text-[40px] uppercase md:w-[60%] font-bold text-[var(--color-primary-olive)]">
           The Solutions we Offer
         </h3>
         {solutions.map((solution, index) => (
-          <div className="w-[70%] space-y-2" key={index}>
+          <div className="md:w-[70%] space-y-2" key={index}>
             <h4 className="text-[#323539] font-bold">{solution.title}</h4>
             <p className="text-[#191720] text-justify">
               {solution.description}

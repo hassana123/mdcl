@@ -22,7 +22,7 @@ export default function ResearchProjectsPage() {
       description="We promote evidence-based policy and practice through rigorous research. By collecting and analysing data, we generate knowledge that informs and strengthens the design and implementation of sustainable development initiatives."
       projects={projects.research}
       category="research"
-      bannerImage="/mdcl/g4.jpg"
+     
     />
   );
 } 

@@ -1,12 +1,47 @@
+'use client';
+
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, getDocs, doc, deleteDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
+import EditProjectModal from './EditProjectModal';
 
-const ProjectList = ({ projects }) => {
+const DeleteConfirmationModal = ({ project, onClose, onConfirm, loading }) => {
+  return (
+    <div className="fixed inset-0 bg-gray-700/30 flex items-center justify-center z-50">
+      <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-md">
+        <h3 className="text-lg font-semibold text-gray-800 mb-4">Confirm Delete</h3>
+        <p className="text-gray-600 mb-6">
+          Are you sure you want to delete the project "{project.title}"? This action cannot be undone.
+        </p>
+        <div className="flex justify-end space-x-4">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 transition-colors"
+            disabled={loading}
+          >
+            Cancel
+          </button>
+          <button
+            onClick={onConfirm}
+            className="px-4 py-2 rounded-md bg-red-600 text-white hover:bg-red-700 transition-colors disabled:opacity-50"
+            disabled={loading}
+          >
+            {loading ? 'Deleting...' : 'Delete'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const ProjectList = ({ projects, onProjectDeleted }) => {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [categories, setCategories] = useState(['All']);
+  const [editingProject, setEditingProject] = useState(null);
+  const [deletingProject, setDeletingProject] = useState(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -37,8 +72,46 @@ const ProjectList = ({ projects }) => {
     setSelectedCategory(category);
   };
 
+  const handleEditClick = (project) => {
+    setEditingProject(project);
+  };
+
+  const handleCloseEditModal = () => {
+    setEditingProject(null);
+  };
+
+  const handleDeleteClick = (project) => {
+    setDeletingProject(project);
+  };
+
+  const handleCloseDeleteModal = () => {
+    setDeletingProject(null);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deletingProject) return;
+
+    setDeleteLoading(true);
+    try {
+      const projectRef = doc(db, 'projects', deletingProject.id);
+      await deleteDoc(projectRef);
+      
+      // Call the callback to refresh the projects list
+      if (onProjectDeleted) {
+        onProjectDeleted();
+      }
+      
+      setDeletingProject(null);
+    } catch (error) {
+      console.error('Error deleting project:', error);
+      alert('Failed to delete project. Please try again.');
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
+
   return (
-    <div>
+    <div className="space-y-6">
       {/* Filter and Sort Area */}
       <div className="flex items-center justify-between space-x-20 mb-6">
         <div className='flex items-center space-x-4'>
@@ -125,10 +198,16 @@ const ProjectList = ({ projects }) => {
                 </p>
                 {/* Action Buttons */}
                 <div className="flex space-x-4">
-                  <button className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors text-sm">
+                  <button
+                    onClick={() => handleEditClick(project)}
+                    className="text-green-700 hover:text-green-800 transition-colors"
+                  >
                     Edit
                   </button>
-                  <button className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors text-sm">
+                  <button 
+                    onClick={() => handleDeleteClick(project)}
+                    className="text-red-600 hover:text-red-800 transition-colors"
+                  >
                     Delete
                   </button>
                 </div>
@@ -136,6 +215,22 @@ const ProjectList = ({ projects }) => {
             </div>
           ))}
         </div>
+      )}
+
+      {editingProject && (
+        <EditProjectModal
+          project={editingProject}
+          onClose={handleCloseEditModal}
+        />
+      )}
+
+      {deletingProject && (
+        <DeleteConfirmationModal
+          project={deletingProject}
+          onClose={handleCloseDeleteModal}
+          onConfirm={handleConfirmDelete}
+          loading={deleteLoading}
+        />
       )}
     </div>
   );
