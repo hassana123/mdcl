@@ -18,7 +18,7 @@ const HeroSection = () => {
   const [activeIndex, setActiveIndex] = useState(0);
 
   return (
-    <section className="relative mt-10 w-full mx-auto flex flex-col items-center justify-center overflow-hidden">
+    <section className="relative mt-3 w-full mx-auto flex flex-col items-center justify-center overflow-hidden">
       {/* Decorative background shape */}
       <div className="absolute -left-5 -top-5 lg:block hidden">
         <svg
@@ -62,17 +62,17 @@ const HeroSection = () => {
       </div>
       {/* Centered Text */}
       <div className="lg:w-[60%] md:w-[85%] md:px-0 px-3 flex flex-col items-center z-10 text-center">
-        <h1 className="text-2xl md:text-3xl font-bold text-[var(--color-title-text)] leading-snug mb-4">
+        <h1 className="text-2xl md:text-3xl font-bold text-[var(--color-title-text)] leading-snug mb-2">
           {heroTitle.map((line, idx) => (
             <span key={idx} className="block">
               {line}
             </span>
           ))}
         </h1>
-        <p className="text-base md:text-lg text-gray-700 max-w-5xl mb-4">
+        <p className="text-base md:text-lg text-gray-700 max-w-5xl mb-2">
           {heroSubtitle}
         </p>
-        <Link href={"/about"} className="bg-[color:var(--color-primary-light-brown)] text-white px-8 py-3 rounded-xl text-lg font-semibold shadow hover:bg-[color:var(--color-primary-brown)]/90 transition mb-4">
+        <Link href={"/about"} className="bg-[color:var(--color-primary-light-brown)] text-white px-8 py-3 rounded-xl text-lg font-semibold shadow hover:bg-[color:var(--color-primary-brown)]/90 transition mb-2">
           Learn More
         </Link>
       </div>
@@ -106,7 +106,7 @@ const HeroSection = () => {
             },
             // when window width is >= 1280px
             1280: {
-              slidesPerView: 6,
+              slidesPerView: 5,
               spaceBetween: 5,
             },
           }}

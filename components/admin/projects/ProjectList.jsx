@@ -38,7 +38,7 @@ const DeleteConfirmationModal = ({ project, onClose, onConfirm, loading }) => {
 const ProjectList = ({ projects, onProjectDeleted }) => {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
-  const [categories, setCategories] = useState(['All']);
+  const [categories, setCategories] = useState([]);
   const [editingProject, setEditingProject] = useState(null);
   const [deletingProject, setDeletingProject] = useState(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
@@ -48,12 +48,19 @@ const ProjectList = ({ projects, onProjectDeleted }) => {
       try {
         const categoriesRef = collection(db, 'categories');
         const querySnapshot = await getDocs(categoriesRef);
-        const categoriesList = ['All', ...querySnapshot.docs.map(doc => doc.data().name)];
+        const categoriesList = querySnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
         setCategories(categoriesList);
       } catch (error) {
         console.error('Error fetching categories:', error);
         // Fallback to default categories if fetch fails
-        setCategories(['All', 'Research', 'Project Management', 'Capacity Development']);
+        setCategories([
+          { id: '1', name: 'Research', description: 'Research related projects' },
+          { id: '2', name: 'Project Management', description: 'Project management related projects' },
+          { id: '3', name: 'Capacity Development', description: 'Capacity development related projects' }
+        ]);
       }
     };
 
@@ -71,6 +78,11 @@ const ProjectList = ({ projects, onProjectDeleted }) => {
   const handleCategoryChange = (category) => {
     setSelectedCategory(category);
   };
+
+  // Get the selected category details
+  const selectedCategoryDetails = selectedCategory === 'All' 
+    ? null 
+    : categories.find(cat => cat.name === selectedCategory);
 
   const handleEditClick = (project) => {
     setEditingProject(project);
@@ -124,7 +136,7 @@ const ProjectList = ({ projects, onProjectDeleted }) => {
             onChange={(e) => handleCategoryChange(e.target.value)}
           >
             {categories.map(category => (
-              <option className='capitalize' key={category} value={category}>{category}</option>
+              <option className='capitalize' key={category.id} value={category.name}>{category.name}</option>
             ))}
           </select>
         </div>
@@ -144,18 +156,39 @@ const ProjectList = ({ projects, onProjectDeleted }) => {
       </div>
 
       {/* Category list section */}
-      <div className="flex border-b border-b-gray-300 space-x-4 mb-6">
-        {categories.map((category) => (
+      <div className="flex flex-col space-y-4 mb-6">
+        <div className="flex border-b border-b-gray-300 space-x-4">
           <button 
-            key={category}
-            onClick={() => handleCategoryChange(category)}
-            className={`px-4 my-2 text-gray-700 capitalize ${
-              selectedCategory === category ? 'border-b rounded-lg border-b-green-700' : ''
+            key="All"
+            onClick={() => handleCategoryChange('All')}
+            className={`px-4 my-2 outline-none text-gray-700 capitalize ${
+              selectedCategory === 'All' ? 'border-b rounded-lg border-b-green-700' : ''
             }`}
           >
-            {category}
+            All
           </button>
-        ))}
+          {categories.map((category) => (
+            <button 
+              key={category.id}
+              onClick={() => handleCategoryChange(category.name)}
+              className={`px-4 my-2 text-gray-700 capitalize ${
+                selectedCategory === category.name ? 'border-b rounded-lg border-b-green-700' : ''
+              }`}
+            >
+              {category.name}
+            </button>
+          ))}
+        </div>
+
+        {/* Display selected category details */}
+        {/* {selectedCategoryDetails && (
+          <div className="bg-gray-50 p-4 rounded-lg">
+            <h3 className="text-xl font-bold text-[var(--color-primary-olive)] mb-2">
+              {selectedCategoryDetails.name}
+            </h3>
+            <p className="text-gray-700">{selectedCategoryDetails.description}</p>
+          </div>
+        )} */}
       </div>
 
       {/* Project Grid */}
@@ -164,6 +197,17 @@ const ProjectList = ({ projects, onProjectDeleted }) => {
           No projects found.
         </div>
       ) : (
+        
+       <>
+       {/* Display selected category details above the project grid */}
+       {selectedCategoryDetails && (
+          <div className="mb-6 w-[60%]">
+            <h3 className="text-xl capitalize font-bold text-[var(--color-primary-olive)] mb-2">
+              {selectedCategoryDetails.name}
+            </h3>
+            <p className="text-gray-500 text-sm">{selectedCategoryDetails.description}</p>
+          </div>
+        )}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredProjects.map((project) => (
             <div key={project.id} className="bg-white rounded-lg shadow-md overflow-hidden">
@@ -215,6 +259,7 @@ const ProjectList = ({ projects, onProjectDeleted }) => {
             </div>
           ))}
         </div>
+       </>
       )}
 
       {editingProject && (

@@ -78,7 +78,7 @@ const AdminProjectsPage = () => {
   }
 
   return (
-    <div className="w-[100%] mx-auto p-8">
+    <div className="w-[100%] mx-auto">
       <div className="flex justify-between items-center mb-8">
         <h2 className="text-xl font-semibold text-gray-700">Manage your Projects</h2>
 

@@ -53,7 +53,7 @@ function ProtectedLayout({ children }) {
         <header className="mb-6 px-5 py-6 bg-[#FFFFFF]">
           <h1 className="text-xl font-bold text-gray-800">{headerTitle}</h1>
         </header>
-        <main className="bg-[#f5f5f5] w-[85%] mx-auto">{children}</main>
+        <main className="bg-[#f5f5f5] w-[95%] mx-auto">{children}</main>
       </section>
     </div>
   );
