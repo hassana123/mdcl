@@ -12,7 +12,7 @@ const AddBlogModal = ({ onClose, onBlogAdded }) => {
   const [error, setError] = useState('');
   const [formData, setFormData] = useState({
     title: '',
-    excerpt: '',
+    // excerpt: '', // Commented out excerpt field
     layoutType: 'standard', // Default layout type
     // Initialize content based on default layout
     content: '', // For 'standard'
@@ -115,19 +115,18 @@ const AddBlogModal = ({ onClose, onBlogAdded }) => {
     e.preventDefault();
 
     // Basic validation
-    if (!formData.title || !formData.excerpt) {
-      setError('Please fill in title and excerpt');
+    if (!formData.title) {
+      setError('Please fill in title');
       return;
     }
 
-    // Excerpt word count validation
-    const excerptWordCount = formData.excerpt.trim().split(/\s+/).filter(word => word.length > 0).length;
-    if (excerptWordCount > 30) { // Changed limit to 30
-        setError('Excerpt cannot exceed 30 words.'); // Changed error message
-        return;
+    // Cover image validation
+    if (!coverImage) {
+      setError('Please upload a cover image');
+      return;
     }
 
-     // Validate content based on layout type
+    // Validate content based on layout type
     if (formData.layoutType === 'standard' && !formData.content.trim()) {
       setError('Please fill in the blog content');
       return;
@@ -159,7 +158,7 @@ const AddBlogModal = ({ onClose, onBlogAdded }) => {
       // Prepare blog data based on layout type
       const blogData = {
         title: formData.title,
-        excerpt: formData.excerpt.trim(), // Trim excerpt before saving
+        // excerpt: formData.excerpt.trim(), // Commented out excerpt
         layoutType: formData.layoutType,
         image: coverImageUrl, // Can be null
         createdAt: new Date(),
@@ -257,20 +256,21 @@ const AddBlogModal = ({ onClose, onBlogAdded }) => {
             />
           </div>
 
-          {/* Excerpt */}
+          {/* Excerpt - Commented out
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Excerpt (Brief Summary)</label>
             <textarea
               name="excerpt"
               value={formData.excerpt}
               onChange={handleInputChange}
-              placeholder="Enter a brief summary of the blog post (max 30 words)" // Changed placeholder
+              placeholder="Enter a brief summary of the blog post (max 30 words)"
               rows="3"
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
               required
               disabled={loading}
             ></textarea>
           </div>
+          */}
 
           {/* Layout Type Selector */}
           <div>
@@ -292,14 +292,16 @@ const AddBlogModal = ({ onClose, onBlogAdded }) => {
 
           {/* Cover Image Upload */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Cover Image</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Cover Image <span className="text-red-500">*</span></label>
             <input
               type="file"
               accept="image/*"
               onChange={handleCoverImageChange}
               className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100"
               disabled={loading}
+              required
             />
+            <p className="text-sm text-gray-500 mt-1">A cover image is required for the blog post</p>
           </div>
 
           {/* Dynamic Content Sections */}
@@ -371,6 +373,7 @@ const AddBlogModal = ({ onClose, onBlogAdded }) => {
                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                        disabled={loading}
                      />
+                     <p className="text-sm text-gray-500 mt-1">Leave empty if no title is needed for this section</p>
                    </div>
 
                   {/* Section Description */}

@@ -12,7 +12,7 @@ const EditBlogModal = ({ blog, onClose, onBlogUpdated }) => {
   const [error, setError] = useState('');
   const [formData, setFormData] = useState({
     title: blog.title || '',
-    excerpt: blog.excerpt || '',
+    // excerpt: blog.excerpt || '', // Commented out excerpt
     layoutType: blog.layoutType || 'standard',
     // Initialize content based on existing blog data and layout type
     content: blog.layoutType === 'standard' ? blog.content || '' : '',
@@ -169,19 +169,19 @@ const EditBlogModal = ({ blog, onClose, onBlogUpdated }) => {
     e.preventDefault();
 
     // Basic validation
-    if (!formData.title || !formData.excerpt) {
-      setError('Please fill in title and excerpt');
+    if (!formData.title) {
+      setError('Please fill in title');
       return;
     }
 
-     // Excerpt word count validation
-    const excerptWordCount = formData.excerpt.trim().split(/\s+/).filter(word => word.length > 0).length;
-    if (excerptWordCount > 50) {
-        setError('Excerpt cannot exceed 50 words.');
-        return;
-    }
+    // Excerpt word count validation - commented out
+    // const excerptWordCount = formData.excerpt.trim().split(/\s+/).filter(word => word.length > 0).length;
+    // if (excerptWordCount > 30) {
+    //     setError('Excerpt cannot exceed 30 words.');
+    //     return;
+    // }
 
-     // Validate content based on layout type
+    // Validate content based on layout type
     if (formData.layoutType === 'standard' && !formData.content.trim()) {
       setError('Please fill in the blog content');
       return;
@@ -213,7 +213,7 @@ const EditBlogModal = ({ blog, onClose, onBlogUpdated }) => {
       // Prepare blog data based on layout type
       const blogData = {
         title: formData.title,
-        excerpt: formData.excerpt.trim(), // Trim excerpt before saving
+        // excerpt: formData.excerpt.trim(), // Commented out excerpt
         layoutType: formData.layoutType,
         image: coverImageUrl, // Can be null
         updatedAt: new Date(),
@@ -311,20 +311,21 @@ const EditBlogModal = ({ blog, onClose, onBlogUpdated }) => {
             />
           </div>
 
-          {/* Excerpt */}
+          {/* Excerpt - Commented out
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Excerpt (Brief Summary)</label>
             <textarea
               name="excerpt"
               value={formData.excerpt}
               onChange={handleInputChange}
-              placeholder="Enter a brief summary of the blog post (max 50 words)"
+              placeholder="Enter a brief summary of the blog post (max 30 words)"
               rows="3"
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
               required
               disabled={loading}
             ></textarea>
           </div>
+          */}
 
           {/* Layout Type Selector */}
           <div>

@@ -203,7 +203,7 @@ const AdminBlogsPage = () => {
                  <h3 className="font-bold text-gray-800 mb-2 line-clamp-1">{blog.title}</h3>
                  <p className="text-gray-700 text-sm mb-1">By: Admin</p>{/* Assuming admin author for now */}
                  <p className="text-xs text-gray-500 mb-4">{blog.createdAt?.toLocaleDateString()}</p>
-                 <p className="text-gray-700 text-sm mb-4 line-clamp-2">{blog.excerpt || 'No excerpt available.'}</p>
+                 {/* <p className="text-gray-700 text-sm mb-4 line-clamp-2">{blog.excerpt || 'No excerpt available.'}</p> */}
                  <div className="flex space-x-4">
                    <button className="text-green-700 hover:text-green-800 transition-colors" onClick={() => handleEditClick(blog)}>Edit</button>
                    <button className="text-red-600 hover:text-red-800 transition-colors" onClick={() => handleDeleteClick(blog)}>Delete</button>
