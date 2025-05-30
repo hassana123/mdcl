@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { storage, db } from '@/lib/firebase';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import { doc, updateDoc, getDocs, collection } from 'firebase/firestore';
 import { useAuth } from '@/app/(admin)/admin/AuthProvider';
 
@@ -112,10 +112,24 @@ const EditBlogModal = ({ blog, onClose, onBlogUpdated }) => {
     }
   };
 
-  const handleRemoveExistingImage = () => {
+  const handleRemoveExistingImage = async () => {
+    if (existingCoverImageUrl) {
+      try {
+        // Remove file from Firebase Storage
+        const imageRef = ref(storage, existingCoverImageUrl);
+        await deleteObject(imageRef);
+        console.log('Existing cover image deleted successfully from storage:', existingCoverImageUrl);
+
+      } catch (error) {
+        console.error('Error deleting existing cover image from storage:', error);
+        setError('Failed to delete old cover image from storage.'); // Optional: inform user
+      }
+    }
+
+    // Always update state to remove the image preview, even if storage deletion fails
     setExistingCoverImageUrl(null);
     setCoverImageFile(null); // Also clear any pending new file upload
-     setError(''); // Clear any previous error
+    setError(''); // Clear any previous error
   };
 
   // Section management handlers
@@ -151,6 +165,19 @@ const EditBlogModal = ({ blog, onClose, onBlogUpdated }) => {
          const storageRef = ref(storage, `blog_covers/${Date.now()}_${coverImageFile.name}`);
          const snapshot = await uploadBytes(storageRef, coverImageFile);
          const downloadURL = await getDownloadURL(snapshot.ref);
+
+         // If there was an existing image, delete it after the new one is uploaded
+         if (existingCoverImageUrl) {
+           try {
+             const oldImageRef = ref(storage, existingCoverImageUrl);
+             await deleteObject(oldImageRef);
+             console.log('Old cover image deleted successfully from storage:', existingCoverImageUrl);
+           } catch (deleteError) {
+             console.error('Error deleting old cover image from storage:', existingCoverImageUrl, deleteError);
+             // Continue even if deletion fails, new image is already uploaded
+           }
+         }
+
          return downloadURL;
        } catch (error) {
          console.error('Error uploading cover image:', error);

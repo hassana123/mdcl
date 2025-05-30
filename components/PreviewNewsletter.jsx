@@ -20,10 +20,10 @@ const PreviewNewsletter = () => {
     <section className="w-full md:px-0 px-5 min-h-[600px] bg-[color:var(--color-primary-olive)]/20 py-16 flex flex-col items-center justify-center">
       {/* Heading and Description */}
       <h2 className="md:text-2xl text-md uppercase md:text-3xl font-bold text-center mb-2 text-[color:var(--color-primary-olive)]">
-       Subscribe to our Newsletter: MICRODEVELOPMENT MATTERS
+       Subscribe to our quarterly Newsletter: MICRODEVELOPMENT MATTERS
       </h2>
       <p className="text-base text-gray-700 text-center mb-8 max-w-2xl">
-       MicroDevelopment Matters is our quarterly newsletter where we share insights on topical development issues at the grassroots level. Each edition features interviews with entrepreneurs and experts across various sectors, offering fresh perspectives and practical knowledge.      </p>
+      <i> MicroDevelopment Matters </i>is our quarterly newsletter where we share insights on topical development issues at the grassroots level. Each edition features interviews with entrepreneurs and experts across various sectors, offering fresh perspectives and practical knowledge.      </p>
       {/* Email Form */}
       <form className="w-full max-w-xl mx-auto md:flex  items-center gap-2 mb-12">
         <input

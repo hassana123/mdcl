@@ -9,7 +9,7 @@ import { Twitter, Instagram, Linkedin } from "lucide-react";
 const team = [
   {
     name: "Furera Isma Jumare",
-    title: "Chairman/Chief Executive Officer",
+    title: "Founder",
     image: "/mdcl/team/furera.jpg",
     profile: "#",
     intro:
@@ -147,7 +147,7 @@ function TeamProfileModal({ member, onClose }) {
             <h2 className="font-bold text-2xl uppercase text-gray-800 mb-2">
               {member.name}
             </h2>
-            <div className="font-semibold text-lg text-gray-700 mb-4">
+            <div className="font-semibold  text-lg text-gray-700 mb-4">
               {member.title}
             </div>
             <div className="text-[15px] text-gray-800 leading-relaxed whitespace-pre-line">

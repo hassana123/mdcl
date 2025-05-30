@@ -1,39 +1,47 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { collection, getDocs, query, orderBy } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
-import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/20/solid'; // Assuming Heroicons are available
+import { collection, getDocs, query, orderBy, deleteDoc, doc } from 'firebase/firestore';
+import { ref, deleteObject } from 'firebase/storage';
+import { db, storage } from '@/lib/firebase';
+import { ChevronLeftIcon, ChevronRightIcon, Trash2Icon, PencilIcon } from 'lucide-react'; // Assuming Heroicons are available
 import Image from 'next/image';
+import AddGalleryItemModal from '@/components/admin/gallery/AddGalleryItemModal'; // Import the modal component
+import EditGalleryItemModal from '@/components/admin/gallery/EditGalleryItemModal';
 
 export default function AdminGalleryPage() {
   const [galleryItems, setGalleryItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [deleteConfirmModal, setDeleteConfirmModal] = useState({ isOpen: false, item: null });
+  const [editModal, setEditModal] = useState({ isOpen: false, item: null });
   const itemsPerPage = 6; // As requested
 
-  useEffect(() => {
-    const fetchGalleryItems = async () => {
-      try {
-        const galleryRef = collection(db, 'gallery');
-        // You might want to order these, e.g., by upload date
-        const q = query(galleryRef, orderBy('createdAt', 'desc'));
-        const querySnapshot = await getDocs(q);
-        const itemsList = querySnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        }));
-        setGalleryItems(itemsList);
-      } catch (error) {
-        console.error('Error fetching gallery items:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  // Function to fetch gallery items
+  const fetchGalleryItems = async () => {
+    try {
+      const galleryRef = collection(db, 'gallery');
+      // You might want to order these, e.g., by upload date
+      const q = query(galleryRef, orderBy('createdAt', 'desc'));
+      const querySnapshot = await getDocs(q);
+      const itemsList = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      setGalleryItems(itemsList);
+    } catch (error) {
+      console.error('Error fetching gallery items:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
+    // Call the fetch function inside useEffect
     fetchGalleryItems();
-  }, []);
+  }, []); // Empty dependency array means this runs once on mount
 
   // Filter items based on search query
   const filteredItems = galleryItems.filter(item =>
@@ -49,14 +57,54 @@ export default function AdminGalleryPage() {
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
+  const handleDelete = async (item) => {
+    try {
+      setLoading(true);
+      
+      // Delete all images from storage
+      if (item.images && item.images.length > 0) {
+        const imageDeletePromises = item.images.map(imageUrl => {
+          const imageRef = ref(storage, imageUrl);
+          return deleteObject(imageRef);
+        });
+        await Promise.all(imageDeletePromises);
+      }
+
+      // Delete all videos from storage
+      if (item.videos && item.videos.length > 0) {
+        const videoDeletePromises = item.videos.map(videoUrl => {
+          const videoRef = ref(storage, videoUrl);
+          return deleteObject(videoRef);
+        });
+        await Promise.all(videoDeletePromises);
+      }
+
+      // Delete the document from Firestore
+      await deleteDoc(doc(db, 'gallery', item.id));
+
+      // Update the UI
+      setGalleryItems(prevItems => prevItems.filter(i => i.id !== item.id));
+      setDeleteConfirmModal({ isOpen: false, item: null });
+    } catch (error) {
+      console.error('Error deleting gallery item:', error);
+      alert('Failed to delete gallery item. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="container mx-auto px-4 py-8">
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-2xl font-bold text-gray-800">Manage your Gallery</h1>
-        <Link href="#" className="px-4 py-2 bg-green-700 text-white rounded-md hover:bg-green-800 transition-colors">
+        {/* Change Link to button and add onClick handler */}
+        <button
+          onClick={() => setIsModalOpen(true)}
+          className="px-4 py-2 bg-green-700 text-white rounded-md hover:bg-green-800 transition-colors"
+        >
           Add to Gallery
-        </Link>
+        </button>
       </div>
 
       {/* Search Bar */}
@@ -96,25 +144,40 @@ export default function AdminGalleryPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {currentItems.map(item => (
             <div key={item.id} className="bg-white rounded-lg overflow-hidden shadow-md border-t-4 border-t-green-700">
-              {/* Placeholder for image or first image from item.images array */}
               <div className="relative w-full h-40 bg-gray-100 flex items-center justify-center">
-                 {/* Replace with actual Image component if item has images */}
-                 {item.images && item.images.length > 0 ? (
-                   <Image
-                     src={item.images[0]}
-                     alt={item.title || 'Gallery Image'}
-                     fill
-                     sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                     className="object-cover"
-                   />
-                 ) : (
-                   <span className="text-gray-400 text-center px-4">No image available</span>
-                 )}
+                {item.images && item.images.length > 0 ? (
+                  <Image
+                    src={item.images[0]}
+                    alt={item.title || 'Gallery Image'}
+                    fill
+                    sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                    className="object-cover"
+                  />
+                ) : (
+                  <span className="text-gray-400 text-center px-4">No image available</span>
+                )}
               </div>
               
               <div className="p-4">
-                <h3 className="font-semibold text-gray-800 mb-2 line-clamp-2">{item.title || 'No Title'}</h3>
-                {/* Link to view images - placeholder */}
+                <div className="flex justify-between items-start">
+                  <h3 className="font-semibold text-gray-800 mb-2 line-clamp-2">{item.title || 'No Title'}</h3>
+                  <div className="flex space-x-2">
+                    <button
+                      onClick={() => setEditModal({ isOpen: true, item })}
+                      className="text-blue-600 hover:text-blue-800 p-1"
+                      title="Edit item"
+                    >
+                      <PencilIcon className="h-5 w-5" />
+                    </button>
+                    <button
+                      onClick={() => setDeleteConfirmModal({ isOpen: true, item })}
+                      className="text-red-600 hover:text-red-800 p-1"
+                      title="Delete item"
+                    >
+                      <Trash2Icon className="h-5 w-5" />
+                    </button>
+                  </div>
+                </div>
                 <Link href={`/admin/gallery/${item.id}`} className="text-sm text-green-700 hover:underline">
                   View Images
                 </Link>
@@ -146,6 +209,47 @@ export default function AdminGalleryPage() {
           </button>
         </div>
       )}
+
+      {/* Delete Confirmation Modal */}
+      {deleteConfirmModal.isOpen && (
+        <div className="fixed inset-0 bg-gray-700/30 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-md">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">Confirm Delete</h3>
+            <p className="text-gray-600 mb-6">
+              Are you sure you want to delete "{deleteConfirmModal.item?.title}"? This action cannot be undone.
+            </p>
+            <div className="flex justify-end space-x-4">
+              <button
+                onClick={() => setDeleteConfirmModal({ isOpen: false, item: null })}
+                className="px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => handleDelete(deleteConfirmModal.item)}
+                className="px-4 py-2 rounded-md bg-red-600 text-white hover:bg-red-700 transition-colors"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Gallery Item Modal */}
+      <EditGalleryItemModal
+        isOpen={editModal.isOpen}
+        onClose={() => setEditModal({ isOpen: false, item: null })}
+        onGalleryItemUpdated={fetchGalleryItems}
+        item={editModal.item}
+      />
+
+      {/* Render the Add Gallery Item Modal */}
+      <AddGalleryItemModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onGalleryItemAdded={fetchGalleryItems} // Refetch items after adding a new one
+      />
 
     </div>
   );

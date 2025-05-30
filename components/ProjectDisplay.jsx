@@ -13,7 +13,6 @@ const ProjectDisplay = ({
   subtitle,
   description,
   category = "Research",
-  bannerImage = "/mdcl/g4.jpg",
 }) => {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -25,26 +24,23 @@ const ProjectDisplay = ({
         setLoading(true);
         const projectsRef = collection(db, 'projects');
         
-        // First, let's get all projects to see what categories we have
-        const allProjectsQuery = query(projectsRef);
-        const allProjectsSnapshot = await getDocs(allProjectsQuery);
-        console.log('All projects:', allProjectsSnapshot.docs.map(doc => ({
-          id: doc.id,
-          category: doc.data().category,
-          title: doc.data().title,
-          status: doc.data().status
-        })));
+        // Normalize category name to match admin panel format
+        const normalizedCategory = category
+          .split('-')
+          .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(' ');
 
-        // Now query for specific category
+        console.log('Fetching projects for category:', normalizedCategory);
+        
+        // Query for specific category
         const q = query(
           projectsRef,
-          where('category', '==', category), // Convert to lowercase to match
+          where('category', '==', normalizedCategory),
           where('status', '==', 'active'),
           orderBy('createdAt', 'desc')
         );
         
         const querySnapshot = await getDocs(q);
-        console.log('Query for category:', category.toLowerCase());
         console.log('Query results:', querySnapshot.docs.map(doc => ({
           id: doc.id,
           category: doc.data().category,
@@ -69,6 +65,8 @@ const ProjectDisplay = ({
 
     fetchProjects();
   }, [category]);
+
+  
 
   return (
     <main className="bg-white min-h-screen">
@@ -97,13 +95,13 @@ const ProjectDisplay = ({
           </div>
         ) : (
           <>
-            <div className="border-l-2 border-[var(--color-primary-olive)] pl-4 mb-8">
+            {/* <div className="border-l-2 border-[var(--color-primary-olive)] pl-4 mb-8">
               <span className="font-semibold text-[var(--color-title-text)]">Our {category} projects include:</span>
-            </div>
+            </div> */}
             
             {projects.length === 0 ? (
               <div className="text-center py-10 text-gray-600">
-                No projects found in this category. (Category: {category.toLowerCase()})
+                No projects found in this category. (Category: {category})
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
@@ -134,7 +132,7 @@ const ProjectDisplay = ({
                     </Link>
                     <p className="text-sm text-gray-700 mb-2">{proj.excerpt}</p>
                     <Link
-                      href={`/projects/${category}/${proj.id}`}
+                      href={`/projects-&-programmes/${category}/${proj.id}`}
                       className="text-[var(--color-primary-brown)] text-sm font-semibold hover:underline mt-auto flex items-center gap-1"
                     >
                       Read More <span className="text-lg">→</span>

@@ -8,8 +8,7 @@ import Link from "next/link";
 const heroImages = Array.from({ length: 20 }, (_, i) => `/mdcl/gallery/g (${i + 1}).jpg`);
 
 const heroTitle = [
-  "Empowering Women. Transforming Agriculture.",
-  "Innovation. Climate Resilience. Access.",
+  "Empowering Women. Transforming Agriculture. Innovation. Climate Resilience. Access",
 ];
 
 const heroSubtitle = `Supporting and empowering women to thrive across agricultural systems and value chains by strengthening their digital and climate resilience skills, building their leadership capacity, and enhancing access to markets.`;
@@ -61,20 +60,22 @@ const HeroSection = () => {
         </svg>
       </div>
       {/* Centered Text */}
-      <div className="lg:w-[60%] md:w-[85%] md:px-0 px-3 flex flex-col items-center z-10 text-center">
-        <h1 className="text-2xl md:text-3xl font-bold text-[var(--color-title-text)] leading-snug mb-2">
-          {heroTitle.map((line, idx) => (
+      <div className="lg:w-full md:w-[85%] md:px-0 px-3 flex flex-col items-center z-10 text-center mb-10">
+        <h1 className="text-2xl md:text-xl font-bold text-[var(--color-title-text)] leading-snug mb-2">
+          {/* {heroTitle.map((line, idx) => (
             <span key={idx} className="block">
               {line}
             </span>
           ))}
+           */}
+           Empowering Women. Transforming Agriculture. Innovation. Climate Resilience. Access
         </h1>
         <p className="text-base md:text-lg text-gray-700 max-w-5xl mb-2">
           {heroSubtitle}
         </p>
-        <Link href={"/about"} className="bg-[color:var(--color-primary-light-brown)] text-white px-8 py-3 rounded-xl text-lg font-semibold shadow hover:bg-[color:var(--color-primary-brown)]/90 transition mb-2">
+        {/* <Link href={"/about"} className="bg-[color:var(--color-primary-light-brown)] text-white px-8 py-3 rounded-xl text-lg font-semibold shadow hover:bg-[color:var(--color-primary-brown)]/90 transition mb-2">
           Learn More
-        </Link>
+        </Link> */}
       </div>
 
       {/* Slider */}
@@ -85,29 +86,29 @@ const HeroSection = () => {
           slidesPerView={2}
           centeredSlides
           loop
-          autoplay={{ delay: 3500 }}
+          autoplay={{ delay: 1500 }}
           onSlideChange={(swiper) => setActiveIndex(swiper.realIndex)}
           className="w-full overflow-hidden"
           breakpoints={{
             // when window width is >= 640px
             640: {
-              slidesPerView: 2,
+              slidesPerView: 0,
               spaceBetween: 10,
             },
             // when window width is >= 768px
             768: {
               slidesPerView: 3,
-              spaceBetween: 10,
+              spaceBetween: 0,
             },
             // when window width is >= 1024px
             1024: {
-              slidesPerView: 4,
-              spaceBetween: 10,
+              slidesPerView: 3,
+              spaceBetween: 0,
             },
             // when window width is >= 1280px
             1280: {
-              slidesPerView: 5,
-              spaceBetween: 5,
+              slidesPerView: 3,
+              spaceBetween: 0,
             },
           }}
         >
@@ -118,7 +119,7 @@ const HeroSection = () => {
             >
               <div
                 className={`relative transition-transform w-full h-[350px] duration-500 rounded-[20px] overflow-hidden shadow-md
-                ${index === activeIndex ? "scale-90 z-20" : "scale-70 z-10"}
+                ${index === activeIndex ? "scale-100 z-20" : "scale-85 z-10"}
                 `}
               >
                 <Image

@@ -18,10 +18,10 @@ export default function CompanyProfile() {
             </Link>{" "}
             /{" "}
             <Link
-              href="/about/profile"
+              href="/about/what-we-are"
               className="hover:underline text-white font-bold"
             >
-              Company Profile
+             What We Are
             </Link>
           </span>
         }
@@ -398,14 +398,12 @@ export default function CompanyProfile() {
             <div className="bg-white rounded-xl shadow flex flex-col items-start border-3 border-[var(--color-primary-light-brown)]">
               <div className="w-full py-3 text-white  bg-[var(--color-primary-light-brown)] mb-3">
                 <span className="font-bold  mb-2 px-4 pt-2">
-                  Research and Innovation
+                 Monitoring and Evaluation (M&E)
                 </span>
               </div>
 
               <p className="text-gray-700 px-4 pb-4">
-                Transforming knowledge into inclusive policies and solutions
-                which reflect women's agricultural experiences.
-              </p>
+               Monitoring and evaluation (M&E) for accountability.            </p>
             </div>
           </div>
         </div>

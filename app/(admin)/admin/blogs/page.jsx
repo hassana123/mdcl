@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { collection, getDocs, query, orderBy, doc, deleteDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useAuth } from '../AuthProvider';
+import { ref, deleteObject } from 'firebase/storage';
 // import BlogList from '@/components/admin/blogs/BlogList'; // Future component
 import AddBlogModal from '@/components/admin/blogs/AddBlogModal';
 import EditBlogModal from '@/components/admin/blogs/EditBlogModal';
@@ -25,6 +26,10 @@ const AdminBlogsPage = () => {
   const [toDate, setToDate] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [categories, setCategories] = useState(['All']); // Placeholder for blog categories
+
+  // Pagination States
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 6; // Define items per page (e.g., 9 or 12 for a grid layout)
 
   useEffect(() => {
     fetchBlogs();
@@ -56,18 +61,7 @@ const AdminBlogsPage = () => {
     }
   };
 
-  // Placeholder function for fetching blog categories
-  const fetchBlogCategories = async () => {
-    try {
-      const categoriesRef = collection(db, 'blogCategories'); // Assuming a 'blogCategories' collection
-      const querySnapshot = await getDocs(categoriesRef);
-      const categoriesList = ['All', ...querySnapshot.docs.map(doc => doc.data().name)];
-      setCategories(categoriesList);
-    } catch (error) {
-      console.error('Error fetching blog categories:', error);      // Fallback or handle error
-    }
-  };
-
+  
   const handleAddBlogClick = () => {
     setShowAddModal(true);
   };
@@ -107,6 +101,19 @@ const AdminBlogsPage = () => {
 
     setDeleteLoading(true);
     try {
+      // Delete cover image from Firebase Storage if it exists
+      if (deletingBlog.image) {
+        try {
+          const imageRef = ref(storage, deletingBlog.image);
+          await deleteObject(imageRef);
+          console.log('Cover image deleted successfully from storage:', deletingBlog.image);
+        } catch (storageError) {
+          console.error('Error deleting cover image from storage:', deletingBlog.image, storageError);
+          // Continue with deleting the document even if image deletion fails
+        }
+      }
+
+      // Then delete the blog document from Firestore
       const blogRef = doc(db, 'blogs', deletingBlog.id);
       await deleteDoc(blogRef);
       
@@ -119,6 +126,15 @@ const AdminBlogsPage = () => {
       setDeleteLoading(false);
     }
   };
+
+  // Pagination Logic
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  // Apply pagination to the blogs array after filtering (if filtering is added later)
+  const currentBlogs = blogs.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(blogs.length / itemsPerPage);
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   // Authentication check
   if (!user) {
@@ -190,7 +206,7 @@ const AdminBlogsPage = () => {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {blogs.map(blog => (
+          {currentBlogs.map(blog => (
             <div key={blog.id} className="bg-white rounded-lg shadow-md overflow-hidden">
                <div className="relative h-48 bg-gray-100">
                  {blog.image ? (
@@ -211,6 +227,29 @@ const AdminBlogsPage = () => {
                </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Pagination Controls */}
+      {blogs.length > itemsPerPage && ( // Only show pagination if there are more items than itemsPerPage
+        <div className="flex items-center justify-center space-x-2 mt-8">
+          <button
+            onClick={() => paginate(currentPage - 1)}
+            disabled={currentPage === 1}
+            className="px-3 py-1 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100 disabled:opacity-50"
+          >
+            Previous
+          </button>
+          <span>
+            Page {currentPage} of {totalPages}
+          </span>
+          <button
+            onClick={() => paginate(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            className="px-3 py-1 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100 disabled:opacity-50"
+          >
+            Next
+          </button>
         </div>
       )}
 

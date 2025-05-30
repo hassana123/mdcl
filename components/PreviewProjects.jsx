@@ -13,21 +13,21 @@ const PreviewProjects = () => {
     {
       src: "/mdcl/p3.svg",
       title: "Research",
-      link: "/projects/research",
+      link: "/projects-&-programmes/research",
       description:
         "We promote evidence-based policy and practice through rigorous research. By collecting and analysing data, we generate knowledge that informs and strengthens the design and implementation of sustainable development initiatives.",
     },
     {
       src: "/mdcl/p1.svg",
       title: "Project Management",
-      link: "/projects/project-management",
+      link: "/projects-&-programmes/project-management",
       description:
         "Effective planning, monitoring, and evaluation are key to successful, goal-oriented, and sustainable project and programme outcomes.",
     },
     {
       src: "/mdcl/p2.svg",
       title: "Capacity Development",
-      link: "/projects/capacity-development",
+      link: "/projects-&-programmes/capacity-development",
       description:
         "Strengthening the skills and capabilities of institutions and personnel is essential for improving service delivery and ensuring the long-term success of development efforts.",
     },
@@ -46,8 +46,8 @@ const PreviewProjects = () => {
               Our Projects are designed to meet the evolving needs of development actors.
             </p>
           </div>
-          <Link href={"/projects"} className="bg-[var(--color-primary-light-brown)] text-white px-8 py-3 rounded-xl text-lg shadow hover:bg-[color:var(--color-primary-brown)]/90 transition">
-            View Programmes
+          <Link href={"/projects-&-programmes"} className="bg-[var(--color-primary-light-brown)] text-white px-8 py-3 rounded-xl text-lg shadow hover:bg-[color:var(--color-primary-brown)]/90 transition">
+            View Projects & Programmes
           </Link>
         </div>
       )}
@@ -67,7 +67,7 @@ const PreviewProjects = () => {
               className="text-[var(--color-primary-light-brown)] font-semibold underline flex items-center space-x-2"
               href={item.link}
             >
-              View Projects <ArrowRight />
+              View Projects/Programmes <ArrowRight />
             </Link>
           </div>
         ))}

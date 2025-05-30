@@ -1,16 +1,23 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { storage, db } from '@/lib/firebase';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { collection, addDoc, getDocs } from 'firebase/firestore';
+import { collection, addDoc } from 'firebase/firestore';
 import { useAuth } from '@/app/(admin)/admin/AuthProvider';
 
 const AddProjectModal = ({ onClose }) => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [categories, setCategories] = useState([]);
+  
+  // Predefined categories
+  const categories = [
+    { id: '1', name: 'Research', description: 'Research related projects' },
+    { id: '2', name: 'Project Management', description: 'Project management related projects' },
+    { id: '3', name: 'Capacity Development', description: 'Capacity development related projects' }
+  ];
+
   const [formData, setFormData] = useState({
     category: '',
     title: '',
@@ -18,37 +25,29 @@ const AddProjectModal = ({ onClose }) => {
   });
   const [sections, setSections] = useState([{ 
     title: '', 
-    description: ''
+    description: '',
+    type: 'text', // 'text', 'bullet', 'numbered', 'nested'
+    items: [] // For bullet points and numbered lists
   }]);
   const [files, setFiles] = useState([]);
   const [uploadProgress, setUploadProgress] = useState(0);
 
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const categoriesRef = collection(db, 'categories');
-        const querySnapshot = await getDocs(categoriesRef);
-        const categoriesList = querySnapshot.docs.map(doc => doc.data().name);
-        setCategories(categoriesList);
-      } catch (error) {
-        console.error('Error fetching categories:', error);
-        setError('Failed to load categories');
-      }
-    };
-
-    fetchCategories();
-  }, []);
-
   const handleAddSection = () => {
     setSections([...sections, { 
       title: '', 
-      description: ''
+      description: '',
+      type: 'text',
+      items: []
     }]);
   };
 
   const handleSectionChange = (index, field, value) => {
     const newSections = sections.map((section, i) => {
       if (i === index) {
+        if (field === 'type') {
+          // Reset items when changing type
+          return { ...section, type: value, items: [] };
+        }
         return { ...section, [field]: value };
       }
       return section;
@@ -74,16 +73,94 @@ const AddProjectModal = ({ onClose }) => {
     }));
   };
 
-  const uploadFiles = async () => {
+  const handleAddListItem = (sectionIndex) => {
+    const newSections = sections.map((section, i) => {
+      if (i === sectionIndex) {
+        return {
+          ...section,
+          items: [...(section.items || []), { 
+            text: '', 
+            description: '',
+            isBold: false,
+            position: 'below',
+            subItems: [] 
+          }]
+        };
+      }
+      return section;
+    });
+    setSections(newSections);
+  };
+
+  const handleListItemChange = (sectionIndex, itemIndex, field, value) => {
+    const newSections = sections.map((section, i) => {
+      if (i === sectionIndex) {
+        const newItems = [...section.items];
+        newItems[itemIndex] = { ...newItems[itemIndex], [field]: value };
+        return { ...section, items: newItems };
+      }
+      return section;
+    });
+    setSections(newSections);
+  };
+
+  const handleAddSubItem = (sectionIndex, itemIndex) => {
+    const newSections = sections.map((section, i) => {
+      if (i === sectionIndex) {
+        const newItems = [...section.items];
+        newItems[itemIndex] = {
+          ...newItems[itemIndex],
+          subItems: [...(newItems[itemIndex].subItems || []), '']
+        };
+        return { ...section, items: newItems };
+      }
+      return section;
+    });
+    setSections(newSections);
+  };
+
+  const handleSubItemChange = (sectionIndex, itemIndex, subItemIndex, value) => {
+    const newSections = sections.map((section, i) => {
+      if (i === sectionIndex) {
+        const newItems = [...section.items];
+        newItems[itemIndex] = {
+          ...newItems[itemIndex],
+          subItems: newItems[itemIndex].subItems.map((subItem, j) => 
+            j === subItemIndex ? value : subItem
+          )
+        };
+        return { ...section, items: newItems };
+      }
+      return section;
+    });
+    setSections(newSections);
+  };
+
+  const uploadFiles = async (formData) => {
     if (files.length === 0) return [];
-    
+
+    const { category, title } = formData;
+    if (!category || !title) {
+      console.error("Category or Title is missing. Cannot upload files.");
+      return [];
+    }
+
     const uploadedUrls = [];
     const totalFiles = files.length;
     let completedFiles = 0;
 
+    // Create a sanitized project folder name
+    const sanitizedTitle = title.toLowerCase().replace(/[^a-z0-9]/g, '-');
+    const projectFolder = `${category}/${sanitizedTitle}`;
+
     for (const file of files) {
       try {
-        const storageRef = ref(storage, `projects/${Date.now()}_${file.name}`);
+        // Create a unique filename with timestamp
+        const timestamp = Date.now();
+        const sanitizedFilename = file.name.toLowerCase().replace(/[^a-z0-9.]/g, '-');
+        const storagePath = `projects/${projectFolder}/${timestamp}-${sanitizedFilename}`;
+        
+        const storageRef = ref(storage, storagePath);
         const snapshot = await uploadBytes(storageRef, file);
         const downloadURL = await getDownloadURL(snapshot.ref);
         uploadedUrls.push(downloadURL);
@@ -109,9 +186,20 @@ const AddProjectModal = ({ onClose }) => {
     }
 
     // Validate sections
-    const hasEmptyDescription = sections.some(section => !section.description.trim());
+    const hasEmptyDescription = sections.some(section => {
+      // For text type, description is required
+      if (section.type === 'text' && !section.description.trim()) {
+        return true;
+      }
+      // For list types, description is optional
+      if (['bullet', 'numbered', 'nested'].includes(section.type)) {
+        return false;
+      }
+      return false;
+    });
+
     if (hasEmptyDescription) {
-      setError('Please fill in all section descriptions');
+      setError('Please fill in all text section descriptions');
       return;
     }
 
@@ -125,13 +213,19 @@ const AddProjectModal = ({ onClose }) => {
 
     try {
       // Upload files first
-      const imageUrls = await uploadFiles();
+      const imageUrls = await uploadFiles(formData);
 
       // Clean up sections data
       const cleanedSections = sections.map(section => {
         const cleanedSection = {
-          description: section.description.trim()
+          type: section.type,
+          items: section.items || []
         };
+
+        // Only add description if it's not empty
+        if (section.description && section.description.trim() !== '') {
+          cleanedSection.description = section.description.trim();
+        }
 
         // Only add title if it's not empty
         if (section.title && section.title.trim() !== '') {
@@ -207,13 +301,13 @@ const AddProjectModal = ({ onClose }) => {
               name="category"
               value={formData.category}
               onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="capitalize w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
               required
             >
               <option value="">Select Category</option>
-              {categories.map((category, index) => (
-                <option key={index} value={category}>
-                  {category}
+              {categories.map((category) => (
+                <option key={category.id} value={category.name}>
+                  {category.name}
                 </option>
               ))}
             </select>
@@ -266,14 +360,14 @@ const AddProjectModal = ({ onClose }) => {
                   )}
                 </div>
 
-                {/* Optional Section Title */}
+                {/* Section Title */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Section Title (Optional)
+                    Section Title
                   </label>
                   <input
                     type="text"
-                    placeholder="Enter section title (optional)"
+                    placeholder="Enter section title"
                     value={section.title}
                     onChange={(e) => handleSectionChange(sectionIndex, 'title', e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -281,19 +375,147 @@ const AddProjectModal = ({ onClose }) => {
                   />
                 </div>
 
-                {/* Section Description */}
+                {/* Section Type */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Section Description</label>
-                  <textarea
-                    placeholder="Enter section description"
-                    rows="3"
-                    value={section.description}
-                    onChange={(e) => handleSectionChange(sectionIndex, 'description', e.target.value)}
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Content Type
+                  </label>
+                  <select
+                    value={section.type}
+                    onChange={(e) => handleSectionChange(sectionIndex, 'type', e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                    required
                     disabled={loading}
-                  ></textarea>
+                  >
+                    <option value="text">Plain Text</option>
+                    <option value="bullet">Bullet Points</option>
+                    <option value="numbered">Numbered List</option>
+                    <option value="nested">Nested List</option>
+                  </select>
                 </div>
+
+                {/* Content based on type */}
+                {section.type === 'text' ? (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                    <textarea
+                      placeholder="Enter section description"
+                      rows="3"
+                      value={section.description}
+                      onChange={(e) => handleSectionChange(sectionIndex, 'description', e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                      required
+                      disabled={loading}
+                    ></textarea>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center">
+                      <label className="block text-sm font-medium text-gray-700">List Items</label>
+                      <button
+                        type="button"
+                        onClick={() => handleAddListItem(sectionIndex)}
+                        className="text-green-700 hover:text-green-800 text-sm flex items-center"
+                        disabled={loading}
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clipRule="evenodd" />
+                        </svg>
+                        Add Item
+                      </button>
+                    </div>
+                    
+                    {section.items?.map((item, itemIndex) => (
+                      <div key={itemIndex} className="space-y-2 border border-gray-200 rounded-md p-4 bg-white">
+                        <div className="flex items-start gap-2">
+                          <div className="flex-1 space-y-2">
+                            <div className="flex items-center gap-2">
+                              <input
+                                type="text"
+                                placeholder={`Enter ${section.type === 'numbered' ? 'item' : 'bullet point'}`}
+                                value={item.text}
+                                onChange={(e) => handleListItemChange(sectionIndex, itemIndex, 'text', e.target.value)}
+                                className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                                disabled={loading}
+                              />
+                              <label className="flex items-center gap-1 text-sm text-gray-600">
+                                <input
+                                  type="checkbox"
+                                  checked={item.isBold}
+                                  onChange={(e) => handleListItemChange(sectionIndex, itemIndex, 'isBold', e.target.checked)}
+                                  className="rounded border-gray-300 text-green-600 focus:ring-green-500"
+                                  disabled={loading}
+                                />
+                                Bold
+                              </label>
+                            </div>
+                            
+                            <div className="flex items-center gap-2">
+                              <select
+                                value={item.position}
+                                onChange={(e) => handleListItemChange(sectionIndex, itemIndex, 'position', e.target.value)}
+                                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                                disabled={loading}
+                              >
+                                <option value="below">Description Below</option>
+                                <option value="inline">Description Inline</option>
+                              </select>
+                            </div>
+
+                            {item.position === 'below' ? (
+                              <textarea
+                                placeholder="Enter description (optional)"
+                                value={item.description}
+                                onChange={(e) => handleListItemChange(sectionIndex, itemIndex, 'description', e.target.value)}
+                                rows="2"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                                disabled={loading}
+                              />
+                            ) : (
+                              <div className="flex items-center gap-2">
+                                <span className="text-gray-500">-</span>
+                                <input
+                                  type="text"
+                                  placeholder="Enter description (optional)"
+                                  value={item.description}
+                                  onChange={(e) => handleListItemChange(sectionIndex, itemIndex, 'description', e.target.value)}
+                                  className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                                  disabled={loading}
+                                />
+                              </div>
+                            )}
+                          </div>
+
+                          {section.type === 'nested' && (
+                            <button
+                              type="button"
+                              onClick={() => handleAddSubItem(sectionIndex, itemIndex)}
+                              className="text-green-700 hover:text-green-800 p-2"
+                              disabled={loading}
+                            >
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clipRule="evenodd" />
+                              </svg>
+                            </button>
+                          )}
+                        </div>
+                        
+                        {/* Sub-items for nested lists */}
+                        {section.type === 'nested' && item.subItems?.map((subItem, subItemIndex) => (
+                          <div key={subItemIndex} className="ml-6">
+                            <input
+                              type="text"
+                              placeholder="Enter sub-item"
+                              value={subItem}
+                              onChange={(e) => handleSubItemChange(sectionIndex, itemIndex, subItemIndex, e.target.value)}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                              disabled={loading}
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             ))}
             <button

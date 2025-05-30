@@ -4,12 +4,15 @@ import Link from 'next/link';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import Image from 'next/image';
+import { ArrowLeftIcon } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 export default function GalleryItemPage({ params }) {
   const { id } = params;
   const [galleryItem, setGalleryItem] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchGalleryItem = async () => {
@@ -60,13 +63,19 @@ export default function GalleryItemPage({ params }) {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-8">
-        <h1 className="text-2xl font-bold text-gray-800">{galleryItem.title || 'Gallery Images'}</h1>
-        <Link href="/admin/gallery" className="text-green-700 hover:underline">
-          Back to Gallery
-        </Link>
+    <div className=" py-8">
+  <div className='flex gap-1 mb-5 items-center'>
+  <ArrowLeftIcon
+          className="h-6 w-6 text-gray-500 cursor-pointer hover:text-gray-800 mr-4"
+          onClick={() => router.push('/admin/gallery')}
+        />
+        <span className='cursor-pointer hover:underline'  onClick={() => router.push('/admin/gallery')}>Back to Gallery</span>
+  </div>
+      <div className=" items-center mb-8">
+        {/* Back Arrow */}
+      
+        {/* Title */}
+        <h1 className="text-lg font-bold text-gray-800">{galleryItem.title || 'Gallery Item Details'}</h1>
       </div>
 
       {/* Images Grid */}

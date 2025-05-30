@@ -48,7 +48,7 @@ const Solutions = () => {
   <div className="lg:block hidden md:w-[85%] mx-auto">
     <Deco/>
    </div>
-      <div className='mt-20 mb-10 md:w-[85%] w-[95%] mx-auto text-center'>
+      <div className='mt-5 mb-10 md:w-[85%] w-[95%] mx-auto text-center'>
         <div className='md:w-[60%] mx-auto'>
           <h1 className='uppercase text-2xl mb-3 font-bold text-[var(--color-primary-olive)]'>OUR SOLUTIONS AT A GLANCE</h1>
         <p className='text-md text-gray-700 mb-10'>Our services are designed to meet the evolving needs of women in agriculture, as well as the diverse stakeholders who support and empower them within the agricultural sector.</p>
@@ -66,7 +66,7 @@ const Solutions = () => {
         </div>
         <div className="max-w-3xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 text-left">
           {solutions.slice(3).map((solution, index) => (
-            <div key={index} className="bg-white border-l-[4px] border-[var(--color-primary-light-brown)] p-6 rounded-lg shadow-md flex flex-col items-center text-center">
+            <div key={index} className="bg-white border-l-[4px] border-[var(--color-primary-light-brown)] px-3 py-2 rounded-lg shadow-md flex flex-col items-center text-center">
              <Image loading='lazy' quality={100} alt='icon' className='mx-auto mb-5' src={solution.icon} width={100} height={100} />
               {/* <div className="w-12 h-12 bg-gray-200 rounded-full mb-4"></div> */}
             

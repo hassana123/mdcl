@@ -32,27 +32,27 @@ const Slideshow = () => {
           // Tablets
           640: {
             slidesPerView: 2,
-            spaceBetween: 15,
+            spaceBetween: 5,
           },
           // Large tablets
           768: {
             slidesPerView: 3,
-            spaceBetween: 15,
+            spaceBetween: 5,
           },
           // Laptops
           1024: {
             slidesPerView: 4,
-            spaceBetween: 20,
+            spaceBetween: 5,
           },
           // Large screens
           1280: {
             slidesPerView: 5,
-            spaceBetween: 20,
+            spaceBetween: 5,
           },
           // Extra large screens
           1536: {
             slidesPerView: 6,
-            spaceBetween: 25,
+            spaceBetween: 5,
           }
         }}
       >

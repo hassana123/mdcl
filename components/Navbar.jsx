@@ -41,12 +41,12 @@ const Navbar = () => {
 
   const navItems = [
     { label: "Home", href: "/" },
-    { label: "About Us", href: "/about/profile", hasDropdown: true },
+    { label: "About Us", href: "/about/what-we-are", hasDropdown: true },
     { label: "Our Solutions", href: "/solutions" },
-    { label: "Projects & Programmes", href: "/projects", hasDropdown: true },
+    { label: "Projects & Programmes", href: "/projects-&-programmes", hasDropdown: true },
     { label: "Gallery", href: "/gallery" },
-    { label: "Blogs", href: "/blogs" },
-    { label: "Resources", href: "/resources/newsletter", hasDropdown:true },
+    { label: "Blog", href: "/blog" },
+    { label: "Resources", href: "/resources", hasDropdown:true },
     { label: "Contact Us", href: "/contact" },
   ];
 
@@ -63,7 +63,7 @@ const Navbar = () => {
     ));
 
   return (
-    <header className="bg-white border-b  border-[var(--color-primary-fuchia)] ">
+    <header className="bg-[var(--color-primary-fuchia)]/60 border-b  border-[var(--color-primary-fuchia)] ">
       {/* Top bar */}
       {/* <div className="bg-[var(--color-primary-fuchia)] py-3 text-black text-[17px]">
         <div className="flex justify-between w-[90%] mx-auto">
@@ -112,7 +112,7 @@ const Navbar = () => {
                     <div className="absolute left-0 mt-2 w-48 bg-white border rounded shadow-lg z-50">
                       {renderDropdown(
                         [
-                          { href: "/about/profile", label: "Company Profile" },
+                          { href: "/about/what-we-are", label: "What We Are" },
                           { href: "/about/team", label: "Our Team" },
                         ],
                         () => setAboutOpen(false)
@@ -150,9 +150,9 @@ const Navbar = () => {
                     <div className="absolute left-0 mt-2 w-56 bg-white border rounded shadow-lg z-50">
                       {renderDropdown(
                         [
-                          { href: "/projects/research", label: "Research Projects" },
-                          { href: "/projects/project-management", label: "Project Management" },
-                          { href: "/projects/capacity-development", label: "Capacity Development" },
+                          { href: "/projects-&-programmes/research", label: "Research Projects" },
+                          { href: "/projects-&-programmes/project-management", label: "Project Management" },
+                          { href: "/projects-&-programmes/capacity-development", label: "Capacity Development" },
                         ],
                         () => setProjectsOpen(false)
                       )}
@@ -189,7 +189,7 @@ if (label === "Resources") {
                       {renderDropdown(
                         [
                           { href: "/resources/newsletter", label: "Newsletter" },
-                          { href: "/resources/others", label: "Others" },
+                          { href: "/resources/others", label: "Other Resources" },
                          
                         ],
                         () => resourceOpen(false)

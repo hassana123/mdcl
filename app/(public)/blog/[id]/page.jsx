@@ -156,7 +156,7 @@ export default function BlogPostPage({ params }) {
         subtitle={
           <span className="text-center font-medium text-white/70">
             <Link href="/" className="hover:underline">Home</Link> /{" "}
-            <Link href="/blogs" className="hover:underline">Blog</Link> /{" "}
+            <Link href="/blog" className="hover:underline">Blog</Link> /{" "}
             <span className="text-white font-bold">Blog Post</span>
           </span>
         }

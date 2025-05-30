@@ -35,7 +35,7 @@ const PreviewSolutions = () => {
     <section className="md:w-[85%] w-[90%] mx-auto my-10">
       <div className="grid md:grid-cols-2 space-y-8">
         <h3 className="text-[40px] uppercase md:w-[60%] font-bold text-[var(--color-primary-olive)]">
-          The Solutions we Offer
+          Our Solutions
         </h3>
         {solutions.map((solution, index) => (
           <div className="md:w-[70%] space-y-2" key={index}>

@@ -9,11 +9,11 @@ export default function ResearchProjectsPage() {
           <Link href={"/"} className="hover:underline">
             Home{" "}/{" "}
           </Link>
-          <Link href={"/projects"} className="hover:underline">
-            Projects{" "}/ {" "}
+          <Link href={"/projects-&-programmes"} className="hover:underline">
+            Projects & Programmes{" "}/ {" "}
           </Link>
           <Link
-            href={"/projects/research"}
+            href={"/projects-&-programmes/research"}
             className="hover:underline text-white font-bold"
           >
             Research{" "}

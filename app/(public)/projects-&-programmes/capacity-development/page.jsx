@@ -10,11 +10,11 @@ export default function CapacityDevelopmentPage() {
           <Link href={"/"} className="hover:underline">
             Home{" "}/{" "}
           </Link>
-          <Link href={"/projects"} className="hover:underline">
-            Projects{" "}/{" "}
+          <Link href={"/projects-&-programmes"} className="hover:underline">
+            Projects & Programmes{" "}/{" "}
           </Link>
           <Link
-            href={"/projects/capacity-development"}
+            href={"/projects-&-programmes/capacity-development"}
             className="hover:underline text-white font-bold"
           >
             Capacity Development{" "}

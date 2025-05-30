@@ -9,11 +9,15 @@ import AddCategoryModal from '@/components/admin/projects/AddCategoryModal';
 
 const AdminProjectsPage = () => {
   const { user } = useAuth();
-  const [projects, setProjects] = useState([]);
+  const [allProjects, setAllProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [searchQuery, setSearchQuery] = useState('');
+  const itemsPerPage = 6;
 
   useEffect(() => {
     fetchProjects();
@@ -32,7 +36,7 @@ const AdminProjectsPage = () => {
         createdAt: doc.data().createdAt?.toDate()
       }));
       
-      setProjects(projectsData);
+      setAllProjects(projectsData);
     } catch (error) {
       console.error('Error fetching projects:', error);
       setError('Failed to load projects');
@@ -40,6 +44,33 @@ const AdminProjectsPage = () => {
       setLoading(false);
     }
   };
+
+  // Filter projects based on category and search query
+  const filteredProjects = allProjects.filter(project => {
+    if (!project.category) return false;
+
+    // Category filter
+    const matchesCategory = selectedCategory === 'All' || 
+      project.category.toLowerCase() === selectedCategory.toLowerCase();
+
+    // Search filter
+    const matchesSearch = searchQuery === '' || 
+      project.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      project.excerpt?.toLowerCase().includes(searchQuery.toLowerCase());
+
+    return matchesCategory && matchesSearch;
+  });
+
+  // Paginate the filtered results
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentProjects = filteredProjects.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredProjects.length / itemsPerPage);
+
+  // Reset to first page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedCategory, searchQuery]);
 
   const handleAddProjectClick = () => {
     setIsProjectModalOpen(true);
@@ -51,7 +82,7 @@ const AdminProjectsPage = () => {
 
   const handleCloseProjectModal = () => {
     setIsProjectModalOpen(false);
-    fetchProjects(); // Refresh projects after adding new one
+    fetchProjects();
   };
 
   const handleCloseCategoryModal = () => {
@@ -59,13 +90,14 @@ const AdminProjectsPage = () => {
   };
 
   const handleCategoryAdded = () => {
-    // This will be passed to AddCategoryModal to refresh categories
     setIsCategoryModalOpen(false);
   };
 
   const handleProjectDeleted = () => {
     fetchProjects();
   };
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   if (!user) {
     return (
@@ -89,17 +121,9 @@ const AdminProjectsPage = () => {
           >
             Add New Project
           </button>
-          <button 
-            className="bg-gray-300 text-gray-800 py-2 px-4 rounded-md hover:bg-gray-400 transition-colors"
-            onClick={handleAddCategoryClick}
-          >
-            Add New Category
-          </button>
         </div>
       </div>
 
-      {/* Manage Your Projects section title - seems to be missing in the provided image but present in the general layout */}
-    
       {error && (
         <div className="mb-4 p-4 bg-red-50 border border-red-200 text-red-700 rounded">
           {error}
@@ -111,7 +135,37 @@ const AdminProjectsPage = () => {
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-700"></div>
         </div>
       ) : (
-        <ProjectList projects={projects} onProjectDeleted={handleProjectDeleted} />
+        <ProjectList 
+          projects={currentProjects} 
+          onProjectDeleted={handleProjectDeleted}
+          allProjects={allProjects}
+          selectedCategory={selectedCategory}
+          onCategoryChange={setSelectedCategory}
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+        />
+      )}
+
+      {filteredProjects.length > itemsPerPage && (
+        <div className="flex items-center justify-end space-x-2 mt-8">
+          <button
+            onClick={() => paginate(currentPage - 1)}
+            disabled={currentPage === 1}
+            className="px-3 py-1 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100 disabled:opacity-50"
+          >
+            Previous
+          </button>
+          <span>
+            Page {currentPage} of {totalPages}
+          </span>
+          <button
+            onClick={() => paginate(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            className="px-3 py-1 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100 disabled:opacity-50"
+          >
+            Next
+          </button>
+        </div>
       )}
 
       {isProjectModalOpen && <AddProjectModal onClose={handleCloseProjectModal} />}

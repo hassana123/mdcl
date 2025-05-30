@@ -40,8 +40,8 @@ const Contact = () => {
         <h2 className="text-lg font-semibold mb-6">Contact Information</h2>
         <div className="text-sm mb-6 space-y-4">
           <div>Email: info@microdevelopmentng.com</div>
-          <div>Phone number: +234(0)92920265, +234(0)8052026025</div>
-          <div>Address: 23 Liverpool Street, Sabo Yaba, Ebute, Abuja</div>
+          <div>Phone number:+234(0)92920265, +234(0)8052026025</div>
+          <div>28 Liverpool Street, Sun City Estate, Abuja</div>
         </div>
         <div className="w-full  h-40 rounded-lg overflow-hidden mb-4 relative">
           <Image
