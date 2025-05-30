@@ -64,8 +64,19 @@ export default function AdminGalleryPage() {
       // Delete all images from storage
       if (item.images && item.images.length > 0) {
         const imageDeletePromises = item.images.map(imageUrl => {
-          const imageRef = ref(storage, imageUrl);
-          return deleteObject(imageRef);
+          // Extract the path from the URL
+          const decodedUrl = decodeURIComponent(imageUrl);
+          const pathMatch = decodedUrl.match(/o\/(.+?)\?/);
+          if (pathMatch) {
+            const path = pathMatch[1];
+            const imageRef = ref(storage, path);
+            return deleteObject(imageRef).catch(error => {
+              console.error('Error deleting image:', error);
+              // Continue with deletion even if one file fails
+              return Promise.resolve();
+            });
+          }
+          return Promise.resolve();
         });
         await Promise.all(imageDeletePromises);
       }
@@ -73,8 +84,19 @@ export default function AdminGalleryPage() {
       // Delete all videos from storage
       if (item.videos && item.videos.length > 0) {
         const videoDeletePromises = item.videos.map(videoUrl => {
-          const videoRef = ref(storage, videoUrl);
-          return deleteObject(videoRef);
+          // Extract the path from the URL
+          const decodedUrl = decodeURIComponent(videoUrl);
+          const pathMatch = decodedUrl.match(/o\/(.+?)\?/);
+          if (pathMatch) {
+            const path = pathMatch[1];
+            const videoRef = ref(storage, path);
+            return deleteObject(videoRef).catch(error => {
+              console.error('Error deleting video:', error);
+              // Continue with deletion even if one file fails
+              return Promise.resolve();
+            });
+          }
+          return Promise.resolve();
         });
         await Promise.all(videoDeletePromises);
       }

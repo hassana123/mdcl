@@ -114,9 +114,9 @@ const AddGalleryItemModal = ({ isOpen, onClose, onGalleryItemAdded }) => {
 
   return (
     <div className="fixed inset-0 bg-gray-700/30 flex items-center justify-center z-50">
-      <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-md">
+      <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-md max-h-[90vh] flex flex-col">
         <h3 className="text-lg font-semibold text-gray-800 mb-4">Add New Gallery Item</h3>
-        <div className="space-y-4">
+        <div className="space-y-4 overflow-y-auto flex-1 pr-2">
           <div>
             <label htmlFor="title" className="block text-sm font-medium text-gray-700">Title</label>
             <input
@@ -233,7 +233,7 @@ const AddGalleryItemModal = ({ isOpen, onClose, onGalleryItemAdded }) => {
             <p className="text-red-500 text-sm">{error}</p>
           )}
         </div>
-        <div className="flex justify-end space-x-4 mt-6">
+        <div className="flex justify-end space-x-4 mt-6 pt-4 border-t">
           <button
             onClick={onClose}
             className="px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 transition-colors"

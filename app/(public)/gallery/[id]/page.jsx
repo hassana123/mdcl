@@ -1,38 +1,65 @@
+"use client";
 import Link from "next/link"
 import { ChevronLeft } from "lucide-react"
+import { useState, useEffect } from "react"
+import { doc, getDoc } from "firebase/firestore"
+import { db } from "@/lib/firebase"
+import Image from "next/image"
+import Banner from "@/components/Banner"
+import { use } from "react"
+import { useParams } from "next/navigation";
 
 // Dummy gallery data (same as in the main gallery page)
-const galleryData = [
-  {
-    id: 1,
-    title:
-      "2010: FACILITATION OF TRIPARTITE AGREEMENT BETWEEN CADP, MARKET ASSOCIATIONS, AND THE COMMERCIAL AGRICULTURE DEVELOPMENT ASSOCIATION (CADA), UNDER THE WORLD BANK-ASSISTED COMMERCIAL AGRICULTURE DEVELOPMENT PROJECT'S DEVELOPMENT OF MARKET INFORMATION KIOSKS IN KADUNA STATE",
-    year: "2010",
-    type: "images",
-    images: ["/placeholder.jpg", "/placeholder.jpg", "/placeholder.jpg"],
-    description:
-      "This project facilitated a tripartite agreement between CADP, Market Associations, and the Commercial Agriculture Development Association (CADA) under the World Bank-assisted Commercial Agriculture Development Project for the development of market information kiosks in Kaduna State.",
-  },
-  {
-    id: 2,
-    title: "TRAINING WORKSHOPS FOR FCT SHARIA COURT OF APPEAL (2010 - 2014)",
-    year: "2010-2014",
-    type: "images",
-    images: ["/placeholder.jpg", "/placeholder.jpg"],
-    description: "Training workshops conducted for FCT Sharia Court of Appeal staff from 2010 to 2014.",
-  },
-  // Add more items as needed...
-]
 
-export default async function GalleryDetailPage({ params }) {
-  const galleryItem = galleryData.find((item) => item.id === Number.parseInt(params.id))
+export default function GalleryDetailPage() {
+  const params= useParams()
+  const [galleryItem, setGalleryItem] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
 
-  if (!galleryItem) {
+  useEffect(() => {
+    const fetchGalleryItem = async () => {
+      try {
+        setLoading(true)
+        const docRef = doc(db, 'gallery', params.id)
+        const docSnap = await getDoc(docRef)
+
+        if (docSnap.exists()) {
+          setGalleryItem({
+            id: docSnap.id,
+            ...docSnap.data(),
+            createdAt: docSnap.data().createdAt?.toDate()
+          })
+        } else {
+          setError('Gallery item not found')
+        }
+      } catch (error) {
+        console.error('Error fetching gallery item:', error)
+        setError('Failed to load gallery item')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchGalleryItem()
+  }, [params.id])
+
+  if (loading) {
+    return (
+      <div className="container mx-auto px-4 py-16">
+        <div className="flex justify-center items-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--color-primary-olive)]"></div>
+        </div>
+      </div>
+    )
+  }
+
+  if (error || !galleryItem) {
     return (
       <div className="container mx-auto px-4 py-16">
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-4">Gallery Item Not Found</h1>
-          <Link href="/gallery" className="text-olive hover:underline">
+          <Link href="/gallery" className="text-[var(--color-primary-olive)] hover:underline">
             Back to Gallery
           </Link>
         </div>
@@ -43,29 +70,28 @@ export default async function GalleryDetailPage({ params }) {
   return (
     <>
       {/* Hero Section */}
-      <section
-        className="relative h-64 bg-cover bg-center flex items-center justify-center"
-        style={{
-          backgroundImage: "linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('/placeholder.jpg')",
-        }}
-      >
-        <div className="text-center text-white">
-          <h1 className="text-4xl font-bold mb-2">Gallery</h1>
-          <nav className="text-sm">
-            <span>Home</span>
-            <span className="mx-2">/</span>
-            <span>Gallery</span>
-          </nav>
-        </div>
-      </section>
+      <Banner
+        title={"Gallery"}
+        subtitle={
+          <span className="text-center font-medium text-white/70">
+            <Link href="/" className="hover:underline">
+              Home
+            </Link>{" "}
+            /{" "}
+            <Link href="/gallery" className="hover:underline">
+              Gallery
+            </Link>{" "}
+          </span>
+        }
+      />
 
       {/* Gallery Detail Content */}
       <section className="py-16 bg-background">
-        <div className="container mx-auto px-4">
+        <div className="w-[95%] md:w-[85%] mx-auto ">
           {/* Back Button */}
           <Link
             href="/gallery"
-            className="inline-flex items-center text-gray-600 hover:text-olive transition-colors mb-8"
+            className="inline-flex items-center text-gray-600 hover:text-[var(--color-primary-olive)] transition-colors mb-8"
           >
             <ChevronLeft className="h-5 w-5 mr-1" />
             Back
@@ -73,31 +99,34 @@ export default async function GalleryDetailPage({ params }) {
 
           {/* Gallery Item Title */}
           <div className="text-center mb-12">
-            <h2 className="text-2xl md:text-3xl font-bold leading-tight max-w-4xl mx-auto">{galleryItem.title}</h2>
+            <h2 className="text-md md:text-lg font-bold leading-relaxed ">
+              {galleryItem.title}
+            </h2>
           </div>
 
           {/* Images Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
-            {galleryItem.images.map((image, index) => (
-              <div key={index} className="relative aspect-video bg-gray-200 rounded-lg overflow-hidden">
-                {/* Replace with actual image when available */}
-                {/* <Image 
-                  src={image || "/placeholder.svg"} 
-                  alt={`${galleryItem.title} - Image ${index + 1}`} 
-                  fill 
-                  className="object-cover"
-                /> */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mx-auto">
+            {galleryItem.images?.map((image, index) => (
+              <div key={index} className="relative aspect-video rounded-lg overflow-hidden">
+                <Image
+                  src={image}
+                  alt={`${galleryItem.title} - Image ${index + 1}`}
+                  fill
+                  className="object-contain rounded-lg"
+                  // sizes="(max-width: 768px) 100vw, 50vw"
+                  priority={index < 2}
+                />
               </div>
             ))}
           </div>
 
-          {/* Description (if available) */}
-          {/* {galleryItem.description && (
+          {/* Description */}
+          {galleryItem.description && (
             <div className="max-w-4xl mx-auto mt-12">
               <h3 className="text-xl font-semibold mb-4">About this Project</h3>
               <p className="text-gray-700 leading-relaxed">{galleryItem.description}</p>
             </div>
-          )} */}
+          )}
         </div>
       </section>
     </>
