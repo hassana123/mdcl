@@ -125,7 +125,7 @@ const ProjectDisplay = ({
                       )}
                     </div>
                     <Link
-                      href={`/projects/${category}/${proj.id}`}
+                      href={`/projects-&-programmes/${category}/${proj.id}`}
                       className="font-semibold underline text-[var(--color-title-text)] mb-2 hover:text-[var(--color-primary-olive)]"
                     >
                       {proj.title}
