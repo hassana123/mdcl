@@ -21,7 +21,7 @@ const AdminBlogsPage = () => {
   const [deleteLoading, setDeleteLoading] = useState(false); // State for delete operation loading
 
   // Placeholder states for filtering and sorting (functionality to be added later)
-  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [selectedCategory, setSelectedCategory] = useState('all');
   const [fromDate, setFromDate] = useState('');
   const [toDate, setToDate] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
@@ -49,7 +49,8 @@ const AdminBlogsPage = () => {
         id: doc.id,
         ...doc.data(),
         // Convert Firestore Timestamp to Date object
-        createdAt: doc.data().createdAt?.toDate() 
+        createdAt: doc.data().createdAt?.toDate(),
+        publishDate: doc.data().publishDate?.toDate()
       }));
       
       setBlogs(blogsData);
@@ -136,6 +137,28 @@ const AdminBlogsPage = () => {
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
+  // Filter blogs based on search query, category, and date range
+  const filteredBlogs = blogs.filter(blog => {
+    const matchesSearch = blog.title.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCategory = selectedCategory === 'all' || blog.category === selectedCategory;
+    
+    // Date filtering - handle both Date objects and Firestore Timestamps
+    const blogDate = blog.publishDate || blog.createdAt;
+    const matchesDateRange = (!fromDate || !toDate) || (
+      blogDate >= new Date(fromDate) && 
+      blogDate <= new Date(toDate + 'T23:59:59')
+    );
+
+    return matchesSearch && matchesCategory && matchesDateRange;
+  });
+
+  // Sort blogs by publish date (newest first)
+  const sortedBlogs = [...filteredBlogs].sort((a, b) => {
+    const dateA = a.publishDate || a.createdAt;
+    const dateB = b.publishDate || b.createdAt;
+    return dateB - dateA;
+  });
+
   // Authentication check
   if (!user) {
     return (
@@ -159,7 +182,7 @@ const AdminBlogsPage = () => {
         </button>
       </div>
 
-      {/* Filter, Sort, and Search Controls (Placeholder) */}
+      {/* Filter, Sort, and Search Controls */}
       <div className="flex items-center space-x-4 mb-6">
         <span className="text-gray-700 font-semibold">Sort by Date:</span>
         {/* Category Filter */}
@@ -171,22 +194,34 @@ const AdminBlogsPage = () => {
         All Blog
         </div>
         
-        {/* Date Filters (Placeholder) */}
-        <input type="date" className="border border-gray-200 shadow-md px-4 outline-none rounded-xl py-2" value={fromDate} onChange={(e) => setFromDate(e.target.value)} />
-        <input type="date" className="border border-gray-200 shadow-md px-4 outline-none rounded-xl py-2" value={toDate} onChange={(e) => setToDate(e.target.value)} />
+        {/* Date Filters */}
+        <div className="flex items-center space-x-2">
+          <input 
+            type="date" 
+            className="border border-gray-200 shadow-md px-4 outline-none rounded-xl py-2" 
+            value={fromDate} 
+            onChange={(e) => setFromDate(e.target.value)} 
+            placeholder="From Date"
+          />
+          <span className="text-gray-500">to</span>
+          <input 
+            type="date" 
+            className="border border-gray-200 shadow-md px-4 outline-none rounded-xl py-2" 
+            value={toDate} 
+            onChange={(e) => setToDate(e.target.value)} 
+            placeholder="To Date"
+          />
+        </div>
 
         {/* Search Input */}
-        <div className="relative ml-auto">
+        <div className="flex-1">
           <input
             type="text"
-            placeholder="Search"
+            placeholder="Search blogs..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full px-3 py-2 pl-10 border border-gray-200 rounded-xl shadow-md focus:outline-none focus:ring-2 focus:ring-green-500"
+            className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500"
           />
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
         </div>
       </div>
 
@@ -206,7 +241,7 @@ const AdminBlogsPage = () => {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {currentBlogs.map(blog => (
+          {sortedBlogs.map(blog => (
             <div key={blog.id} className="bg-white rounded-lg shadow-md overflow-hidden">
                <div className="relative h-48 bg-gray-100">
                  {blog.image ? (
@@ -217,9 +252,10 @@ const AdminBlogsPage = () => {
                </div>
                <div className="p-4">
                  <h3 className="font-bold text-gray-800 mb-2 line-clamp-1">{blog.title}</h3>
-                 <p className="text-gray-700 text-sm mb-1">By: Admin</p>{/* Assuming admin author for now */}
-                 <p className="text-xs text-gray-500 mb-4">{blog.createdAt?.toLocaleDateString()}</p>
-                 {/* <p className="text-gray-700 text-sm mb-4 line-clamp-2">{blog.excerpt || 'No excerpt available.'}</p> */}
+                 <p className="text-gray-700 text-sm mb-1">By: {blog.postedBy}</p>
+                 <p className="text-xs text-gray-500 mb-4">
+                   Published: {(blog.publishDate || blog.createdAt).toLocaleDateString()}
+                 </p>
                  <div className="flex space-x-4">
                    <button className="text-green-700 hover:text-green-800 transition-colors" onClick={() => handleEditClick(blog)}>Edit</button>
                    <button className="text-red-600 hover:text-red-800 transition-colors" onClick={() => handleDeleteClick(blog)}>Delete</button>

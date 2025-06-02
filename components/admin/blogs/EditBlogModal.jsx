@@ -16,9 +16,29 @@ const EditBlogModal = ({ blog, onClose, onBlogUpdated }) => {
     layoutType: blog.layoutType || 'standard',
     // Initialize content based on existing blog data and layout type
     content: blog.layoutType === 'standard' ? blog.content || '' : '',
-    sections: (blog.layoutType === 'sectioned' || blog.layoutType === 'introduction-conclusion') ? blog.sections || [{ title: '', description: '', id: Math.random() }] : [{ title: '', description: '', id: Math.random() }],
+    sections: (blog.layoutType === 'sectioned' || blog.layoutType === 'introduction-conclusion') ? 
+      blog.sections?.map(section => ({
+        ...section,
+        type: section.type || 'text',
+        items: section.items || []
+      })) || [{ 
+        title: '', 
+        description: '',
+        type: 'text',
+        items: []
+      }] : [{ 
+        title: '', 
+        description: '',
+        type: 'text',
+        items: []
+      }],
     introduction: blog.layoutType === 'introduction-conclusion' ? blog.introduction || '' : '',
     conclusion: blog.layoutType === 'introduction-conclusion' ? blog.conclusion || '' : '',
+    publishDate: blog.publishDate ? (typeof blog.publishDate.toDate === 'function' ? 
+      blog.publishDate.toDate().toISOString().split('T')[0] : 
+      new Date(blog.publishDate).toISOString().split('T')[0]) : 
+      new Date().toISOString().split('T')[0],
+    postedBy: blog.postedBy || 'mdcl',
   });
   const [coverImageFile, setCoverImageFile] = useState(null); // For new file uploads
   const [existingCoverImageUrl, setExistingCoverImageUrl] = useState(blog.image || null); // To display and manage existing image
@@ -159,6 +179,77 @@ const EditBlogModal = ({ blog, onClose, onBlogUpdated }) => {
     }));
   };
 
+  const handleAddListItem = (sectionIndex) => {
+    setFormData(prev => {
+      const newSections = prev.sections.map((section, i) => {
+        if (i === sectionIndex) {
+          return {
+            ...section,
+            items: [...(section.items || []), { 
+              text: '', 
+              description: '',
+              isBold: false,
+              position: 'below',
+              subItems: [] 
+            }]
+          };
+        }
+        return section;
+      });
+      return { ...prev, sections: newSections };
+    });
+  };
+
+  const handleListItemChange = (sectionIndex, itemIndex, field, value) => {
+    setFormData(prev => {
+      const newSections = prev.sections.map((section, i) => {
+        if (i === sectionIndex) {
+          const newItems = [...section.items];
+          newItems[itemIndex] = { ...newItems[itemIndex], [field]: value };
+          return { ...section, items: newItems };
+        }
+        return section;
+      });
+      return { ...prev, sections: newSections };
+    });
+  };
+
+  const handleAddSubItem = (sectionIndex, itemIndex) => {
+    setFormData(prev => {
+      const newSections = prev.sections.map((section, i) => {
+        if (i === sectionIndex) {
+          const newItems = [...section.items];
+          newItems[itemIndex] = {
+            ...newItems[itemIndex],
+            subItems: [...(newItems[itemIndex].subItems || []), '']
+          };
+          return { ...section, items: newItems };
+        }
+        return section;
+      });
+      return { ...prev, sections: newSections };
+    });
+  };
+
+  const handleSubItemChange = (sectionIndex, itemIndex, subItemIndex, value) => {
+    setFormData(prev => {
+      const newSections = prev.sections.map((section, i) => {
+        if (i === sectionIndex) {
+          const newItems = [...section.items];
+          newItems[itemIndex] = {
+            ...newItems[itemIndex],
+            subItems: newItems[itemIndex].subItems.map((subItem, j) => 
+              j === subItemIndex ? value : subItem
+            )
+          };
+          return { ...section, items: newItems };
+        }
+        return section;
+      });
+      return { ...prev, sections: newSections };
+    });
+  };
+
   const uploadCoverImage = async () => {
     if (coverImageFile) {
        try {
@@ -201,13 +292,6 @@ const EditBlogModal = ({ blog, onClose, onBlogUpdated }) => {
       return;
     }
 
-    // Excerpt word count validation - commented out
-    // const excerptWordCount = formData.excerpt.trim().split(/\s+/).filter(word => word.length > 0).length;
-    // if (excerptWordCount > 30) {
-    //     setError('Excerpt cannot exceed 30 words.');
-    //     return;
-    // }
-
     // Validate content based on layout type
     if (formData.layoutType === 'standard' && !formData.content.trim()) {
       setError('Please fill in the blog content');
@@ -215,9 +299,19 @@ const EditBlogModal = ({ blog, onClose, onBlogUpdated }) => {
     }
 
     if ((formData.layoutType === 'sectioned' || formData.layoutType === 'introduction-conclusion') && 
-        formData.sections.some(section => !section.description.trim())) {
-        setError('Please fill in all section descriptions');
-        return;
+        formData.sections.some(section => {
+          // For text type, description is required
+          if (section.type === 'text' && !section.description.trim()) {
+            return true;
+          }
+          // For list types, description is optional
+          if (['bullet', 'numbered', 'nested'].includes(section.type)) {
+            return false;
+          }
+          return false;
+        })) {
+      setError('Please fill in all text section descriptions');
+      return;
     }
 
     if (formData.layoutType === 'introduction-conclusion' && 
@@ -243,8 +337,10 @@ const EditBlogModal = ({ blog, onClose, onBlogUpdated }) => {
         // excerpt: formData.excerpt.trim(), // Commented out excerpt
         layoutType: formData.layoutType,
         image: coverImageUrl, // Can be null
+        publishDate: new Date(formData.publishDate),
         updatedAt: new Date(),
         updatedBy: user.uid,
+        postedBy: formData.postedBy,
       };
 
       // Add content based on layout type
@@ -253,18 +349,25 @@ const EditBlogModal = ({ blog, onClose, onBlogUpdated }) => {
       } else if (formData.layoutType === 'sectioned') {
         // Clean up sections: remove empty titles, trim descriptions
         blogData.sections = formData.sections.map(section => ({
-            description: section.description.trim(),
-            ...(section.title.trim() && { title: section.title.trim() }), // Add title only if not empty
-        })).filter(section => section.description); // Filter out sections with empty descriptions
+          type: section.type || 'text',
+          items: section.items || [],
+          ...(section.title && section.title.trim() && { title: section.title.trim() }), // Add title only if not empty
+          ...(section.description && section.description.trim() && { description: section.description.trim() }), // Add description only if not empty
+        })).filter(section => 
+          (section.description && section.description.trim()) || (section.items && section.items.length > 0)
+        ); // Filter out empty sections
 
       } else if (formData.layoutType === 'introduction-conclusion') {
         blogData.introduction = formData.introduction.trim();
-         // Clean up sections: remove empty titles, trim descriptions
-         blogData.sections = formData.sections.map(section => ({
-             description: section.description.trim(),
-             ...(section.title.trim() && { title: section.title.trim() }), // Add title only if not empty
-         })).filter(section => section.description); // Filter out sections with empty descriptions
-
+        // Clean up sections: remove empty titles, trim descriptions
+        blogData.sections = formData.sections.map(section => ({
+          type: section.type || 'text',
+          items: section.items || [],
+          ...(section.title && section.title.trim() && { title: section.title.trim() }), // Add title only if not empty
+          ...(section.description && section.description.trim() && { description: section.description.trim() }), // Add description only if not empty
+        })).filter(section => 
+          (section.description && section.description.trim()) || (section.items && section.items.length > 0)
+        ); // Filter out empty sections
         blogData.conclusion = formData.conclusion.trim();
       }
 
@@ -354,6 +457,35 @@ const EditBlogModal = ({ blog, onClose, onBlogUpdated }) => {
           </div>
           */}
 
+          {/* Publish Date */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Publish Date</label>
+            <input
+              type="date"
+              name="publishDate"
+              value={formData.publishDate}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+              required
+              disabled={loading}
+            />
+          </div>
+
+          {/* Posted By */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Posted By</label>
+            <input
+              type="text"
+              name="postedBy"
+              value={formData.postedBy}
+              onChange={handleInputChange}
+              placeholder="Enter author name"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+              required
+              disabled={loading}
+            />
+          </div>
+
           {/* Layout Type Selector */}
           <div>
             <label htmlFor="layoutType" className="block text-sm font-medium text-gray-700 mb-1">Blog Layout Type</label>
@@ -437,50 +569,179 @@ const EditBlogModal = ({ blog, onClose, onBlogUpdated }) => {
           {/* Sectioned Layout Content (and Intermediate Sections for intro-conclusion) */}
           {(formData.layoutType === 'sectioned' || formData.layoutType === 'introduction-conclusion') && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">{formData.layoutType === 'sectioned' ? 'Sections' : 'Intermediate Sections'}</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Blog Sections</label>
               {formData.sections.map((section, index) => (
                 <div key={section.id || index} className="border border-gray-200 rounded-md p-4 mb-4 space-y-4 bg-gray-50">
                   <div className="flex justify-between items-center">
-                     <h4 className="font-semibold text-gray-700">Section {index + 1}</h4>
-                     {formData.sections.length > 1 && (
-                       <button 
-                         type="button" 
-                         onClick={() => handleRemoveSection(index)} 
-                         className="text-red-600 hover:text-red-800 text-sm"
-                         disabled={loading}
-                       >
-                         Remove Section
-                       </button>
-                     )}
-                   </div>
-                  {/* Optional Section Title */}
-                   <div>
-                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                       Section Title (Optional)
-                     </label>
-                     <input
-                       type="text"
-                       placeholder="Enter section title (optional)"
-                       value={section.title}
-                       onChange={(e) => handleSectionChange(index, 'title', e.target.value)}
-                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                       disabled={loading}
-                     />
-                   </div>
+                    <h4 className="font-semibold text-gray-700">Section {index + 1}</h4>
+                    {formData.sections.length > 1 && (
+                      <button 
+                        type="button" 
+                        onClick={() => handleRemoveSection(index)} 
+                        className="text-red-600 hover:text-red-800 text-sm"
+                        disabled={loading}
+                      >
+                        Remove Section
+                      </button>
+                    )}
+                  </div>
 
-                  {/* Section Description */}
+                  {/* Section Title */}
                   <div>
-                     <label className="block text-sm font-medium text-gray-700 mb-1">Section Description</label>
-                     <textarea
-                       placeholder="Enter section description"
-                       rows="3"
-                       value={section.description}
-                       onChange={(e) => handleSectionChange(index, 'description', e.target.value)}
-                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                       required
-                       disabled={loading}
-                     ></textarea>
-                   </div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Section Title
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Enter section title"
+                      value={section.title}
+                      onChange={(e) => handleSectionChange(index, 'title', e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                      disabled={loading}
+                    />
+                  </div>
+
+                  {/* Section Type */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Content Type
+                    </label>
+                    <select
+                      value={section.type}
+                      onChange={(e) => handleSectionChange(index, 'type', e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                      disabled={loading}
+                    >
+                      <option value="text">Plain Text</option>
+                      <option value="bullet">Bullet Points</option>
+                      <option value="numbered">Numbered List</option>
+                      <option value="nested">Nested List</option>
+                    </select>
+                  </div>
+
+                  {/* Content based on type */}
+                  {section.type === 'text' ? (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Section Description</label>
+                      <textarea
+                        placeholder="Enter section description"
+                        rows="3"
+                        value={section.description}
+                        onChange={(e) => handleSectionChange(index, 'description', e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                        required
+                        disabled={loading}
+                      ></textarea>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      <div className="flex justify-between items-center">
+                        <label className="block text-sm font-medium text-gray-700">List Items</label>
+                        <button
+                          type="button"
+                          onClick={() => handleAddListItem(index)}
+                          className="text-green-700 hover:text-green-800 text-sm flex items-center"
+                          disabled={loading}
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clipRule="evenodd" />
+                          </svg>
+                          Add Item
+                        </button>
+                      </div>
+                      
+                      {section.items?.map((item, itemIndex) => (
+                        <div key={itemIndex} className="space-y-2 border border-gray-200 rounded-md p-4 bg-white">
+                          <div className="flex items-start gap-2">
+                            <div className="flex-1 space-y-2">
+                              <div className="flex items-center gap-2">
+                                <input
+                                  type="text"
+                                  placeholder={`Enter ${section.type === 'numbered' ? 'item' : 'bullet point'}`}
+                                  value={item.text}
+                                  onChange={(e) => handleListItemChange(index, itemIndex, 'text', e.target.value)}
+                                  className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                                  disabled={loading}
+                                />
+                                <label className="flex items-center gap-1 text-sm text-gray-600">
+                                  <input
+                                    type="checkbox"
+                                    checked={item.isBold}
+                                    onChange={(e) => handleListItemChange(index, itemIndex, 'isBold', e.target.checked)}
+                                    className="rounded border-gray-300 text-green-600 focus:ring-green-500"
+                                    disabled={loading}
+                                  />
+                                  Bold
+                                </label>
+                              </div>
+                              
+                              <div className="flex items-center gap-2">
+                                <select
+                                  value={item.position}
+                                  onChange={(e) => handleListItemChange(index, itemIndex, 'position', e.target.value)}
+                                  className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                                  disabled={loading}
+                                >
+                                  <option value="below">Description Below</option>
+                                  <option value="inline">Description Inline</option>
+                                </select>
+                              </div>
+
+                              {item.position === 'below' ? (
+                                <textarea
+                                  placeholder="Enter description (optional)"
+                                  value={item.description}
+                                  onChange={(e) => handleListItemChange(index, itemIndex, 'description', e.target.value)}
+                                  rows="2"
+                                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                                  disabled={loading}
+                                />
+                              ) : (
+                                <div className="flex items-center gap-2">
+                                  <span className="text-gray-500">-</span>
+                                  <input
+                                    type="text"
+                                    placeholder="Enter description (optional)"
+                                    value={item.description}
+                                    onChange={(e) => handleListItemChange(index, itemIndex, 'description', e.target.value)}
+                                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                                    disabled={loading}
+                                  />
+                                </div>
+                              )}
+                            </div>
+
+                            {section.type === 'nested' && (
+                              <button
+                                type="button"
+                                onClick={() => handleAddSubItem(index, itemIndex)}
+                                className="text-green-700 hover:text-green-800 p-2"
+                                disabled={loading}
+                              >
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clipRule="evenodd" />
+                                </svg>
+                              </button>
+                            )}
+                          </div>
+                        
+                          {/* Sub-items for nested lists */}
+                          {section.type === 'nested' && item.subItems?.map((subItem, subItemIndex) => (
+                            <div key={subItemIndex} className="ml-6">
+                              <input
+                                type="text"
+                                placeholder="Enter sub-item"
+                                value={subItem}
+                                onChange={(e) => handleSubItemChange(index, itemIndex, subItemIndex, e.target.value)}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                                disabled={loading}
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               ))}
               <button
