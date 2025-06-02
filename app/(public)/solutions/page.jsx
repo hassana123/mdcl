@@ -6,27 +6,27 @@ import Link from 'next/link';
 import Image from 'next/image';
 const solutions = [
   {
-    icon:"/mdcl/icon (1).png",
+    icon:"/mdcl/sol1.png",
     title: "Consulting and Advisory Services",
     desc: "Institutional capacity building, agribusiness development, and policy consulting to Governments, NGOs, development agencies, and private agribusinesses.",
   },
   {
-     icon:"/mdcl/icon (2).png",
+     icon:"/mdcl/sol2.png",
     title: "Training and Capacity Development",
     desc: "Workshops, online courses, in-person training programmes for women entrepreneurs, cooperatives, corporate agribusinesses, and donor organisations.",
   },
   {
-     icon:"/mdcl/icon (3).png",
+     icon:"/mdcl/sol3.jpg",
     title: "Research and Data Services",
     desc: "Market research, feasibility studies, policy reports. Target audience – development agencies, government, and investors.",
   },
   {
-     icon:"/mdcl/icon (1).png",
+     icon:"/mdcl/sol4.jpg",
     title: "Agribusiness Incubation & Market Linkage Services",
     desc: "Mentorship, access to finance, digital platforms, and aggregation hubs for women-led agribusinesses, cooperatives, financial institutions.",
   },
   {
-    icon:"/mdcl/icon (1).png",
+    icon:"/mdcl/sol5.jpg",
     title: "Events and Conferences",
     desc: "Industry events, networking summits, policy dialogues for development agencies, government, cooperatives, and corporate stakeholders.",
   },
