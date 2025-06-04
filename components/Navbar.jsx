@@ -190,7 +190,7 @@ if (label === "Resources") {
                         [
                           { href: "/resources/newsletter", label: "Newsletters" },
                           { href: "/resources/facts", label: "Facts Sheet" },
-                          { href: "/resources/others", label: "Others" },
+                          { href: "/resources/others", label: "Other Resources" },
                          
                         ],
                         () => setResourceOpen(false)
