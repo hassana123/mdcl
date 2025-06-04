@@ -190,7 +190,7 @@ export default function ProjectDetailsPage({ params }) {
         <Link href={`/projects-&-programmes/${category}`} className="text-[var(--color-primary-olive)] font-semibold mb-6 inline-block">&larr; Back</Link>
         
         {/* Main Content */}
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-4xl mx-auto text-justify">
           <h1 className="text-2xl md:text-3xl font-bold mb-6 text-[var(--color-title-text)]">{project.title}</h1>
           
           {/* First Image */}

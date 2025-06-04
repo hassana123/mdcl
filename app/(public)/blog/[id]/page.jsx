@@ -210,7 +210,7 @@ export default function BlogPostPage() {
         />
 
         {/* Blog Content */}
-        <article className="max-w-4xl mx-auto px-4 py-12">
+        <article className="max-w-4xl mx-auto px-4 py-12 text-justify">
           {/* Cover Image */}
           <div className="relative w-full h-[400px] mb-8 rounded-xl overflow-hidden">
             <Image
