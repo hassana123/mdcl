@@ -189,7 +189,7 @@ if (label === "Resources") {
                       {renderDropdown(
                         [
                           { href: "/resources/newsletter", label: "Newsletters" },
-                          { href: "/resources/faq", label: "FAQs Sheet" },
+                          { href: "/resources/faqs", label: "FAQs Sheet" },
                           { href: "/resources/policy", label: "Policies" },
                          
                         ],
