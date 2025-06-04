@@ -65,7 +65,7 @@ export default function Home() {
       )}
 
       <Contact/>
-      <BlogPopupModal />
+      {/* <BlogPopupModal /> */}
     </main>
   );
 }
