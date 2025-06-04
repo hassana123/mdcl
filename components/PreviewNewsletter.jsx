@@ -32,7 +32,7 @@ const PreviewNewsletter = ({
         </button>
       </form>
       {/* Newsletter Cards */}
-      <div className="md:w-[85%] w-[95%]  mx-auto grid md:grid-cols-3 lg:grid-cols-4  grid-cols-2 gap-5  justify-center items-stretch">
+      <div className="md:w-[85%] w-[95%]  mx-auto grid md:grid-cols-2 lg:grid-cols-3  grid-cols-1 gap-5  justify-center items-stretch">
         {newslettersToDisplay.map((nl) => (
           <div key={nl.id} className="bg-white/60 rounded-xl shadow p-5 flex flex-col items-center ">
             {/* Display actual cover image if available */}

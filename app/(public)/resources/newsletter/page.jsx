@@ -53,7 +53,9 @@ const Newsletter = () => {
             }
            
         />
-        <Deco />
+      <div className='lg:block hidden'>
+      <Deco />
+      </div>
         <div className="">
           {loading ? (
             <p className='text-center'>Loading newsletters...</p>
