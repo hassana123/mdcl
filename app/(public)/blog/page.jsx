@@ -107,7 +107,7 @@ export default function BlogPage() {
               </div>
               <div className="p-5 flex flex-col flex-1">
                 <h3 className="font-semibold text-lg text-[var(--color-title-text)] mb-2 hover:underline">
-                  <Link href={`/blogs/${blog.id}`}>{blog.title}</Link>
+                  <Link href={`/blog/${blog.id}`}>{blog.title}</Link>
                 </h3>
                 <p className="text-sm text-gray-700 flex-1 mb-4">
                   {getPreviewText(blog)}

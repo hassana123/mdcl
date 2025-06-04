@@ -259,10 +259,10 @@ export default function BlogPostPage() {
         {/* Back to Blogs Link */}
         <div className="mt-8">
           <Link
-            href="/blogs"
+            href="/blog"
             className="text-[var(--color-primary-olive)] font-semibold hover:underline flex items-center gap-2"
           >
-            <span>←</span> Back to Blogs
+            <span>←</span> Back to Blog
           </Link>
         </div>
       </article>
