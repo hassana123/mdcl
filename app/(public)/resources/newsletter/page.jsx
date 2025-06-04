@@ -5,6 +5,7 @@ import PreviewNewsletter from '@/components/PreviewNewsletter'
 import Banner from '@/components/Banner'
 import Deco from '@/components/Deco'
 import Partners from '@/components/Partners'
+import LoadingSpinner from '@/components/LoadingSpinner'
 import { collection, getDocs, query, orderBy, where } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import Image from 'next/image';
@@ -58,7 +59,7 @@ const Newsletter = () => {
       </div>
         <div className="">
           {loading ? (
-            <p className='text-center'>Loading newsletters...</p>
+            <LoadingSpinner />
           ) : error ? (
             <p className="text-red-500">{error}</p>
           ) : newsletters.length === 0 ? (
