@@ -6,8 +6,10 @@ import Link from "next/link";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import Partners from "@/components/Partners";
+import { useParams } from 'next/navigation';
 
-export default function BlogPostPage({ params }) {
+export default function BlogPostPage() {
+  const params = useParams();
   const { id } = params;
   const [blog, setBlog] = useState(null);
   const [loading, setLoading] = useState(true);

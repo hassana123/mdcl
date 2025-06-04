@@ -113,7 +113,7 @@ export default function BlogPage() {
                   {getPreviewText(blog)}
                 </p>
                 <Link
-                  href={`/blogs/${blog.id}`}
+                  href={`/blog/${blog.id}`}
                   className="text-[color:var(--color-primary-olive)] font-semibold text-sm hover:underline mt-auto flex items-center gap-1"
                 >
                   Read More <span className="text-lg">→</span>

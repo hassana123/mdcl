@@ -11,6 +11,7 @@ import PreviewProjects from "@/components/PreviewProjects";
 import { collection, getDocs, query, orderBy, where } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useState, useEffect } from 'react';
+import BlogPopupModal from "@/components/BlogPopupModal";
 
 export default function Home() {
   const [newsletters, setNewsletters] = useState([]);
@@ -64,6 +65,7 @@ export default function Home() {
       )}
 
       <Contact/>
+      <BlogPopupModal />
     </main>
   );
 }
