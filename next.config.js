@@ -1,6 +1,8 @@
 /** @type {import('next').NextConfig} */
-// next.config.js
 const nextConfig = {
+    experimental: {
+      turbo: false, // ✅ disable Turbopack for stability
+    },
     webpack: (config) => {
       config.module.rules.push({
         test: /pdf\.worker\.entry\.js/,

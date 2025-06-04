@@ -47,14 +47,14 @@ const Newsletter = () => {
             subtitle={
             <span className="text-center font-medium text-white/70">
                 <Link href="/" className="hover:underline">Home</Link> /{" "}
-                <Link href="/newsletter" className="hover:underline text-white font-bold">Newsletter</Link>
+                <Link href="/resources" className="hover:underline">Resources</Link> /{" "}
+                <Link href="/resources/newsletter" className="hover:underline text-white font-bold">Newsletter</Link>
             </span>
             }
            
         />
         <Deco />
         <div className="">
-         
           {loading ? (
             <p className='text-center'>Loading newsletters...</p>
           ) : error ? (
