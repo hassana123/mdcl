@@ -8,6 +8,7 @@ import { db } from "@/lib/firebase";
 import Partners from "@/components/Partners";
 import { useParams } from 'next/navigation';
 import { Facebook, Twitter, Linkedin, Share2, MessageCircle } from 'lucide-react';
+import Head from 'next/head';
 
 export default function BlogPostPage() {
   const params = useParams();
@@ -151,124 +152,156 @@ export default function BlogPostPage() {
     );
   }
 
+  // Format date for meta description
+  const formattedDate = blog.publishDate?.toDate 
+    ? new Date(blog.publishDate.toDate()).toLocaleDateString('en-GB', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      })
+    : blog.publishDate;
+
   return (
-    <main className="bg-white min-h-screen">
-      {/* Banner */}
-      <Banner
-        title={blog.title}
-        subtitle={
-          <span className="text-center font-medium text-white/70">
-            <Link href="/" className="hover:underline">Home</Link> /{" "}
-            <Link href="/blog" className="hover:underline">Blog</Link> /{" "}
-            <span className="text-white font-bold">Blog Post</span>
-          </span>
-        }
-      />
+    <>
+      <Head>
+        <title>{`${blog.title} | MDCL Blog`}</title>
+        <meta name="description" content={blog.excerpt || blog.content?.substring(0, 160)} />
+        <meta name="author" content={blog.postedBy || "MDCL"} />
+        <meta name="keywords" content={blog.tags?.join(', ') || 'development, consulting, Nigeria'} />
+        
+        {/* Open Graph / Facebook */}
+        <meta property="og:type" content="article" />
+        <meta property="og:title" content={blog.title} />
+        <meta property="og:description" content={blog.excerpt || blog.content?.substring(0, 160)} />
+        <meta property="og:image" content={blog.image} />
+        <meta property="og:url" content={`https://mdcl.com.ng/blog/${id}`} />
+        <meta property="article:published_time" content={blog.publishDate?.toDate?.toISOString()} />
+        <meta property="article:author" content={blog.postedBy || "MDCL"} />
+        {blog.tags?.map((tag, index) => (
+          <meta key={index} property="article:tag" content={tag} />
+        ))}
 
-      {/* Blog Content */}
-      <article className="max-w-4xl mx-auto px-4 py-12">
-        {/* Cover Image */}
-        <div className="relative w-full h-[400px] mb-8 rounded-xl overflow-hidden">
-          <Image
-            src={blog.image}
-            alt={blog.title}
-            fill
-            priority
-            className="object-cover"
-            sizes="(max-width: 768px) 100vw, 1200px"
-          />
-        </div>
+        {/* Twitter */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={blog.title} />
+        <meta name="twitter:description" content={blog.excerpt || blog.content?.substring(0, 160)} />
+        <meta name="twitter:image" content={blog.image} />
+      </Head>
 
-        {/* Blog Title */}
-        <h1 className="text-3xl md:text-4xl font-bold text-[var(--color-title-text)] mb-4">
-          {blog.title}
-        </h1>
-
-        {/* Date and Author */}
-        <div className="flex items-center gap-4 text-gray-600 mb-8">
-          <span>Posted on: {blog.publishDate?.toDate ? new Date(blog.publishDate.toDate()).toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-          }) : blog.publishDate}</span>
-          {blog.postedBy && (
-            <span>• By {blog.postedBy}</span>
-          )}
-        </div>
+      <main className="bg-white min-h-screen">
+        {/* Banner */}
+        <Banner
+          title={blog.title}
+          subtitle={
+            <span className="text-center font-medium text-white/70">
+              <Link href="/" className="hover:underline">Home</Link> /{" "}
+              <Link href="/blog" className="hover:underline">Blog</Link> /{" "}
+              <span className="text-white font-bold">Blog Post</span>
+            </span>
+          }
+        />
 
         {/* Blog Content */}
-        <div className="prose prose-lg max-w-none">
-          {renderContent()}
-        </div>
-
-        {/* Social Share Section */}
-        <div className="mt-12 pt-8 border-t">
-          <h3 className="text-xl font-semibold text-gray-800 mb-4">
-            Share This Story, Choose Your Platform!
-          </h3>
-          <div className="flex items-center gap-4">
-            <a
-              href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="p-2 rounded-full bg-blue-600 text-white hover:bg-blue-700 transition-colors"
-              aria-label="Share on Facebook"
-            >
-              <Facebook size={20} />
-            </a>
-            <a
-              href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent(blog.title)}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="p-2 rounded-full bg-sky-500 text-white hover:bg-sky-600 transition-colors"
-              aria-label="Share on Twitter"
-            >
-              <Twitter size={20} />
-            </a>
-            <a
-              href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(window.location.href)}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="p-2 rounded-full bg-blue-700 text-white hover:bg-blue-800 transition-colors"
-              aria-label="Share on LinkedIn"
-            >
-              <Linkedin size={20} />
-            </a>
-            <a
-              href={`https://wa.me/?text=${encodeURIComponent(`${blog.title} ${window.location.href}`)}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="p-2 rounded-full bg-green-600 text-white hover:bg-green-700 transition-colors"
-              aria-label="Share on WhatsApp"
-            >
-              <MessageCircle size={20} />
-            </a>
-            <button
-              onClick={() => {
-                navigator.clipboard.writeText(window.location.href);
-                alert('Link copied to clipboard!');
-              }}
-              className="p-2 rounded-full bg-gray-600 text-white hover:bg-gray-700 transition-colors"
-              aria-label="Copy link"
-            >
-              <Share2 size={20} />
-            </button>
+        <article className="max-w-4xl mx-auto px-4 py-12">
+          {/* Cover Image */}
+          <div className="relative w-full h-[400px] mb-8 rounded-xl overflow-hidden">
+            <Image
+              src={blog.image}
+              alt={blog.title}
+              fill
+              priority
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, 1200px"
+            />
           </div>
-        </div>
 
-        {/* Back to Blogs Link */}
-        <div className="mt-8">
-          <Link
-            href="/blog"
-            className="text-[var(--color-primary-olive)] font-semibold hover:underline flex items-center gap-2"
-          >
-            <span>←</span> Back to Blog
-          </Link>
-        </div>
-      </article>
+          {/* Blog Title */}
+          <h1 className="text-3xl md:text-4xl font-bold text-[var(--color-title-text)] mb-4">
+            {blog.title}
+          </h1>
 
-      {/* Partners Section */}
-      <Partners />
-    </main>
+          {/* Date and Author */}
+          <div className="flex items-center gap-4 text-gray-600 mb-8">
+            <span>Posted on: {formattedDate}</span>
+            {blog.postedBy && (
+              <span>• By {blog.postedBy}</span>
+            )}
+          </div>
+
+          {/* Blog Content */}
+          <div className="prose prose-lg max-w-none">
+            {renderContent()}
+          </div>
+
+          {/* Social Share Section */}
+          <div className="mt-12 pt-8 border-t">
+            <h3 className="text-xl font-semibold text-gray-800 mb-4">
+              Share This Story, Choose Your Platform!
+            </h3>
+            <div className="flex items-center gap-4">
+              <a
+                href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-2 rounded-full bg-blue-600 text-white hover:bg-blue-700 transition-colors"
+                aria-label="Share on Facebook"
+              >
+                <Facebook size={20} />
+              </a>
+              <a
+                href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent(blog.title)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-2 rounded-full bg-sky-500 text-white hover:bg-sky-600 transition-colors"
+                aria-label="Share on Twitter"
+              >
+                <Twitter size={20} />
+              </a>
+              <a
+                href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(window.location.href)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-2 rounded-full bg-blue-700 text-white hover:bg-blue-800 transition-colors"
+                aria-label="Share on LinkedIn"
+              >
+                <Linkedin size={20} />
+              </a>
+              <a
+                href={`https://wa.me/?text=${encodeURIComponent(`${blog.title} ${window.location.href}`)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-2 rounded-full bg-green-600 text-white hover:bg-green-700 transition-colors"
+                aria-label="Share on WhatsApp"
+              >
+                <MessageCircle size={20} />
+              </a>
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText(window.location.href);
+                  alert('Link copied to clipboard!');
+                }}
+                className="p-2 rounded-full bg-gray-600 text-white hover:bg-gray-700 transition-colors"
+                aria-label="Copy link"
+              >
+                <Share2 size={20} />
+              </button>
+            </div>
+          </div>
+
+          {/* Back to Blogs Link */}
+          <div className="mt-8">
+            <Link
+              href="/blog"
+              className="text-[var(--color-primary-olive)] font-semibold hover:underline flex items-center gap-2"
+            >
+              <span>←</span> Back to Blog
+            </Link>
+          </div>
+        </article>
+
+        {/* Partners Section */}
+        <Partners />
+      </main>
+    </>
   );
 } 
