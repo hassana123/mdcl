@@ -188,11 +188,12 @@ if (label === "Resources") {
                     <div className="absolute left-0 mt-2 w-56 bg-white border rounded shadow-lg z-50">
                       {renderDropdown(
                         [
-                          { href: "/resources/newsletter", label: "Newsletter" },
-                          { href: "/resources/others", label: "Other Resources" },
+                          { href: "/resources/newsletter", label: "Newsletters" },
+                          { href: "/resources/faq", label: "FAQs Sheet" },
+                          { href: "/resources/policy", label: "Policies" },
                          
                         ],
-                        () => resourceOpen(false)
+                        () => setResourceOpen(false)
                       )}
                     </div>
                   )}
@@ -282,21 +283,22 @@ if (label === "Resources") {
               }
               if (label === "Resources") {
                 return (
-                  <li key={label} className="relative" ref={projectsRef}>
+                  <li key={label} className="relative" ref={resourcesRef}>
                     <div className="flex justify-between items-center">
                       <Link href={href} onClick={() => setMobileOpen(false)}>
                         {label}
                       </Link>
                       <button onClick={() => setResourceOpen((prev) => !prev)}>
-                        <ChevronDown className={`${resourceOpen ? "rotate-180" : ""} transition-transform`} />
+                        <ChevronDown className={`${resourceOpen ? "rotate-180" : "rotate-0"} transition-transform`} />
                       </button>
                     </div>
-                    {projectsOpen && (
+                    {resourceOpen && (
                       <div className="mt-1 ml-4 border-l pl-3">
                         {renderDropdown(
                           [
-                            { href: "/resources/newsletter", label: "Newsletter" },
-                            { href: "/resources/other", label: "Others" },
+                            { href: "/resources/newsletter", label: "Newsletters" },
+                            { href: "/resources/faq", label: "FAQs Sheet" },
+                            { href: "/resources/policy", label: "Policies" },
                             
                           ],
                           () => setMobileOpen(false)

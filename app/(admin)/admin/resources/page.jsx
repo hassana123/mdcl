@@ -1,8 +1,9 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import { collection, getDocs, query, orderBy } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
-import { ChevronLeftIcon, ChevronRightIcon, PlusIcon } from 'lucide-react';
+import { collection, getDocs, query, orderBy, deleteDoc, doc } from 'firebase/firestore';
+import { ref, deleteObject } from 'firebase/storage';
+import { db, storage } from '@/lib/firebase';
+import { ChevronLeftIcon, ChevronRightIcon, PlusIcon, Edit2Icon, Trash2Icon } from 'lucide-react';
 import Image from 'next/image';
 import AddNewsletterModal from '@/components/admin/resources/AddNewsletterModal';
 import AddFAQModal from '@/components/admin/resources/AddFAQModal';
@@ -15,6 +16,8 @@ export default function AdminResourcesPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedCategory, setSelectedCategory] = useState('newsletter');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editData, setEditData] = useState(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
   const itemsPerPage = 6;
 
   const fetchResources = async () => {
@@ -52,6 +55,46 @@ export default function AdminResourcesPage() {
   const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+  const handleEdit = (item) => {
+    setEditData(item);
+    setIsModalOpen(true);
+  };
+
+  const handleDelete = async (item) => {
+    if (!window.confirm('Are you sure you want to delete this item?')) {
+      return;
+    }
+
+    setDeleteLoading(true);
+    try {
+      // Delete files from storage
+      if (item.coverImage) {
+        const coverImageRef = ref(storage, item.coverImage);
+        await deleteObject(coverImageRef);
+      }
+      if (item.pdfUrl) {
+        const pdfRef = ref(storage, item.pdfUrl);
+        await deleteObject(pdfRef);
+      }
+
+      // Delete document from Firestore
+      await deleteDoc(doc(db, 'resources', item.id));
+      
+      // Refresh the resources list
+      await fetchResources();
+    } catch (err) {
+      console.error("Error deleting resource:", err);
+      alert("Failed to delete resource. Please try again.");
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setEditData(null);
+  };
 
   const renderAddButton = () => {
     switch (selectedCategory) {
@@ -93,24 +136,27 @@ export default function AdminResourcesPage() {
         return (
           <AddNewsletterModal
             isOpen={isModalOpen}
-            onClose={() => setIsModalOpen(false)}
+            onClose={handleCloseModal}
             onResourceAdded={fetchResources}
+            editData={editData}
           />
         );
       case 'faq':
         return (
           <AddFAQModal
             isOpen={isModalOpen}
-            onClose={() => setIsModalOpen(false)}
+            onClose={handleCloseModal}
             onResourceAdded={fetchResources}
+            editData={editData}
           />
         );
       case 'policy':
         return (
           <AddPolicyModal
             isOpen={isModalOpen}
-            onClose={() => setIsModalOpen(false)}
+            onClose={handleCloseModal}
             onResourceAdded={fetchResources}
+            editData={editData}
           />
         );
       default:
@@ -199,11 +245,11 @@ export default function AdminResourcesPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {currentItems.map(item => (
             <div key={item.id} className="bg-white rounded-lg overflow-hidden shadow-md border-t-4 border-t-green-700">
-              {selectedCategory === 'newsletter' && item.coverImage && (
+              {(selectedCategory === 'newsletter' || selectedCategory === 'faq') && item.coverImage && (
                 <div className="relative w-full h-40 bg-gray-100">
                   <Image
                     src={item.coverImage}
-                    alt={item.title || 'Newsletter Cover'}
+                    alt={item.title || 'Cover Image'}
                     fill
                     className="object-cover"
                   />
@@ -214,16 +260,34 @@ export default function AdminResourcesPage() {
                 {item.description && (
                   <p className="text-sm text-gray-600 mb-2 line-clamp-2">{item.description}</p>
                 )}
-                {selectedCategory === 'newsletter' && item.pdfUrl && (
-                  <a
-                    href={item.pdfUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm text-green-700 hover:underline"
-                  >
-                    View PDF
-                  </a>
-                )}
+                <div className="flex justify-between items-center mt-4">
+                  {(selectedCategory === 'newsletter' || selectedCategory === 'faq') && item.pdfUrl && (
+                    <a
+                      href={item.pdfUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-green-700 hover:underline"
+                    >
+                      View PDF
+                    </a>
+                  )}
+                  <div className="flex space-x-2">
+                    <button
+                      onClick={() => handleEdit(item)}
+                      className="p-1 text-gray-600 hover:text-green-700 transition-colors"
+                      disabled={deleteLoading}
+                    >
+                      <Edit2Icon className="h-5 w-5" />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(item)}
+                      className="p-1 text-gray-600 hover:text-red-600 transition-colors"
+                      disabled={deleteLoading}
+                    >
+                      <Trash2Icon className="h-5 w-5" />
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           ))}

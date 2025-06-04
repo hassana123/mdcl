@@ -1,23 +1,15 @@
 import React from "react";
+import Image from "next/image";
+const PreviewNewsletter = ({
+  newsletters = [], // Accept newsletters array as prop
+  limit = newsletters.length // Accept limit as prop, default to all
+}) => {
 
-const newsletters = [
-  {
-    title: "MicroDevelopment Matters Vol 1",
-    link: "#",
-  },
-  {
-    title: "MicroDevelopment Matters Vol 2",
-    link: "#",
-  },
-  {
-    title: "MicroDevelopment Matters Vol 3",
-    link: "#",
-  },
-];
+  // Use the passed newsletters and apply limit
+  const newslettersToDisplay = newsletters.slice(0, limit);
 
-const PreviewNewsletter = () => {
   return (
-    <section className="w-full md:px-0 px-5 min-h-[600px] bg-[color:var(--color-primary-olive)]/20 py-16 flex flex-col items-center justify-center">
+    <section className="w-full md:px-0 px-5 min-h-[600px] bg-[color:var(--color-primary-olive)]/20 py-5 flex flex-col items-center justify-center">
       {/* Heading and Description */}
       <h2 className="md:text-2xl text-md uppercase md:text-3xl font-bold text-center mb-2 text-[color:var(--color-primary-olive)]">
        Subscribe to our quarterly Newsletter: MICRODEVELOPMENT MATTERS
@@ -41,18 +33,38 @@ const PreviewNewsletter = () => {
       </form>
       {/* Newsletter Cards */}
       <div className="w-full max-w-5xl mx-auto flex flex-col md:flex-row gap-6 justify-center items-stretch">
-        {newsletters.map((nl, idx) => (
-          <div key={idx} className="bg-white/60 rounded-xl shadow p-5 flex flex-col items-center w-full md:w-1/3 max-w-xs mx-auto">
-            <div className="w-full h-32 bg-gray-200 rounded mb-4" />
+        {newslettersToDisplay.map((nl) => (
+          <div key={nl.id} className="bg-white/60 rounded-xl shadow p-5 flex flex-col items-center w-full md:w-1/3 max-w-xs mx-auto">
+            {/* Display actual cover image if available */}
+            {nl.coverImage ? (
+              <div className="relative w-full h-32 rounded overflow-hidden mb-4">
+                <Image
+                  src={nl.coverImage}
+                  alt={nl.title || 'Newsletter Cover'}
+                  fill
+                  className="object-cover"
+                />
+              </div>
+            ) : (
+              // Original placeholder if no image
+              <div className="w-full h-32 bg-gray-200 rounded mb-4" />
+            )}
+           
+            {/* Original title styling */}
             <div className="font-semibold text-[var(--color-title-text)] text-base text-center mb-3">
               {nl.title}
             </div>
-            <a
-              href={nl.link}
-              className="bg-[color:var(--color-primary-light-brown)]/90 text-white px-6 py-2 rounded font-semibold text-sm shadow hover:bg-[color:var(--color-primary-brown)] transition"
-            >
-              View Newsletter
-            </a>
+            {/* Use actual PDF link */}
+            {nl.pdfUrl && (
+              <a
+                href={nl.pdfUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-[color:var(--color-primary-light-brown)]/90 text-white px-6 py-2 rounded font-semibold text-sm shadow hover:bg-[color:var(--color-primary-brown)] transition"
+              >
+                View Newsletter
+              </a>
+            )}
           </div>
         ))}
       </div>
