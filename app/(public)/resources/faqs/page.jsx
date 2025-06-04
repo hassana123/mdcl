@@ -3,6 +3,7 @@ import Link from 'next/link'
 import Banner from '@/components/Banner'
 import Deco from '@/components/Deco'
 import Partners from '@/components/Partners'
+import Image from 'next/image'
 
 const Faqs = () => {
   // Dummy data for FAQs
@@ -11,6 +12,12 @@ const Faqs = () => {
     { id: 2, title: "Fact Sheet Title 2", link: "#" },
     { id: 3, title: "Fact Sheet Title 3", link: "#" },
     { id: 4, title: "Fact Sheet Title 4", link: "#" },
+  ];
+
+  // Image paths to use
+  const images = [
+    '/mdcl/sh1.jpg',
+    '/mdcl/sh2.jpg',
   ];
 
   return (
@@ -36,12 +43,16 @@ const Faqs = () => {
           <h2 className="text-2xl text-center font-bold text-gray-800 mb-6">Frequently Asked Questions Sheets</h2>
           
           <div className="grid grid-cols-1  md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {dummyFaqs.map(faq => (
+            {dummyFaqs.map((faq, index) => (
               <div key={faq.id} className="bg-white rounded-lg overflow-hidden shadow-md border-t-4 border-t-green-700 flex flex-col">
-                {/* Placeholder for image/visual if needed, matching image - using a div */}
-                <div className="w-full h-40 bg-gray-100 border-b border-b-green-700 flex items-center justify-center text-gray-500">
-                  {/* Placeholder for image/content like in the example image */}
-                   Fact Sheet Graphic Placeholder
+                {/* Display image, alternating between the two provided */}
+                <div className="relative w-full h-40 rounded-t-lg overflow-hidden">
+                  <Image
+                    src={images[index % images.length]}
+                    alt={`Fact Sheet Graphic ${index + 1}`}
+                    fill
+                    className="object-cover"
+                  />
                 </div>
 
                 <div className="p-4 flex flex-col flex-grow">
@@ -50,7 +61,7 @@ const Faqs = () => {
                   <div className="mt-auto pt-2">
                     <Link
                       href={faq.link}
-                      className="text-sm text-green-700 hover:underline"
+                      className="text-md underline font-semibold text-green-700 hover:font-bold"
                     >
                       View Fact Sheet
                     </Link>
