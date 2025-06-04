@@ -1,6 +1,6 @@
 "use client"
 
-import { FileTextIcon, FileQuestionIcon, ScaleIcon } from 'lucide-react';
+import { NewspaperIcon, FileTextIcon, LibraryIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import Banner from '@/components/Banner';
@@ -12,8 +12,8 @@ export default function Resources() {
   const [loadingPreview, setLoadingPreview] = useState(true);
   const [previewError, setPreviewError] = useState(null);
 
-  const dummyFAQs = ["FAQ Title 1", "FAQ Title 2", "FAQ Title 3"];
-  const dummyPolicies = ["Policy Title A", "Policy Title B", "Policy Title C"];
+  const dummyFactSheets = ["Fact Sheet 1", "Fact Sheet 2", "Fact Sheet 3"];
+  const dummyOtherResources = ["Resource 1", "Resource 2", "Resource 3"];
 
   const fetchPreviewNewsletters = async () => {
     try {
@@ -44,15 +44,30 @@ export default function Resources() {
 
   return (
     <>
-      <Banner title="Our Resources" subtitle="Explore our Newsletters, FAQs, and Policies" />
+      <Banner
+        title="Our Resources"
+        subtitle={
+          <span className="text-center font-medium text-white/70">
+            <Link href="/" className="hover:underline">
+              Home
+            </Link>{" "}
+            /{" "}
+            <Link
+              href="/resources"
+              className="hover:underline text-white font-bold"
+            >
+              Resources
+            </Link>{" "}
+          </span>
+        }
+      />
       <div className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Newsletters Card */}
           <div
             className="bg-white rounded-lg shadow-md p-6 text-center cursor-pointer border-t-4 border-t-green-700 hover:shadow-lg transition-shadow duration-200 flex flex-col h-full"
-           
           >
-            <FileTextIcon className="mx-auto h-12 w-12 text-green-700 mb-4" />
+            <NewspaperIcon className="mx-auto h-12 w-12 text-green-700 mb-4" />
             <h2 className="text-xl font-semibold text-gray-800 mb-4">Newsletters</h2>
             <div className="text-left w-full flex-grow">
               {loadingPreview ? (
@@ -85,50 +100,47 @@ export default function Resources() {
             </div>
           </div>
 
-          {/* FAQs Sheet Card */}
+          {/* Fact Sheets Card */}
           <div
             className="bg-white rounded-lg shadow-md p-6 text-center cursor-pointer border-t-4 border-t-green-700 hover:shadow-lg transition-shadow duration-200 flex flex-col h-full"
-            onClick={() => window.location.href = '/resources/faq'}
           >
-            <FileQuestionIcon className="mx-auto h-12 w-12 text-green-700 mb-4" />
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">FAQs Sheet</h2>
+            <FileTextIcon className="mx-auto h-12 w-12 text-green-700 mb-4" />
+            <h2 className="text-xl font-semibold text-gray-800 mb-4">Fact Sheets</h2>
              <div className="text-left w-full flex-grow">
                <ul className="list-disc list-inside space-y-1 text-sm text-gray-700">
-                 {dummyFAQs.map((faq, index) => (
-                   <li key={index} className="line-clamp-1">{faq}</li>
+                 {dummyFactSheets.map((fact, index) => (
+                   <li key={index} className="line-clamp-1">{fact}</li>
                  ))}
                </ul>
              </div>
              <div className="mt-auto pt-4 text-center">
-                 <Link href="/resources/faq" className="text-sm text-green-700 hover:underline">
-                   See More FAQs
+                 <Link href="/resources/facts" className="text-sm text-green-700 hover:underline">
+                   See More Fact Sheets
                  </Link>
               </div>
           </div>
 
-          {/* Policies Card */}
+          {/* Other Resources Card */}
           <div
             className="bg-white rounded-lg shadow-md p-6 text-center cursor-pointer border-t-4 border-t-green-700 hover:shadow-lg transition-shadow duration-200 flex flex-col h-full"
-            onClick={() => window.location.href = '/resources/policy'}
           >
-            <ScaleIcon className="mx-auto h-12 w-12 text-green-700 mb-4" />
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">Policies</h2>
+            <LibraryIcon className="mx-auto h-12 w-12 text-green-700 mb-4" />
+            <h2 className="text-xl font-semibold text-gray-800 mb-4">Other Resources</h2>
              <div className="text-left w-full flex-grow">
                <ul className="list-disc list-inside space-y-1 text-sm text-gray-700">
-                 {dummyPolicies.map((policy, index) => (
-                   <li key={index} className="line-clamp-1">{policy}</li>
+                 {dummyOtherResources.map((resource, index) => (
+                   <li key={index} className="line-clamp-1">{resource}</li>
                  ))}
                </ul>
              </div>
               <div className="mt-auto pt-4 text-center">
-                 <Link href="/resources/policy" className="text-sm text-green-700 hover:underline">
-                   See More Policies
+                 <Link href="/resources/others" className="text-sm text-green-700 hover:underline">
+                   See More Resources
                  </Link>
                </div>
           </div>
         </div>
       </div>
     </>
-
   );
 }

@@ -50,7 +50,7 @@ export default function Home() {
       <PreviewAboutUs/>
       <PreviewSolutions/>
       <PreviewProjects/>
-      <Slideshow/>
+      {/* <Slideshow/> */}
       <Partners/>
       <PreviewBlog/>
 
@@ -66,6 +66,7 @@ export default function Home() {
 
       <Contact/>
       {/* <BlogPopupModal /> */}
+      
     </main>
   );
 }

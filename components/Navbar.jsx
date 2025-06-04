@@ -189,8 +189,8 @@ if (label === "Resources") {
                       {renderDropdown(
                         [
                           { href: "/resources/newsletter", label: "Newsletters" },
-                          { href: "/resources/faqs", label: "FAQs Sheet" },
-                          { href: "/resources/policy", label: "Policies" },
+                          { href: "/resources/facts", label: "Facts Sheet" },
+                          { href: "/resources/others", label: "Others" },
                          
                         ],
                         () => setResourceOpen(false)

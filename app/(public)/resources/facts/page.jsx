@@ -7,7 +7,7 @@ import Image from 'next/image'
 
 const Faqs = () => {
   // Dummy data for FAQs
-  const dummyFaqs = [
+  const dummyFacts = [
     { id: 1, title: "Fact Sheet Title 1", link: "#" },
     { id: 2, title: "Fact Sheet Title 2", link: "#" },
     { id: 3, title: "Fact Sheet Title 3", link: "#" },
@@ -23,12 +23,12 @@ const Faqs = () => {
   return (
     <>
     <Banner
-    title="FAQs Sheet"
+    title="Facts Sheet"
     subtitle={
     <span className="text-center font-medium text-white/70">
         <Link href="/" className="hover:underline">Home</Link> /{" "}
         <Link href="/resources" className="hover:underline">Resources</Link> /{" "}
-        <span className="text-white font-bold">FAQs Sheet</span>
+        <span className="text-white font-bold">Facts Sheet</span>
     </span>
     }
    
@@ -40,10 +40,10 @@ const Faqs = () => {
        
 
         <div className="">
-          <h2 className="text-2xl text-center font-bold text-gray-800 mb-6">Frequently Asked Questions</h2>
-          
+          {/* <h2 className="text-2xl text-center font-bold text-gray-800 mb-6">Frequently Asked Questions</h2>
+           */}
           <div className="grid grid-cols-1  md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {dummyFaqs.map((faq, index) => (
+            {dummyFacts.map((faq, index) => (
               <div key={faq.id} className="bg-white rounded-lg overflow-hidden shadow-md border-t-4 border-t-green-700 flex flex-col">
                 {/* Display image, alternating between the two provided */}
                 <div className="relative w-full h-40 rounded-t-lg overflow-hidden">
