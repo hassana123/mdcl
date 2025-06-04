@@ -32,9 +32,9 @@ const PreviewNewsletter = ({
         </button>
       </form>
       {/* Newsletter Cards */}
-      <div className="w-full max-w-5xl mx-auto flex flex-col md:flex-row gap-6 justify-center items-stretch">
+      <div className="md:w-[85%] w-[95%]  mx-auto grid md:grid-cols-3 lg:grid-cols-4  grid-cols-2 gap-5  justify-center items-stretch">
         {newslettersToDisplay.map((nl) => (
-          <div key={nl.id} className="bg-white/60 rounded-xl shadow p-5 flex flex-col items-center w-full md:w-1/3 max-w-xs mx-auto">
+          <div key={nl.id} className="bg-white/60 rounded-xl shadow p-5 flex flex-col items-center ">
             {/* Display actual cover image if available */}
             {nl.coverImage ? (
               <div className="relative w-full h-32 rounded overflow-hidden mb-4">
