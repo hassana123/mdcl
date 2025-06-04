@@ -66,6 +66,7 @@ const ProjectDisplay = ({
     fetchProjects();
   }, [category]);
 
+  console.log(projects);
   
 
   return (
