@@ -161,6 +161,14 @@ export default function BlogPostPage() {
       })
     : blog.publishDate;
 
+  // Get ISO date string safely
+  const getISODate = (date) => {
+    if (!date) return new Date().toISOString();
+    if (date.toDate) return date.toDate().toISOString();
+    if (date instanceof Date) return date.toISOString();
+    return new Date(date).toISOString();
+  };
+
   return (
     <>
       <Head>
@@ -175,7 +183,7 @@ export default function BlogPostPage() {
         <meta property="og:description" content={blog.excerpt || blog.content?.substring(0, 160)} />
         <meta property="og:image" content={blog.image} />
         <meta property="og:url" content={`https://mdcl.com.ng/blog/${id}`} />
-        <meta property="article:published_time" content={blog.publishDate?.toDate?.toISOString()} />
+        <meta property="article:published_time" content={getISODate(blog.publishDate)} />
         <meta property="article:author" content={blog.postedBy || "MDCL"} />
         {blog.tags?.map((tag, index) => (
           <meta key={index} property="article:tag" content={tag} />
