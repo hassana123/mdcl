@@ -19,7 +19,8 @@
     "react-dom": "^19.0.0",
     "react-pdf": "^9.2.1",
     "resend": "^4.5.1",
-    "swiper": "^11.2.6"
+    "swiper": "^11.2.6",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

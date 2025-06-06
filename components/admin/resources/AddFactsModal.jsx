@@ -9,12 +9,31 @@ import { Document, Page, pdfjs } from 'react-pdf';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
 
-// Configure PDF.js worker
+const capturePdfCover = () => {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      const canvas = document.querySelector('.react-pdf__Page__canvas');
+      if (!canvas) {
+        reject('Canvas not found');
+        return;
+      }
 
-  pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.8.69/pdf.worker.min.mjs`;
+      canvas.toBlob((blob) => {
+        if (!blob) {
+          reject('Failed to convert canvas to image');
+        } else {
+          resolve(blob);
+        }
+      }, 'image/jpeg', 0.8); // Save as JPEG
+    }, 500); // wait for canvas to be rendered
+  });
+};
 
+if (typeof window !== 'undefined') {
+  pdfjs.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.8.69/pdf.worker.min.mjs";
+}
 
-const AddFAQModal = ({ isOpen, onClose, onResourceAdded, editData = null }) => {
+const AddFactsModal = ({ isOpen, onClose, onResourceAdded, editData = null }) => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [pdfFile, setPdfFile] = useState(null);
@@ -73,7 +92,7 @@ const AddFAQModal = ({ isOpen, onClose, onResourceAdded, editData = null }) => {
 
       // Upload PDF if new one is selected
       if (pdfFile) {
-        const pdfPath = `resources/faqs/${title}/pdf/${pdfFile.name}`;
+        const pdfPath = `resources/facts/${title}/pdf/${pdfFile.name}`;
         const pdfRef = ref(storage, pdfPath);
         const pdfUpload = uploadBytesResumable(pdfRef, pdfFile);
 
@@ -101,10 +120,10 @@ const AddFAQModal = ({ isOpen, onClose, onResourceAdded, editData = null }) => {
         pdfUrl = await getDownloadURL(pdfRef);
 
         // Upload preview image
-        if (pdfPreview) {
-          const previewPath = `resources/faqs/${title}/preview/preview.jpg`;
+        if (pdfFile && pdfPreview) {
+          const previewBlob = await capturePdfCover(); // Using the helper function
+          const previewPath = `resources/facts/${title}/preview/preview.jpg`;
           const previewRef = ref(storage, previewPath);
-          const previewBlob = await fetch(pdfPreview).then(r => r.blob());
           await uploadBytesResumable(previewRef, previewBlob);
           coverImageUrl = await getDownloadURL(previewRef);
         }
@@ -121,9 +140,9 @@ const AddFAQModal = ({ isOpen, onClose, onResourceAdded, editData = null }) => {
       }
 
       if (editData) {
-        // Update existing FAQ
-        const faqRef = doc(db, 'resources', editData.id);
-        await updateDoc(faqRef, {
+        // Update existing fact
+        const factRef = doc(db, 'resources', editData.id);
+        await updateDoc(factRef, {
           title,
           description,
           coverImage: coverImageUrl,
@@ -131,13 +150,13 @@ const AddFAQModal = ({ isOpen, onClose, onResourceAdded, editData = null }) => {
           updatedAt: Timestamp.now(),
         });
       } else {
-        // Add new FAQ
+        // Add new fact
         await addDoc(collection(db, 'resources'), {
           title,
           description,
           coverImage: coverImageUrl,
           pdfUrl,
-          category: 'faq',
+          category: 'facts',
           createdAt: Timestamp.now(),
         });
       }
@@ -153,8 +172,8 @@ const AddFAQModal = ({ isOpen, onClose, onResourceAdded, editData = null }) => {
       onClose();
 
     } catch (err) {
-      console.error("Error handling FAQ:", err);
-      setError("Failed to process FAQ. Please try again.");
+      console.error("Error handling fact:", err);
+      setError("Failed to process fact. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -181,8 +200,8 @@ const AddFAQModal = ({ isOpen, onClose, onResourceAdded, editData = null }) => {
       onResourceAdded();
       onClose();
     } catch (err) {
-      console.error("Error deleting FAQ:", err);
-      setError("Failed to delete FAQ. Please try again.");
+      console.error("Error deleting fact:", err);
+      setError("Failed to delete fact. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -194,7 +213,7 @@ const AddFAQModal = ({ isOpen, onClose, onResourceAdded, editData = null }) => {
     <div className="fixed inset-0 bg-gray-700/30 flex items-center justify-center z-50">
       <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-md max-h-[90vh] flex flex-col">
         <h3 className="text-lg font-semibold text-gray-800 mb-4">
-          {editData ? 'Edit FAQ' : 'Add FAQ'}
+          {editData ? 'Edit Fact' : 'Add Fact'}
         </h3>
         <div className="space-y-4 overflow-y-auto flex-1 pr-2">
           <div>
@@ -223,7 +242,7 @@ const AddFAQModal = ({ isOpen, onClose, onResourceAdded, editData = null }) => {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">PDF Preview</label>
               <div className="mt-1 border border-gray-300 rounded-md overflow-hidden w-32 h-32 flex items-center justify-center">
-                {pdfFile ? (
+                {pdfPreview ? (
                   <Document file={pdfPreview}>
                     <Page pageNumber={1} width={128} />
                   </Document>
@@ -242,7 +261,7 @@ const AddFAQModal = ({ isOpen, onClose, onResourceAdded, editData = null }) => {
 
           {/* PDF Upload */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">FAQ PDF</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Fact PDF</label>
             <div className="mt-1 border-2 border-dashed border-gray-300 rounded-md p-4 text-center">
               <input
                 type="file"
@@ -296,7 +315,7 @@ const AddFAQModal = ({ isOpen, onClose, onResourceAdded, editData = null }) => {
             className="px-4 py-2 rounded-md bg-green-700 text-white hover:bg-green-800 transition-colors disabled:opacity-50"
             disabled={loading}
           >
-            {loading ? 'Processing...' : editData ? 'Update FAQ' : 'Add FAQ'}
+            {loading ? 'Processing...' : editData ? 'Update Fact' : 'Add Fact'}
           </button>
         </div>
       </div>
@@ -304,4 +323,4 @@ const AddFAQModal = ({ isOpen, onClose, onResourceAdded, editData = null }) => {
   );
 };
 
-export default AddFAQModal; 
+export default AddFactsModal; 

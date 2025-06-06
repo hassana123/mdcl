@@ -1,8 +1,30 @@
-import React from 'react';
+"use client"
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 
 const AdminDashboard = () => {
+  const [totalProjects, setTotalProjects] = useState(0);
+  const [totalBlogs, setTotalBlogs] = useState(0);
+  const [totalResources, setTotalResources] = useState(0);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const projectsSnapshot = await getDocs(collection(db, 'projects'));
+      setTotalProjects(projectsSnapshot.size);
+
+      const blogsSnapshot = await getDocs(collection(db, 'blogs'));
+      setTotalBlogs(blogsSnapshot.size);
+
+      const resourcesSnapshot = await getDocs(collection(db, 'resources'));
+      setTotalResources(resourcesSnapshot.size);
+    };
+
+    fetchData();
+  }, []);
+
   return (
     <>
       {/* Welcome Message */}
@@ -12,7 +34,7 @@ const AdminDashboard = () => {
       </div>
       {/* Dashboard Overview */}
       <div className="mb-8">
-        <h3 className="text-lg  font-semibold text-gray-700 mb-4">Dashboard Overview</h3>
+        <h3 className="text-lg font-semibold text-gray-700 mb-4">Dashboard Overview</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* Overview Cards */}
           <div className="bg-white p-4 rounded-lg shadow flex items-center">
@@ -23,8 +45,8 @@ const AdminDashboard = () => {
               </svg>
             </div>
             <div>
-              <div className="text-sm text-gray-500">Total Project</div>
-              <div className="text-2xl font-bold text-gray-800">4</div> {/* Replace with dynamic data */}
+              <div className="text-sm text-gray-500">Total Projects</div>
+              <div className="text-2xl font-bold text-gray-800">{totalProjects}</div>
               <div className="text-sm text-gray-500">Active</div>
             </div>
           </div>
@@ -37,7 +59,7 @@ const AdminDashboard = () => {
             </div>
             <div>
               <div className="text-sm text-gray-500">Total Blogs</div>
-              <div className="text-2xl font-bold text-gray-800">4</div> {/* Replace with dynamic data */}
+              <div className="text-2xl font-bold text-gray-800">{totalBlogs}</div>
               <div className="text-sm text-gray-500">Active</div>
             </div>
           </div>
@@ -49,8 +71,8 @@ const AdminDashboard = () => {
               </svg>
             </div>
             <div>
-              <div className="text-sm text-gray-500">Total Total Resources</div>
-              <div className="text-2xl font-bold text-gray-800">4</div> {/* Replace with dynamic data */}
+              <div className="text-sm text-gray-500">Total Resources</div>
+              <div className="text-2xl font-bold text-gray-800">{totalResources}</div>
               <div className="text-sm text-gray-500">Active</div>
             </div>
           </div>

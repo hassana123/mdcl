@@ -11,8 +11,10 @@ export default function Resources() {
   const [previewNewsletters, setPreviewNewsletters] = useState([]);
   const [loadingPreview, setLoadingPreview] = useState(true);
   const [previewError, setPreviewError] = useState(null);
+  const [previewFacts, setPreviewFacts] = useState([]);
+  const [loadingFacts, setLoadingFacts] = useState(true);
+  const [factsError, setFactsError] = useState(null);
 
-  const dummyFactSheets = ["Fact Sheet 1", "Fact Sheet 2", "Fact Sheet 3"];
   const dummyOtherResources = ["Resource 1", "Resource 2", "Resource 3"];
 
   const fetchPreviewNewsletters = async () => {
@@ -38,8 +40,32 @@ export default function Resources() {
     }
   };
 
+  const fetchPreviewFacts = async () => {
+    try {
+      setLoadingFacts(true);
+      const resourcesRef = collection(db, 'resources');
+      const q = query(
+        resourcesRef,
+        where('category', '==', 'facts'),
+        orderBy('title', 'asc')
+      );
+      const querySnapshot = await getDocs(q);
+      const factsData = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      setPreviewFacts(factsData.slice(0, 3));
+      setLoadingFacts(false);
+    } catch (e) {
+      console.error("Error fetching preview facts:", e);
+      setFactsError("Failed to load facts preview.");
+      setLoadingFacts(false);
+    }
+  };
+
   useEffect(() => {
     fetchPreviewNewsletters();
+    fetchPreviewFacts();
   }, []);
 
   return (
@@ -106,18 +132,35 @@ export default function Resources() {
           >
             <FileTextIcon className="mx-auto h-12 w-12 text-green-700 mb-4" />
             <h2 className="text-xl font-semibold text-gray-800 mb-4">Fact Sheets</h2>
-             <div className="text-left w-full flex-grow">
-               <ul className="list-disc list-inside space-y-1 text-sm text-gray-700">
-                 {dummyFactSheets.map((fact, index) => (
-                   <li key={index} className="line-clamp-1">{fact}</li>
-                 ))}
-               </ul>
-             </div>
-             <div className="mt-auto pt-4 text-center">
-                 <Link href="/resources/facts" className="text-sm text-green-700 hover:underline">
-                   See More Fact Sheets
-                 </Link>
-              </div>
+            <div className="text-left w-full flex-grow">
+              {loadingFacts ? (
+                <p className="text-sm text-gray-600">Loading preview...</p>
+              ) : factsError ? (
+                <p className="text-sm text-red-500">{factsError}</p>
+              ) : previewFacts.length === 0 ? (
+                <p className="text-sm text-gray-600">No recent facts.</p>
+              ) : (
+                <ul className="list-disc list-inside space-y-1 text-sm text-gray-700">
+                  {previewFacts.map((fact) => (
+                    <li key={fact.id} className="line-clamp-1">
+                      <a
+                        href={fact.pdfUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="hover:underline text-gray-700"
+                      >
+                        {fact.title || 'Untitled'}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+            <div className="mt-auto pt-4 text-center">
+              <Link href="/resources/facts" className="text-sm text-green-700 hover:underline">
+                See More Fact Sheets
+              </Link>
+            </div>
           </div>
 
           {/* Other Resources Card */}

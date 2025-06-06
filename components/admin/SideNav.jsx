@@ -2,7 +2,7 @@
 import React from 'react'
 import Image from "next/image";
 import Link from "next/link";
-import { LayoutDashboard, FolderOpen, FileText, ImageIcon, BookOpen, LogOut } from "lucide-react";
+import { LayoutDashboard, FolderOpen, FileText, ImageIcon, BookOpen, LogOut, Users } from "lucide-react";
 import { useAuth } from '@/app/(admin)/admin/AuthProvider';
 import { usePathname } from 'next/navigation';
 
@@ -16,6 +16,7 @@ const SideNav = () => {
         { href: "/admin/blogs", label: "Blog", icon: FileText },
         { href: "/admin/gallery", label: "Gallery", icon: ImageIcon },
         { href: "/admin/resources", label: "Resources", icon: BookOpen },
+        { href: "/admin/subscribers", label: "Subscribers", icon: Users },
     ];
 
     const handleLogout = async () => {

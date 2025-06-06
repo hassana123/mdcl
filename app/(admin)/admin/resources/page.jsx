@@ -6,7 +6,7 @@ import { db, storage } from '@/lib/firebase';
 import { ChevronLeftIcon, ChevronRightIcon, PlusIcon, Edit2Icon, Trash2Icon } from 'lucide-react';
 import Image from 'next/image';
 import AddNewsletterModal from '@/components/admin/resources/AddNewsletterModal';
-import AddFAQModal from '@/components/admin/resources/AddFAQModal';
+import AddFactsModal from '@/components/admin/resources/AddFactsModal';
 import AddPolicyModal from '@/components/admin/resources/AddPolicyModal';
 
 export default function AdminResourcesPage() {
@@ -107,22 +107,22 @@ export default function AdminResourcesPage() {
             Add Newsletter
           </button>
         );
-      case 'faq':
+      case 'facts':
         return (
           <button
             onClick={() => setIsModalOpen(true)}
             className="px-4 py-2 bg-green-700 text-white rounded-md hover:bg-green-800 transition-colors"
           >
-            Add FAQ
+            Add facts
           </button>
         );
-      case 'policy':
+      case 'others':
         return (
           <button
             onClick={() => setIsModalOpen(true)}
             className="px-4 py-2 bg-green-700 text-white rounded-md hover:bg-green-800 transition-colors"
           >
-            Add Policy
+           Other Resources
           </button>
         );
       default:
@@ -141,16 +141,16 @@ export default function AdminResourcesPage() {
             editData={editData}
           />
         );
-      case 'faq':
+      case 'facts':
         return (
-          <AddFAQModal
+          <AddFactsModal
             isOpen={isModalOpen}
             onClose={handleCloseModal}
             onResourceAdded={fetchResources}
             editData={editData}
           />
         );
-      case 'policy':
+      case 'others':
         return (
           <AddPolicyModal
             isOpen={isModalOpen}
@@ -186,24 +186,24 @@ export default function AdminResourcesPage() {
             Newsletters
           </button>
           <button
-            onClick={() => setSelectedCategory('faq')}
+            onClick={() => setSelectedCategory('facts')}
             className={`px-4 py-2 rounded-md ${
-              selectedCategory === 'faq'
+              selectedCategory === 'facts'
                 ? 'bg-green-700 text-white'
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
             }`}
           >
-            FAQs
+            Facts
           </button>
           <button
-            onClick={() => setSelectedCategory('policy')}
+            onClick={() => setSelectedCategory('other')}
             className={`px-4 py-2 rounded-md ${
-              selectedCategory === 'policy'
+              selectedCategory === 'others'
                 ? 'bg-green-700 text-white'
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
             }`}
           >
-            Policies
+            Others
           </button>
         </div>
       </div>
@@ -245,7 +245,7 @@ export default function AdminResourcesPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {currentItems.map(item => (
             <div key={item.id} className="bg-white rounded-lg overflow-hidden shadow-md border-t-4 border-t-green-700">
-              {(selectedCategory === 'newsletter' || selectedCategory === 'faq') && item.coverImage && (
+              {(selectedCategory === 'newsletter' || selectedCategory === 'facts') && item.coverImage && (
                 <div className="relative w-full h-40 bg-gray-100">
                   <Image
                     src={item.coverImage}
@@ -261,7 +261,7 @@ export default function AdminResourcesPage() {
                   <p className="text-sm text-gray-600 mb-2 line-clamp-2">{item.description}</p>
                 )}
                 <div className="flex justify-between items-center mt-4">
-                  {(selectedCategory === 'newsletter' || selectedCategory === 'faq') && item.pdfUrl && (
+                  {(selectedCategory === 'newsletter' || selectedCategory === 'facts') && item.pdfUrl && (
                     <a
                       href={item.pdfUrl}
                       target="_blank"
