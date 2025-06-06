@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import Image from "next/image";
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, query, where, getDocs } from 'firebase/firestore';
 import { db } from "@/lib/firebase";
-import { CheckCircle2, X } from 'lucide-react';
+import { CheckCircle2, X, AlertCircle } from 'lucide-react';
 
 const PreviewNewsletter = ({
   newsletters = [], // Accept newsletters array as prop
@@ -13,13 +13,53 @@ const PreviewNewsletter = ({
   const [status, setStatus] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [isExistingSubscriber, setIsExistingSubscriber] = useState(false);
+  const [emailError, setEmailError] = useState("");
+
+  const validateEmail = (email) => {
+    // RFC 5322 compliant email regex
+    const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+    return emailRegex.test(email);
+  };
+
+  const handleEmailChange = (e) => {
+    const newEmail = e.target.value;
+    setEmail(newEmail);
+    
+    if (newEmail && !validateEmail(newEmail)) {
+      setEmailError("Please enter a valid email address");
+    } else {
+      setEmailError("");
+    }
+  };
 
   const handleSubscribe = async (e) => {
     e.preventDefault();
+    
+    // Validate email before proceeding
+    if (!validateEmail(email)) {
+      setEmailError("Please enter a valid email address");
+      return;
+    }
+
     setIsSubmitting(true);
     setStatus("");
+    setEmailError("");
 
     try {
+      // Check if email already exists
+      const subscribersRef = collection(db, 'newsletter_subscribers');
+      const q = query(subscribersRef, where("email", "==", email));
+      const querySnapshot = await getDocs(q);
+
+      if (!querySnapshot.empty) {
+        setIsExistingSubscriber(true);
+        setShowSuccessModal(true);
+        setEmail("");
+        setIsSubmitting(false);
+        return;
+      }
+
       // Add email to the newsletter_subscribers collection
       await addDoc(collection(db, 'newsletter_subscribers'), {
         email: email,
@@ -27,6 +67,7 @@ const PreviewNewsletter = ({
         status: 'active'
       });
 
+      setIsExistingSubscriber(false);
       setShowSuccessModal(true);
       setEmail("");
     } catch (err) {
@@ -95,16 +136,22 @@ const PreviewNewsletter = ({
               <X size={24} />
             </button>
             <div className="flex flex-col items-center text-center">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-6">
-                <CheckCircle2 className="w-10 h-10 text-green-600" />
+              <div className={`w-16 h-16 ${isExistingSubscriber ? 'bg-yellow-100' : 'bg-green-100'} rounded-full flex items-center justify-center mb-6`}>
+                {isExistingSubscriber ? (
+                  <AlertCircle className="w-10 h-10 text-yellow-600" />
+                ) : (
+                  <CheckCircle2 className="w-10 h-10 text-green-600" />
+                )}
               </div>
               <h3 className="text-2xl font-bold text-gray-900 mb-2">
-                Subscription Successful!
+                {isExistingSubscriber ? 'Already Subscribed!' : 'Subscription Successful!'}
               </h3>
               <p className="text-gray-600 mb-6">
-                Thank you for subscribing to our Newsletter. 
+                {isExistingSubscriber 
+                  ? "This email is already subscribed to our Newsletter."
+                  : "Thank you for subscribing to our Newsletter."
+                }
               </p>
-              {/* You'll be the first to know when we publish new content. */}
               <button
                 onClick={closeSuccessModal}
                 className="bg-[color:var(--color-primary-olive)] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[color:var(--color-primary-olive)]/90 transition-colors"
@@ -123,22 +170,29 @@ const PreviewNewsletter = ({
       <p className="text-base text-gray-700 text-center mb-8 max-w-2xl">
       <i> MicroDevelopment Matters </i>is our quarterly newsletter where we share insights on topical development issues at the grassroots level. Each edition features interviews with entrepreneurs and experts across various sectors, offering fresh perspectives and practical knowledge.      </p>
       {/* Email Form */}
-      <form onSubmit={handleSubscribe} className="w-full max-w-xl mx-auto md:flex items-center gap-2 mb-12">
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="Enter your email address..."
-          className="flex-1 px-4 py-3 rounded-l-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary-olive)]/60 text-sm bg-white"
-          required
-        />
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className="bg-[color:var(--color-primary-olive)] text-white px-8 py-3 rounded-r-lg font-semibold text-base shadow hover:bg-[color:var(--color-primary-olive)] transition disabled:opacity-60"
-        >
-          {isSubmitting ? "Subscribing..." : "Subscribe"}
-        </button>
+      <form onSubmit={handleSubscribe} className="w-full max-w-xl mx-auto md:flex flex-col items-center gap-2 mb-12">
+        <div className="w-full flex flex-col">
+          <div className="flex">
+            <input
+              type="email"
+              value={email}
+              onChange={handleEmailChange}
+              placeholder="Enter your email address..."
+              className={`flex-1 px-4 py-3 rounded-l-lg border ${emailError ? 'border-red-500' : 'border-gray-300'} focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary-olive)]/60 text-sm bg-white`}
+              required
+            />
+            <button
+              type="submit"
+              disabled={isSubmitting || !!emailError}
+              className="bg-[color:var(--color-primary-olive)] cursor-pointer text-white px-8 py-3 rounded-r-lg font-semibold text-base shadow hover:bg-[color:var(--color-primary-olive)] transition disabled:opacity-60 disabled:cursor-not-allowed"
+            >
+              {isSubmitting ? "Subscribing..." : "Subscribe"}
+            </button>
+          </div>
+          {emailError && (
+            <p className="text-red-500 text-sm mt-1 ml-1">{emailError}</p>
+          )}
+        </div>
       </form>
       {status && !showSuccessModal && (
         <div className={`text-center mb-8 ${status.includes("Thank you") ? "text-green-600" : "text-red-500"}`}>
