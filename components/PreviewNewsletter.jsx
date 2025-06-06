@@ -1,10 +1,38 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Image from "next/image";
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { db } from "@/lib/firebase";
+
 const PreviewNewsletter = ({
   newsletters = [], // Accept newsletters array as prop
   limit = newsletters.length, // Accept limit as prop, default to all
   loading = false // Add loading prop
 }) => {
+  const [email, setEmail] = useState("");
+  const [status, setStatus] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubscribe = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setStatus("");
+
+    try {
+      // Add email to the newsletter_subscribers collection
+      await addDoc(collection(db, 'newsletter_subscribers'), {
+        email: email,
+        subscribedAt: serverTimestamp(),
+        status: 'active'
+      });
+
+      setStatus("Thank you for subscribing to our newsletter!");
+      setEmail("");
+    } catch (err) {
+      console.error("Error subscribing:", err);
+      setStatus("Something went wrong. Please try again later.");
+    }
+    setIsSubmitting(false);
+  };
 
   // Use the passed newsletters and apply limit
   const newslettersToDisplay = newsletters.slice(0, limit);
@@ -57,20 +85,28 @@ const PreviewNewsletter = ({
       <p className="text-base text-gray-700 text-center mb-8 max-w-2xl">
       <i> MicroDevelopment Matters </i>is our quarterly newsletter where we share insights on topical development issues at the grassroots level. Each edition features interviews with entrepreneurs and experts across various sectors, offering fresh perspectives and practical knowledge.      </p>
       {/* Email Form */}
-      <form className="w-full max-w-xl mx-auto md:flex  items-center gap-2 mb-12">
+      <form onSubmit={handleSubscribe} className="w-full max-w-xl mx-auto md:flex items-center gap-2 mb-12">
         <input
           type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
           placeholder="Enter your email address..."
           className="flex-1 px-4 py-3 rounded-l-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary-olive)]/60 text-sm bg-white"
           required
         />
         <button
           type="submit"
-          className="bg-[color:var(--color-primary-olive)] text-white px-8 py-3 rounded-r-lg font-semibold text-base shadow hover:bg-[color:var(--color-primary-olive)] transition"
+          disabled={isSubmitting}
+          className="bg-[color:var(--color-primary-olive)] text-white px-8 py-3 rounded-r-lg font-semibold text-base shadow hover:bg-[color:var(--color-primary-olive)] transition disabled:opacity-60"
         >
-          Subscribe
+          {isSubmitting ? "Subscribing..." : "Subscribe"}
         </button>
       </form>
+      {status && (
+        <div className={`text-center mb-8 ${status.includes("Thank you") ? "text-green-600" : "text-red-500"}`}>
+          {status}
+        </div>
+      )}
       {/* Newsletter Cards */}
       <div className="md:w-[85%] w-[95%]  mx-auto grid md:grid-cols-2 lg:grid-cols-3  grid-cols-1 gap-5  justify-center items-stretch">
         {newslettersToDisplay.map((nl) => (

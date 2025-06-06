@@ -46,13 +46,13 @@ const Faqs = () => {
             {dummyFacts.map((faq, index) => (
               <div key={faq.id} className="bg-white rounded-lg overflow-hidden shadow-md border-t-4 border-t-green-700 flex flex-col">
                 {/* Display image, alternating between the two provided */}
-                <div className="relative w-full h-40 rounded-t-lg overflow-hidden">
-                  <Image
+                <div className="relative w-full h-40 bg-gray-200 rounded-t-lg overflow-hidden">
+                  {/* <Image
                     src={images[index % images.length]}
                     alt={`Fact Sheet Graphic ${index + 1}`}
                     fill
                     className="object-cover"
-                  />
+                  /> */}
                 </div>
 
                 <div className="p-4 flex flex-col flex-grow">
