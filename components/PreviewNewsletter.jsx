@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Image from "next/image";
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from "@/lib/firebase";
+import { CheckCircle2, X } from 'lucide-react';
 
 const PreviewNewsletter = ({
   newsletters = [], // Accept newsletters array as prop
@@ -11,6 +12,7 @@ const PreviewNewsletter = ({
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   const handleSubscribe = async (e) => {
     e.preventDefault();
@@ -25,13 +27,17 @@ const PreviewNewsletter = ({
         status: 'active'
       });
 
-      setStatus("Thank you for subscribing to our newsletter!");
+      setShowSuccessModal(true);
       setEmail("");
     } catch (err) {
       console.error("Error subscribing:", err);
       setStatus("Something went wrong. Please try again later.");
     }
     setIsSubmitting(false);
+  };
+
+  const closeSuccessModal = () => {
+    setShowSuccessModal(false);
   };
 
   // Use the passed newsletters and apply limit
@@ -77,7 +83,39 @@ const PreviewNewsletter = ({
   }
 
   return (
-    <section className="w-full md:px-0 px-5 min-h-[600px] bg-[color:var(--color-primary-olive)]/20 py-5 flex flex-col items-center justify-center">
+    <section className="w-full md:px-0 px-5 min-h-[600px] bg-[color:var(--color-primary-olive)]/20 py-5 flex flex-col items-center justify-center relative">
+      {/* Success Modal */}
+      {showSuccessModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 animate-fadeIn">
+          <div className="bg-white rounded-2xl p-8 max-w-md w-full mx-4 relative animate-slideUp">
+            <button
+              onClick={closeSuccessModal}
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              <X size={24} />
+            </button>
+            <div className="flex flex-col items-center text-center">
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-6">
+                <CheckCircle2 className="w-10 h-10 text-green-600" />
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                Subscription Successful!
+              </h3>
+              <p className="text-gray-600 mb-6">
+                Thank you for subscribing to our Newsletter. 
+              </p>
+              {/* You'll be the first to know when we publish new content. */}
+              <button
+                onClick={closeSuccessModal}
+                className="bg-[color:var(--color-primary-olive)] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[color:var(--color-primary-olive)]/90 transition-colors"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Heading and Description */}
       <h2 className="md:text-2xl text-md uppercase md:text-3xl font-bold text-center mb-2 text-[color:var(--color-primary-olive)]">
        Subscribe to our quarterly Newsletter: MICRODEVELOPMENT MATTERS
@@ -102,7 +140,7 @@ const PreviewNewsletter = ({
           {isSubmitting ? "Subscribing..." : "Subscribe"}
         </button>
       </form>
-      {status && (
+      {status && !showSuccessModal && (
         <div className={`text-center mb-8 ${status.includes("Thank you") ? "text-green-600" : "text-red-500"}`}>
           {status}
         </div>
