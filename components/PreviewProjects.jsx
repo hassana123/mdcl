@@ -42,9 +42,9 @@ const PreviewProjects = () => {
             <h3 className="text-[var(--color-primary-olive)] text-[30px] font-bold my-3">
               PROJECTS & PROGRAMMES
             </h3>
-            <p className="text-[#1C1C1C]">
+            {/* <p className="text-[#1C1C1C]">
               Our Projects are designed to meet the evolving needs of development actors.
-            </p>
+            </p> */}
           </div>
           <Link href={"/projects-&-programmes"} className="bg-[var(--color-primary-light-brown)] text-white px-8 py-3 rounded-xl text-lg shadow hover:bg-[color:var(--color-primary-brown)]/90 transition">
             View Projects & Programmes

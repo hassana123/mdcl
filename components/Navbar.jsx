@@ -150,7 +150,7 @@ const Navbar = () => {
                     <div className="absolute left-0 mt-2 w-56 bg-white border rounded shadow-lg z-50">
                       {renderDropdown(
                         [
-                          { href: "/projects-&-programmes/research", label: "Research Projects" },
+                          { href: "/projects-&-programmes/research", label: "Research" },
                           { href: "/projects-&-programmes/project-management", label: "Project Management" },
                           { href: "/projects-&-programmes/capacity-development", label: "Capacity Development" },
                         ],

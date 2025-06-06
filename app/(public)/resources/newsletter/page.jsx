@@ -20,15 +20,40 @@ const Newsletter = () => {
       const resourcesRef = collection(db, 'resources');
       const q = query(
         resourcesRef,
-        where('category', '==', 'newsletter'),
-        orderBy('title', 'asc') // Order by title alphabetically
+        where('category', '==', 'newsletter')
       );
       const querySnapshot = await getDocs(q);
       const newslettersData = querySnapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
       }));
-      setNewsletters(newslettersData);
+
+      // Sort newsletters by volume and number numerically
+      const sortedNewsletters = newslettersData.sort((a, b) => {
+        // Extract volume and number from titles
+        const getVolumeAndNumber = (title) => {
+          const match = title.match(/Vol\.(\d+)\s+No\.(\d+)/);
+          if (match) {
+            return {
+              volume: parseInt(match[1]),
+              number: parseInt(match[2])
+            };
+          }
+          return { volume: 0, number: 0 };
+        };
+
+        const aInfo = getVolumeAndNumber(a.title);
+        const bInfo = getVolumeAndNumber(b.title);
+
+        // First compare volumes
+        if (aInfo.volume !== bInfo.volume) {
+          return aInfo.volume - bInfo.volume;
+        }
+        // If volumes are equal, compare numbers
+        return aInfo.number - bInfo.number;
+      });
+
+      setNewsletters(sortedNewsletters);
       setLoading(false);
     } catch (e) {
       console.log(e);
@@ -59,13 +84,13 @@ const Newsletter = () => {
       </div>
         <div className="">
           {loading ? (
-            <LoadingSpinner />
+            <PreviewNewsletter loading={true} />
           ) : error ? (
             <p className="text-red-500">{error}</p>
           ) : newsletters.length === 0 ? (
             <p>No newsletters available at the moment.</p>
           ) : (
-            <PreviewNewsletter newsletters={newsletters} /> 
+            <PreviewNewsletter newsletters={newsletters} loading={false} /> 
           )}
         </div>
         <Partners/>

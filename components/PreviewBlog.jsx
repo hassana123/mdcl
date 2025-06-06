@@ -1,49 +1,109 @@
-import React from "react";
+"use client"
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
-
-const blogs = [
-  {
-    image: "/mdcl/b1.jpg",
-    title: "Educating Girls: A pathway to sustainable development",
-    excerpt:
-      "Although progress has been recorded in recent years, girls throughout the world have continually suffered severe disadvantage and marginalization in the education system in Sub-Saharan Africa. For example, an estimated 51 [...]",
-    link: "#",
-  },
-  {
-    image: "/mdcl/b2.jpg",
-    title: "Is the nigeria coin lost and gone?",
-    excerpt:
-      "The main idea of having the coin as part of the Nigerian currency was to show the 'thrift' value of a naira. At the early stages of its introduction, the kobo [...]",
-    link: "#",
-  },
-  {
-    image: "/mdcl/b3.jpg",
-    title: "My take on development",
-    excerpt:
-      "Philosophers, economists and political leaders have all shared their musings on the term 'development'. I believe human development is empowerment, it is about people taking control of their own [...]",
-    link: "#",
-  },
-];
+import Link from "next/link";
+import { collection, getDocs, query, orderBy, limit } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 
 const PreviewBlog = () => {
+  const [blogs, setBlogs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const getPreviewText = (blog) => {
+    let text = '';
+    if (blog.layoutType === 'standard') {
+      text = blog.content;
+    } else if (blog.layoutType === 'sectioned') {
+      text = blog.sections[0]?.description || '';
+    } else if (blog.layoutType === 'introduction-conclusion') {
+      text = blog.introduction;
+    }
+    
+    // Get first 15-20 words
+    const words = text.split(/\s+/).slice(0, 20).join(' ');
+    return words.length < text.length ? `${words} [...]` : words;
+  };
+
+  useEffect(() => {
+    const fetchBlogs = async () => {
+      try {
+        const blogsRef = collection(db, 'blogs');
+        const q = query(
+          blogsRef,
+          orderBy('publishDate', 'desc'),
+          limit(3)
+        );
+        const querySnapshot = await getDocs(q);
+        const blogsData = querySnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+        setBlogs(blogsData);
+        setLoading(false);
+      } catch (e) {
+        console.error("Error fetching blogs:", e);
+        setError("Failed to load blogs");
+        setLoading(false);
+      }
+    };
+
+    fetchBlogs();
+  }, []);
+
+  if (loading) {
+    return (
+      <section className="w-[85%] mx-auto py-16 flex flex-col items-center">
+        <h2 className="text-2xl md:text-3xl font-bold text-[var(--color-title-text)] text-center mb-5">
+          Blog Posts
+        </h2>
+        <div className="w-full flex flex-col md:flex-row gap-6 justify-center items-stretch">
+          {[1, 2, 3].map((_, idx) => (
+            <div key={idx} className="bg-white rounded-xl shadow-md flex-1 flex flex-col overflow-hidden max-w-sm mx-auto animate-pulse">
+              <div className="w-full h-48 bg-gray-200" />
+              <div className="p-5 flex flex-col flex-1">
+                <div className="h-6 bg-gray-200 rounded w-3/4 mb-2" />
+                <div className="space-y-2 flex-1 mb-4">
+                  <div className="h-4 bg-gray-200 rounded w-full" />
+                  <div className="h-4 bg-gray-200 rounded w-5/6" />
+                  <div className="h-4 bg-gray-200 rounded w-4/6" />
+                </div>
+                <div className="h-4 bg-gray-200 rounded w-1/4" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section className="w-[85%] mx-auto py-16 flex flex-col items-center">
+        <h2 className="text-2xl md:text-3xl font-bold text-[var(--color-title-text)] text-center mb-5">
+          Blog Posts
+        </h2>
+        <p className="text-red-500">{error}</p>
+      </section>
+    );
+  }
+
   return (
-    <section className="w-[85%] mx-auto mx-auto py-16  flex flex-col items-center">
+    <section className="w-[85%] mx-auto py-16 flex flex-col items-center">
       {/* Section Title */}
       <h2 className="text-2xl md:text-3xl font-bold text-[var(--color-title-text)] text-center mb-5">
-       Blog Posts
+        Blog Posts
       </h2>
-      {/* <p className="text-base text-gray-700 text-center mb-6 max-w-xl">
-        Here's a quick glance over our  blog posts and media articles
-      </p> */}
-      <button className="mb-10 bg-[var(--color-primary-light-brown)] text-white px-6 py-2 rounded-lg font-semibold shadow hover:bg-[color:var(--color-primary-brown)]/90 transition">
+
+      <Link href="/blog" className="mb-10 bg-[var(--color-primary-light-brown)] text-white px-6 py-2 rounded-lg font-semibold shadow hover:bg-[color:var(--color-primary-brown)]/90 transition">
         View Blog
-      </button>
+      </Link>
 
       {/* Blog Cards */}
       <div className="w-full flex flex-col md:flex-row gap-6 justify-center items-stretch">
-        {blogs.map((blog, idx) => (
+        {blogs.map((blog) => (
           <div
-            key={idx}
+            key={blog.id}
             className="bg-white rounded-xl shadow-md flex-1 flex flex-col overflow-hidden max-w-sm mx-auto"
           >
             <div className="relative w-full h-48">
@@ -53,7 +113,7 @@ const PreviewBlog = () => {
                 fill
                 className="object-cover"
                 sizes="(max-width: 768px) 100vw, 33vw"
-                priority={idx === 0}
+                priority={blog.id === blogs[0]?.id}
               />
             </div>
             <div className="p-5 flex flex-col flex-1">
@@ -61,14 +121,14 @@ const PreviewBlog = () => {
                 {blog.title}
               </h3>
               <p className="text-sm text-gray-700 flex-1 mb-4">
-                {blog.excerpt}
+                {getPreviewText(blog)}
               </p>
-              <a
-                href={blog.link}
+              <Link
+                href={`/blog/${blog.id}`}
                 className="text-[color:var(--color-primary-olive)] font-semibold text-sm hover:underline mt-auto"
               >
                 Read More &rarr;
-              </a>
+              </Link>
             </div>
           </div>
         ))}

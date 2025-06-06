@@ -35,25 +35,36 @@ const Footer = () => {
 
         <div className="flex gap-4 mt-1">
           <a
-            href="#"
-            className=" hover:text-[color:var(--color-primary-olive)] transition"
+            href="https://www.instagram.com/microdevelopmentng/"
+            target="_blank"
+            className="hover:text-[color:var(--color-primary-olive)] transition"
             aria-label="Instagram"
           >
             <Instagram size={20} />
           </a>
           <a
-            href="#"
-            className=" hover:text-[color:var(--color-primary-olive)] transition"
+            href="https://web.facebook.com/people/MicroDevelopment-Consulting-Limited/100063761342350/?_rdc=1&_rdr#"
+            target="_blank"
+            className="hover:text-[color:var(--color-primary-olive)] transition"
             aria-label="Facebook"
           >
             <Facebook size={20} />
           </a>
           <a
-            href="#"
-            className=" hover:text-[color:var(--color-primary-olive)] transition"
+            href="https://x.com/microdevconsult"
+            target="_blank"
+            className="hover:text-[color:var(--color-primary-olive)] transition"
             aria-label="Twitter"
           >
             <Twitter size={20} />
+          </a>
+          <a
+            href="https://www.linkedin.com/company/microdevelopmentng/posts/?feedView=all"
+            target="_blank"
+            className="hover:text-[color:var(--color-primary-olive)] transition"
+            aria-label="LinkedIn"
+          >
+            <Linkedin size={20} />
           </a>
         </div>
       </div>
