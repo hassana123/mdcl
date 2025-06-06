@@ -109,9 +109,9 @@ const ProjectDisplay = ({
                 {projects.map((proj) => (
                   <div key={proj.id} className="flex flex-col">
                     <div className="relative w-full h-60 rounded-xl overflow-hidden mb-3">
-                      {proj.images && proj.images.length > 0 ? (
+                      {proj.coverImage ? (
                         <Image
-                          src={proj.images[0]}
+                          src={proj.coverImage}
                           alt={proj.title}
                           fill
                           loading="lazy"

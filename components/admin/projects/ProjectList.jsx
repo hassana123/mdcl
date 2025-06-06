@@ -198,10 +198,10 @@ const ProjectList = ({
               <div key={project.id} className="bg-white rounded-lg shadow-md overflow-hidden">
                 {/* Project Image */}
                 <div className="relative h-48 bg-gray-100">
-                  {project.images && project.images.length > 0 ? (
-                    <img 
-                      src={project.images[0]} 
-                      alt={project.title} 
+                  {project.coverImage ? (
+                    <img
+                      src={project.coverImage} 
+                      alt={project.title}
                       className="w-full h-full object-cover"
                     />
                   ) : (
@@ -233,7 +233,7 @@ const ProjectList = ({
                     >
                       Edit
                     </button>
-                    <button 
+                    <button
                       onClick={() => handleDeleteClick(project)}
                       className="text-red-600 hover:text-red-800 transition-colors"
                     >

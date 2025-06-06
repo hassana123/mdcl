@@ -193,16 +193,15 @@ export default function ProjectDetailsPage({ params }) {
         <div className="max-w-4xl mx-auto text-justify">
           <h1 className="text-2xl md:text-3xl font-bold mb-6 text-[var(--color-title-text)]">{project.title}</h1>
           
-          {/* First Image */}
-          {project.images && project.images.length > 0 && (
+          {/* Cover Image */}
+          {project.coverImage && (
             <div className="relative w-[80%] mx-auto aspect-video mb-8 rounded-xl overflow-hidden">
               <Image
-                src={project.images[0]}
+                src={project.coverImage}
                 alt={project.title}
                 fill
-                priorityw
+                priority
                 className="object-cover rounded-xl"
-                
               />
             </div>
           )}
@@ -224,7 +223,7 @@ export default function ProjectDetailsPage({ params }) {
         </div>
 
         {/* Additional Images Grid */}
-        {project.images && project.images.length > 1 && (
+        {/* {project.images && project.images.length > 1 && (
           <div className="mt-16">
             <h2 className="text-2xl font-bold mb-8 text-[var(--color-title-text)]">Project Gallery</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -241,7 +240,7 @@ export default function ProjectDetailsPage({ params }) {
               ))}
             </div>
           </div>
-        )}
+        )} */}
       </div>
     </main>
   );

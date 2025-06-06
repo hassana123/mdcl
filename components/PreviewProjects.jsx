@@ -67,7 +67,7 @@ const PreviewProjects = () => {
               className="text-[var(--color-primary-light-brown)] font-semibold underline flex items-center space-x-2"
               href={item.link}
             >
-              View Projects/Programmes <ArrowRight />
+              View {item.title} <ArrowRight />
             </Link>
           </div>
         ))}

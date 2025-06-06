@@ -29,7 +29,7 @@ const AddProjectModal = ({ onClose }) => {
     type: 'text', // 'text', 'bullet', 'numbered', 'nested'
     items: [] // For bullet points and numbered lists
   }]);
-  const [files, setFiles] = useState([]);
+  const [coverImage, setCoverImage] = useState(null);
   const [uploadProgress, setUploadProgress] = useState(0);
 
   const handleAddSection = () => {
@@ -61,8 +61,10 @@ const AddProjectModal = ({ onClose }) => {
   };
 
   const handleFileChange = (e) => {
-    const selectedFiles = Array.from(e.target.files);
-    setFiles(prevFiles => [...prevFiles, ...selectedFiles]);
+    const file = e.target.files[0];
+    if (file) {
+      setCoverImage(file);
+    }
   };
 
   const handleInputChange = (e) => {
@@ -136,44 +138,34 @@ const AddProjectModal = ({ onClose }) => {
     setSections(newSections);
   };
 
-  const uploadFiles = async (formData) => {
-    if (files.length === 0) return [];
+  const uploadCoverImage = async (formData) => {
+    if (!coverImage) return null;
 
     const { category, title } = formData;
     if (!category || !title) {
-      console.error("Category or Title is missing. Cannot upload files.");
-      return [];
+      console.error("Category or Title is missing. Cannot upload cover image.");
+      return null;
     }
 
-    const uploadedUrls = [];
-    const totalFiles = files.length;
-    let completedFiles = 0;
+    try {
+      // Create a sanitized project folder name
+      const sanitizedTitle = title.toLowerCase().replace(/[^a-z0-9]/g, '-');
+      const projectFolder = `${category}/${sanitizedTitle}`;
 
-    // Create a sanitized project folder name
-    const sanitizedTitle = title.toLowerCase().replace(/[^a-z0-9]/g, '-');
-    const projectFolder = `${category}/${sanitizedTitle}`;
-
-    for (const file of files) {
-      try {
-        // Create a unique filename with timestamp
-        const timestamp = Date.now();
-        const sanitizedFilename = file.name.toLowerCase().replace(/[^a-z0-9.]/g, '-');
-        const storagePath = `projects/${projectFolder}/${timestamp}-${sanitizedFilename}`;
-        
-        const storageRef = ref(storage, storagePath);
-        const snapshot = await uploadBytes(storageRef, file);
-        const downloadURL = await getDownloadURL(snapshot.ref);
-        uploadedUrls.push(downloadURL);
-        
-        completedFiles++;
-        setUploadProgress((completedFiles / totalFiles) * 100);
-      } catch (error) {
-        console.error('Error uploading file:', error);
-        throw new Error('Failed to upload files');
-      }
+      // Create a unique filename with timestamp
+      const timestamp = Date.now();
+      const sanitizedFilename = coverImage.name.toLowerCase().replace(/[^a-z0-9.]/g, '-');
+      const storagePath = `projects/${projectFolder}/cover-${timestamp}-${sanitizedFilename}`;
+      
+      const storageRef = ref(storage, storagePath);
+      const snapshot = await uploadBytes(storageRef, coverImage);
+      const downloadURL = await getDownloadURL(snapshot.ref);
+      
+      return downloadURL;
+    } catch (error) {
+      console.error('Error uploading cover image:', error);
+      throw new Error('Failed to upload cover image');
     }
-
-    return uploadedUrls;
   };
 
   const handleSubmit = async (e) => {
@@ -212,8 +204,8 @@ const AddProjectModal = ({ onClose }) => {
     setError('');
 
     try {
-      // Upload files first
-      const imageUrls = await uploadFiles(formData);
+      // Upload cover image first
+      const coverImageUrl = await uploadCoverImage(formData);
 
       // Clean up sections data
       const cleanedSections = sections.map(section => {
@@ -239,7 +231,7 @@ const AddProjectModal = ({ onClose }) => {
       const projectData = {
         ...formData,
         sections: cleanedSections,
-        images: imageUrls,
+        coverImage: coverImageUrl,
         createdAt: new Date(),
         createdBy: user.uid,
         status: 'active'
@@ -531,25 +523,19 @@ const AddProjectModal = ({ onClose }) => {
             </button>
           </div>
 
-          {/* Upload Attachments */}
+          {/* Upload Cover Image */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Upload Images</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Upload Cover Image</label>
             <input
               type="file"
-              multiple
               accept="image/*"
               onChange={handleFileChange}
               className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100"
               disabled={loading}
             />
-            {files.length > 0 && (
+            {coverImage && (
               <div className="mt-2">
-                <p className="text-sm text-gray-600">Selected files: {files.length}</p>
-                <ul className="mt-1 text-sm text-gray-500">
-                  {files.map((file, index) => (
-                    <li key={index}>{file.name}</li>
-                  ))}
-                </ul>
+                <p className="text-sm text-gray-600">Selected file: {coverImage.name}</p>
               </div>
             )}
           </div>

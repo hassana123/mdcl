@@ -33,8 +33,8 @@ const EditProjectModal = ({ project, onClose }) => {
     type: 'text',
     items: []
   }]);
-  const [files, setFiles] = useState([]);
-  const [existingImages, setExistingImages] = useState(project.images || []);
+  const [coverImage, setCoverImage] = useState(null);
+  const [existingCoverImage, setExistingCoverImage] = useState(project.coverImage || null);
   const [uploadProgress, setUploadProgress] = useState(0);
 
   const handleAddSection = () => {
@@ -66,8 +66,10 @@ const EditProjectModal = ({ project, onClose }) => {
   };
 
   const handleFileChange = (e) => {
-    const selectedFiles = Array.from(e.target.files);
-    setFiles(prevFiles => [...prevFiles, ...selectedFiles]);
+    const file = e.target.files[0];
+    if (file) {
+      setCoverImage(file);
+    }
   };
 
   const handleInputChange = (e) => {
@@ -78,20 +80,20 @@ const EditProjectModal = ({ project, onClose }) => {
     }));
   };
 
-  const handleRemoveExistingImage = async (indexToRemove) => {
-    const imageToRemoveUrl = existingImages[indexToRemove];
+  const handleRemoveExistingImage = async () => {
+    if (!existingCoverImage) return;
 
     try {
       // Extract the path from the URL
       let imagePath;
       try {
         // Handle different URL formats
-        if (imageToRemoveUrl.includes('/o/')) {
+        if (existingCoverImage.includes('/o/')) {
           // URL format: https://firebasestorage.googleapis.com/v0/b/[bucket]/o/[path]?[token]
-          imagePath = decodeURIComponent(imageToRemoveUrl.split('/o/')[1].split('?')[0]);
+          imagePath = decodeURIComponent(existingCoverImage.split('/o/')[1].split('?')[0]);
         } else {
           // If it's already a path
-          imagePath = imageToRemoveUrl;
+          imagePath = existingCoverImage;
         }
 
         // Remove any leading/trailing slashes
@@ -103,68 +105,54 @@ const EditProjectModal = ({ project, onClose }) => {
         try {
           await deleteObject(imageRef);
           console.log('Successfully deleted image:', imagePath);
-          // Remove image URL from the state after successful deletion
-          setExistingImages(prev => prev.filter((_, index) => index !== indexToRemove));
+          setExistingCoverImage(null);
         } catch (deleteError) {
           if (deleteError.code === 'storage/object-not-found') {
             console.warn('Image not found in storage, removing from state anyway:', imagePath);
-            // Remove from state even if not found in storage
-            setExistingImages(prev => prev.filter((_, index) => index !== indexToRemove));
+            setExistingCoverImage(null);
           } else {
             throw deleteError;
           }
         }
       } catch (pathError) {
         console.error('Error processing image path:', pathError);
-        // If we can't process the path, just remove from state
-        setExistingImages(prev => prev.filter((_, index) => index !== indexToRemove));
+        setExistingCoverImage(null);
       }
     } catch (error) {
       console.error('Error in handleRemoveExistingImage:', error);
       setError('Failed to delete image. It will be removed from the project anyway.');
-      // Remove from state even if there's an error
-      setExistingImages(prev => prev.filter((_, index) => index !== indexToRemove));
+      setExistingCoverImage(null);
     }
   };
 
-  const uploadFiles = async (formData) => {
-    if (files.length === 0) return [];
+  const uploadCoverImage = async (formData) => {
+    if (!coverImage) return existingCoverImage;
 
     const { category, title } = formData;
     if (!category || !title) {
-      console.error("Category or Title is missing. Cannot upload new files.");
-      return [];
+      console.error("Category or Title is missing. Cannot upload cover image.");
+      return existingCoverImage;
     }
 
-    const uploadedUrls = [];
-    const totalFiles = files.length;
-    let completedFiles = 0;
+    try {
+      // Create a sanitized project folder name
+      const sanitizedTitle = title.toLowerCase().replace(/[^a-z0-9]/g, '-');
+      const projectFolder = `${category}/${sanitizedTitle}`;
 
-    // Create a sanitized project folder name
-    const sanitizedTitle = title.toLowerCase().replace(/[^a-z0-9]/g, '-');
-    const projectFolder = `${category}/${sanitizedTitle}`;
-
-    for (const file of files) {
-      try {
-        // Create a unique filename with timestamp
-        const timestamp = Date.now();
-        const sanitizedFilename = file.name.toLowerCase().replace(/[^a-z0-9.]/g, '-');
-        const storagePath = `projects/${projectFolder}/${timestamp}-${sanitizedFilename}`;
-        
-        const storageRef = ref(storage, storagePath);
-        const snapshot = await uploadBytes(storageRef, file);
-        const downloadURL = await getDownloadURL(snapshot.ref);
-        uploadedUrls.push(downloadURL);
-        
-        completedFiles++;
-        setUploadProgress((completedFiles / totalFiles) * 100);
-      } catch (error) {
-        console.error('Error uploading file:', error);
-        throw new Error('Failed to upload files');
-      }
+      // Create a unique filename with timestamp
+      const timestamp = Date.now();
+      const sanitizedFilename = coverImage.name.toLowerCase().replace(/[^a-z0-9.]/g, '-');
+      const storagePath = `projects/${projectFolder}/cover-${timestamp}-${sanitizedFilename}`;
+      
+      const storageRef = ref(storage, storagePath);
+      const snapshot = await uploadBytes(storageRef, coverImage);
+      const downloadURL = await getDownloadURL(snapshot.ref);
+      
+      return downloadURL;
+    } catch (error) {
+      console.error('Error uploading cover image:', error);
+      throw new Error('Failed to upload cover image');
     }
-
-    return uploadedUrls;
   };
 
   const handleAddListItem = (sectionIndex) => {
@@ -266,8 +254,8 @@ const EditProjectModal = ({ project, onClose }) => {
     setError('');
 
     try {
-      // Upload new files first
-      const newImageUrls = await uploadFiles(formData);
+      // Upload new cover image if one was selected
+      const coverImageUrl = await uploadCoverImage(formData);
 
       // Clean up sections data
       const cleanedSections = sections.map(section => {
@@ -293,7 +281,7 @@ const EditProjectModal = ({ project, onClose }) => {
       const projectData = {
         ...formData,
         sections: cleanedSections,
-        images: [...existingImages, ...newImageUrls],
+        coverImage: coverImageUrl,
         updatedAt: new Date(),
         updatedBy: user.uid
       };
@@ -585,52 +573,42 @@ const EditProjectModal = ({ project, onClose }) => {
             </button>
           </div>
 
-          {/* Existing Images */}
-          {existingImages.length > 0 && (
+          {/* Existing Cover Image */}
+          {existingCoverImage && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Existing Images</label>
-              <div className="grid grid-cols-3 gap-4">
-                {existingImages.map((image, index) => (
-                  <div key={index} className="relative group">
-                    <img 
-                      src={image} 
-                      alt={`Project image ${index + 1}`}
-                      className="w-full h-32 object-cover rounded-md"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveExistingImage(index)}
-                      className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-                      </svg>
-                    </button>
-                  </div>
-                ))}
+              <label className="block text-sm font-medium text-gray-700 mb-2">Current Cover Image</label>
+              <div className="relative group">
+                <img 
+                  src={existingCoverImage} 
+                  alt="Project cover image"
+                  className="w-full h-48 object-cover rounded-md"
+                />
+                <button
+                  type="button"
+                  onClick={handleRemoveExistingImage}
+                  className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                  </svg>
+                </button>
               </div>
             </div>
           )}
 
-          {/* Upload New Images */}
+          {/* Upload New Cover Image */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Upload New Images</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Upload New Cover Image</label>
             <input
               type="file"
-              multiple
               accept="image/*"
               onChange={handleFileChange}
               className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100"
               disabled={loading}
             />
-            {files.length > 0 && (
+            {coverImage && (
               <div className="mt-2">
-                <p className="text-sm text-gray-600">Selected files: {files.length}</p>
-                <ul className="mt-1 text-sm text-gray-500">
-                  {files.map((file, index) => (
-                    <li key={index}>{file.name}</li>
-                  ))}
-                </ul>
+                <p className="text-sm text-gray-600">Selected file: {coverImage.name}</p>
               </div>
             )}
           </div>
