@@ -9,6 +9,15 @@ export const metadata = {
   authors: [{ name: "Micro Development Consulting Limited" }],
   creator: "Micro Development Consulting Limited",
   publisher: "Micro Development Consulting Limited",
+  icons: {
+    icon: [
+      { url: '/logo.jpg' },
+      { url: '/logo.jpg', type: 'image/png' },
+    ],
+    apple: [
+      { url: '/logo.jpg' },
+    ],
+  },
   formatDetection: {
     email: false,
     address: false,
