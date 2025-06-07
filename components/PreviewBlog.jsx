@@ -55,7 +55,7 @@ const PreviewBlog = () => {
     return (
       <section className="w-[85%] mx-auto py-16 flex flex-col items-center">
         <h2 className="text-2xl md:text-3xl font-bold text-[var(--color-title-text)] text-center mb-5">
-          Blog Posts
+          Blog
         </h2>
         <div className="w-full flex flex-col md:flex-row gap-6 justify-center items-stretch">
           {[1, 2, 3].map((_, idx) => (
@@ -81,7 +81,7 @@ const PreviewBlog = () => {
     return (
       <section className="w-[85%] mx-auto py-16 flex flex-col items-center">
         <h2 className="text-2xl md:text-3xl font-bold text-[var(--color-title-text)] text-center mb-5">
-          Blog Posts
+          Blog 
         </h2>
         <p className="text-red-500">{error}</p>
       </section>
@@ -92,11 +92,11 @@ const PreviewBlog = () => {
     <section className="w-[85%] mx-auto py-16 flex flex-col items-center">
       {/* Section Title */}
       <h2 className="text-2xl md:text-3xl font-bold text-[var(--color-title-text)] text-center mb-5">
-        Blog Posts
+        Blog 
       </h2>
 
       <Link href="/blog" className="mb-10 bg-[var(--color-primary-light-brown)] text-white px-6 py-2 rounded-lg font-semibold shadow hover:bg-[color:var(--color-primary-brown)]/90 transition">
-        View Blog
+        View Blog Posts
       </Link>
 
       {/* Blog Cards */}
