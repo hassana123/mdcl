@@ -42,12 +42,12 @@ const Facts = () => {
   return (
     <>
       <Banner
-        title="Facts Sheet"
+        title="Fact Sheets"
         subtitle={
           <span className="text-center font-medium text-white/70">
             <Link href="/" className="hover:underline">Home</Link> /{" "}
             <Link href="/resources" className="hover:underline">Resources</Link> /{" "}
-            <span className="text-white font-bold">Facts Sheet</span>
+            <span className="text-white font-bold">Fact Sheets</span>
           </span>
         }
       />
