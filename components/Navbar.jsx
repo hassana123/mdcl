@@ -189,7 +189,7 @@ if (label === "Resources") {
                       {renderDropdown(
                         [
                           { href: "/resources/newsletter", label: "Newsletters" },
-                          { href: "/resources/facts", label: "Facts Sheet" },
+                          { href: "/resources/facts", label: "Fact Sheets" },
                           { href: "/resources/others", label: "Other Resources" },
                          
                         ],
@@ -244,7 +244,7 @@ if (label === "Resources") {
                       <div className="mt-1 ml-4 border-l pl-3">
                         {renderDropdown(
                           [
-                            { href: "/about/profile", label: "Company Profile" },
+                            { href: "/about/what-we-are", label: "What We Are" },
                             { href: "/about/team", label: "Our Team" },
                           ],
                           () => setMobileOpen(false)
@@ -270,9 +270,9 @@ if (label === "Resources") {
                       <div className="mt-1 ml-4 border-l pl-3">
                         {renderDropdown(
                           [
-                            { href: "/projects/research", label: "Research Projects" },
-                            { href: "/projects/management", label: "Project Management" },
-                            { href: "/projects/capacity", label: "Capacity Development" },
+                            { href: "/projects-&-programmes/research", label: "Research" },
+                            { href: "/projects-&-programmes/management", label: "Project Management" },
+                            { href: "/projects-&-programmes/capacity", label: "Capacity Development" },
                           ],
                           () => setMobileOpen(false)
                         )}
@@ -297,8 +297,8 @@ if (label === "Resources") {
                         {renderDropdown(
                           [
                             { href: "/resources/newsletter", label: "Newsletters" },
-                            { href: "/resources/faq", label: "FAQs Sheet" },
-                            { href: "/resources/policy", label: "Policies" },
+                            { href: "/resources/facts", label: "Fact Sheets" },
+                            { href: "/resources/others", label: "Other Resources" },
                             
                           ],
                           () => setMobileOpen(false)
