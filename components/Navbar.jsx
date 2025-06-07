@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import Image from "next/image";
-import logo from "../public/mdcl/logo.jpg";
+import logo from "../public/mdcl/logo-bg.png";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ChevronDown, Menu, X } from "lucide-react";
