@@ -3,14 +3,19 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { auth } from '@/lib/firebase';
 import { onAuthStateChanged, signInWithEmailAndPassword, signOut } from 'firebase/auth';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 
 const AuthContext = createContext({});
+
+export const useAuth = () => useContext(AuthContext);
+
+const publicRoutes = ['/admin/login', '/admin/signup'];
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -24,7 +29,21 @@ export const AuthProvider = ({ children }) => {
 
     return () => unsubscribe();
   }, []);
-console.log(user);
+
+  useEffect(() => {
+    if (!loading) {
+      const isPublicRoute = publicRoutes.includes(pathname);
+      
+      // Only redirect if not on a public route and not authenticated
+      if (!user && !isPublicRoute) {
+        router.push('/admin/login');
+      }
+      // Only redirect to dashboard if authenticated and on a public route
+      else if (user && isPublicRoute) {
+        router.push('/admin/dashboard');
+      }
+    }
+  }, [user, loading, pathname, router]);
 
   const login = async (email, password) => {
     try {
@@ -51,8 +70,4 @@ console.log(user);
       {children}
     </AuthContext.Provider>
   );
-};
-
-export const useAuth = () => {
-  return useContext(AuthContext);
 }; 

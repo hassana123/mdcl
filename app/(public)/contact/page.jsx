@@ -5,6 +5,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { Linkedin, Twitter, Facebook, Instagram, CheckCircle2, MapPin } from "lucide-react";
 import emailjs from '@emailjs/browser';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 import styles from './contact.module.css';
 
 const Contact = () => {
@@ -31,12 +33,22 @@ const Contact = () => {
         to_name: "MicroDevelopment",
       };
 
+      // Send email using EmailJS
       await emailjs.send(
         'service_u7o36lr',
         'template_trrww8g',
         templateParams,
         'fMDmIeULGLnsvqA7f'
       );
+
+      // Store message in Firestore
+      await addDoc(collection(db, 'contactMessages'), {
+        from_name: `${form.firstName} ${form.lastName}`,
+        from_email: form.email,
+        message: form.message,
+        isRead: false,
+        timestamp: serverTimestamp()
+      });
 
       setForm({ firstName: "", lastName: "", email: "", message: "" });
       setIsFlipped(true);

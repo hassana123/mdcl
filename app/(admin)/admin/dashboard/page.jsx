@@ -26,7 +26,7 @@ const AdminDashboard = () => {
   }, []);
 
   return (
-    <>
+    <section className='w-full'>
       {/* Welcome Message */}
       <div className="mb-8 space-y-5 text-center">
         <h2 className="text-xl font-semibold text-gray-700">Welcome to your MDCL dashboard</h2>
@@ -121,7 +121,7 @@ const AdminDashboard = () => {
           </Link>
         </div>
       </div>
-    </>
+    </section>
   );
 };
 

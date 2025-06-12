@@ -69,7 +69,7 @@ const BlogPopupModal = () => {
         {/* Header */}
         <div className="flex items-center  text-gray-600 mb-4">
           <Bell  size={25} className="mr-1 text-[var(--color-primary-light-brown)]" />
-          <span>Announcement/Notice</span>
+          <span>Announcement</span>
         </div>
 
         {loading ? (

@@ -2,7 +2,7 @@
 import React from 'react'
 import Image from "next/image";
 import Link from "next/link";
-import { LayoutDashboard, FolderOpen, FileText, ImageIcon, BookOpen, LogOut, Users } from "lucide-react";
+import { LayoutDashboard, FolderOpen, FileText, ImageIcon, BookOpen, LogOut, Users, FolderKanban, Newspaper, MessageSquare, Megaphone } from "lucide-react";
 import { useAuth } from '@/app/(admin)/admin/AuthProvider';
 import { usePathname } from 'next/navigation';
 
@@ -17,6 +17,8 @@ const SideNav = () => {
         { href: "/admin/gallery", label: "Gallery", icon: ImageIcon },
         { href: "/admin/resources", label: "Resources", icon: BookOpen },
         { href: "/admin/subscribers", label: "Subscribers", icon: Users },
+        { href: "/admin/contact-messages", label: "Contact Messages", icon: MessageSquare },
+        { href: "/admin/announcements", label: "Announcements", icon: Megaphone },
     ];
 
     const handleLogout = async () => {
@@ -42,7 +44,7 @@ const SideNav = () => {
                 </div>
 
                 {/* Navigation */}
-                <nav className="mt-10 flex flex-col text-black font-bold space-y-6">
+                <nav className="mt-10 flex flex-col text-black font-bold space-y-4">
                     {sidebarLinks.map(({ href, label, icon: Icon }) => (
                         <SidebarLink 
                             key={href} 

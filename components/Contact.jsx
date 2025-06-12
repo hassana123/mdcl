@@ -3,6 +3,8 @@ import React, { useState, useRef } from "react";
 import Image from "next/image";
 import { Twitter, Linkedin, Instagram, Facebook, CheckCircle2, MapPin } from "lucide-react";
 import emailjs from '@emailjs/browser';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 import styles from './contact.module.css';
 
 const Contact = () => {
@@ -28,6 +30,7 @@ const Contact = () => {
         message: form.message,
       };
 
+      // Send email using EmailJS
       await emailjs.send(
         'service_u7o36lr',
         'template_trrww8g',
@@ -35,10 +38,20 @@ const Contact = () => {
         'fMDmIeULGLnsvqA7f'
       );
 
+      // Store message in Firestore
+      await addDoc(collection(db, 'contactMessages'), {
+        from_name: `${form.firstName} ${form.lastName}`,
+        from_email: form.email,
+        message: form.message,
+        isRead: false,
+        timestamp: serverTimestamp()
+      });
+
       setStatus("Your message has been sent successfully!");
       setForm({ firstName: "", lastName: "", email: "", message: "" });
       setIsFlipped(true);
     } catch (err) {
+      console.error("Error:", err);
       setStatus("Something went wrong. Please try again later.");
     }
     setLoading(false);

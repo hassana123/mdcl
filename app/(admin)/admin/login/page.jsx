@@ -71,7 +71,13 @@ const AdminLogin = () => {
           </button>
         </form>
         <p className="mt-4 text-sm text-gray-600">
-          Don't have an account? <a href="#" className="text-purple-600 hover:underline">Contact Admin</a>
+          Don't have an account?{' '}
+          <a 
+            href="mailto:info@microdevelopmentng.com?subject=Admin Account Request" 
+            className="text-[color:var(--color-primary-olive)] hover:underline"
+          >
+            Contact Admin
+          </a>
         </p>
       </div>
     </div>

@@ -4,8 +4,7 @@ import "../../(public)/globals.css"
 import SideNav from "@/components/admin/SideNav";
 import { AuthProvider } from "./AuthProvider";
 import { useAuth } from "./AuthProvider";
-import { usePathname, redirect } from 'next/navigation';
-import { useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 
 function getHeaderTitle(pathname) {
   const path = pathname.split('/').pop();
@@ -16,22 +15,20 @@ function getHeaderTitle(pathname) {
     'blogs': 'Blog',
     'gallery': 'Gallery',
     'resources': 'Resources',
-    'login': 'Login'
+    'login': 'Login',
+    'signup': 'Sign Up'
   };
 
   return titles[path] || 'Dashboard';
 }
 
+const publicRoutes = ['/admin/login', '/admin/signup'];
+
 function ProtectedLayout({ children }) {
   const { user, loading } = useAuth();
   const pathname = usePathname();
   const headerTitle = getHeaderTitle(pathname);
-
-  useEffect(() => {
-    if (!loading && !user && pathname !== '/admin/login') {
-      redirect('/admin/login');
-    }
-  }, [user, loading, pathname]);
+  const isPublicRoute = publicRoutes.includes(pathname);
 
   if (loading) {
     return (
@@ -41,19 +38,21 @@ function ProtectedLayout({ children }) {
     );
   }
 
-  if (pathname === '/admin/login') {
+  // For public routes (login and signup), render without the admin layout
+  if (isPublicRoute) {
     return children;
   }
 
+  // For protected routes, show the admin layout
   return (
     <div className="flex flex-1">
       <SideNav />
       {/* Main Content */}
-      <section className="flex-1">
+      <section className="flex-1 overflow-y-auto">
         <header className="mb-6 px-5 py-6 bg-[#FFFFFF]">
           <h1 className="text-xl font-bold text-gray-800">{headerTitle}</h1>
         </header>
-        <main className="bg-[#f5f5f5] w-[95%] mx-auto">{children}</main>
+        <main className="bg-[#f5f5f5] w-[96%] mx-auto">{children}</main>
       </section>
     </div>
   );
