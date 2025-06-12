@@ -62,7 +62,7 @@ const AdminSignup = () => {
       });
 
       // Redirect to login page
-      router.push('/admin/login');
+      router.push('/admin/dashboard');
     } catch (error) {
       console.error('Signup error:', error);
       setError(
