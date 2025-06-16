@@ -1,59 +1,34 @@
 "use client"
-import React, { useState } from 'react';
-import { collection, addDoc, serverTimestamp, query, orderBy, getDocs, deleteDoc, doc } from 'firebase/firestore';
+
+import React, { useState, useEffect } from 'react';
+import { collection, getDocs, query, orderBy, deleteDoc, doc, updateDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import { Plus, Trash2, Edit2, X } from 'lucide-react';
+import { PlusIcon, Trash2Icon, EditIcon, EyeIcon, EyeOffIcon } from 'lucide-react';
+import AnnouncementForm from '@/components/admin/announcements/AnnouncementForm';
 
 const Announcements = () => {
   const [announcements, setAnnouncements] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
-  const [formData, setFormData] = useState({
-    title: '',
-    content: '',
-    priority: 'normal', // high, normal, low
-    status: 'active' // active, inactive
-  });
+  const [selectedAnnouncement, setSelectedAnnouncement] = useState(null);
+  const [filter, setFilter] = useState('all');
+  const [sortBy, setSortBy] = useState('date');
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      await addDoc(collection(db, 'announcements'), {
-        ...formData,
-        timestamp: serverTimestamp()
-      });
-      setShowModal(false);
-      setFormData({ title: '', content: '', priority: 'normal', status: 'active' });
-      // Refresh announcements list
-      fetchAnnouncements();
-    } catch (error) {
-      console.error('Error adding announcement:', error);
-    }
-  };
-
-  const handleDelete = async (id) => {
-    try {
-      await deleteDoc(doc(db, 'announcements', id));
-      // Refresh announcements list
-      fetchAnnouncements();
-    } catch (error) {
-      console.error('Error deleting announcement:', error);
-    }
-  };
+  useEffect(() => {
+    fetchAnnouncements();
+  }, []);
 
   const fetchAnnouncements = async () => {
     try {
       setLoading(true);
-      const q = query(
-        collection(db, 'announcements'),
-        orderBy('timestamp', 'desc')
-      );
+      const q = query(collection(db, 'announcements'), orderBy('timestamp', 'desc'));
       const querySnapshot = await getDocs(q);
-      const announcementsList = querySnapshot.docs.map(doc => ({
+      const announcementsData = querySnapshot.docs.map(doc => ({
         id: doc.id,
-        ...doc.data()
+        ...doc.data(),
+        timestamp: doc.data().timestamp?.toDate()
       }));
-      setAnnouncements(announcementsList);
+      setAnnouncements(announcementsData);
     } catch (error) {
       console.error('Error fetching announcements:', error);
     } finally {
@@ -61,181 +36,207 @@ const Announcements = () => {
     }
   };
 
-  React.useEffect(() => {
-    fetchAnnouncements();
-  }, []);
+  const handleDelete = async (id) => {
+    if (window.confirm('Are you sure you want to delete this announcement?')) {
+      try {
+        await deleteDoc(doc(db, 'announcements', id));
+        setAnnouncements(announcements.filter(announcement => announcement.id !== id));
+      } catch (error) {
+        console.error('Error deleting announcement:', error);
+      }
+    }
+  };
+
+  const handleToggleStatus = async (id, currentStatus) => {
+    try {
+      const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
+      await updateDoc(doc(db, 'announcements', id), { status: newStatus });
+      setAnnouncements(announcements.map(announcement => 
+        announcement.id === id ? { ...announcement, status: newStatus } : announcement
+      ));
+    } catch (error) {
+      console.error('Error updating announcement status:', error);
+    }
+  };
+
+  const handleEdit = (announcement) => {
+    setSelectedAnnouncement(announcement);
+    setShowModal(true);
+  };
+
+  const filteredAnnouncements = announcements.filter(announcement => {
+    if (filter === 'all') return true;
+    return announcement.status === filter;
+  });
+
+  const sortedAnnouncements = [...filteredAnnouncements].sort((a, b) => {
+    if (sortBy === 'date') {
+      return b.timestamp - a.timestamp;
+    }
+    return a.priority.localeCompare(b.priority);
+  });
 
   return (
-    <div className="p-3">
-      <div className="mb-6 flex justify-between items-center">
-        <h1 className="text-2xl font-bold">Announcements</h1>
-        <button
-          onClick={() => setShowModal(true)}
-          className="bg-[color:var(--color-primary-light-brown)] text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-[color:var(--color-primary-olive)] transition-colors"
-        >
-          <Plus className="w-5 h-5" />
-          New Announcement
-        </button>
-      </div>
+    <div className="min-h-screen">
+      <div className="w-full mx-auto ">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+          {/* <h1 className="text-2xl font-bold text-gray-900">Announcements</h1> */}
+          <button
+            onClick={() => {
+              setSelectedAnnouncement(null);
+              setShowModal(true);
+            }}
+            className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[color:var(--color-primary-light-brown)] hover:bg-[color:var(--color-primary-olive)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[color:var(--color-primary-olive)]"
+          >
+            <PlusIcon className="h-5 w-5 mr-2" />
+            New Announcement
+          </button>
+        </div>
 
-      <div className="bg-white rounded-lg shadow overflow-hidden">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Content</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Priority</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {announcements.map((announcement) => (
-              <tr key={announcement.id}>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm font-medium text-gray-900">{announcement.title}</div>
-                </td>
-                <td className="px-6 py-4">
-                  <div className="text-sm text-gray-500 max-w-xs truncate">{announcement.content}</div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                    announcement.priority === 'high' 
-                      ? 'bg-red-100 text-red-800'
-                      : announcement.priority === 'low'
-                      ? 'bg-blue-100 text-blue-800'
-                      : 'bg-green-100 text-green-800'
-                  }`}>
-                    {announcement.priority}
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                    announcement.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                  }`}>
-                    {announcement.status}
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-500">
-                    {announcement.timestamp?.toDate().toLocaleDateString()}
-                  </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => {/* TODO: Implement edit */}}
-                      className="text-blue-600 hover:text-blue-900"
-                    >
-                      <Edit2 className="w-5 h-5" />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(announcement.id)}
-                      className="text-red-600 hover:text-red-900"
-                    >
-                      <Trash2 className="w-5 h-5" />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {/* New Announcement Modal */}
-      {showModal && (
-        <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg max-w-2xl w-full">
-            <div className="p-6">
-              <div className="flex justify-between items-start mb-4">
-                <h2 className="text-xl font-bold">New Announcement</h2>
-                <button
-                  onClick={() => setShowModal(false)}
-                  className="text-gray-500 hover:text-gray-700"
+        <div className="bg-white rounded-lg shadow overflow-hidden">
+          <div className="p-4 border-b border-gray-200">
+            <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex-1">
+                <label htmlFor="filter" className="block text-sm font-medium text-gray-700 mb-1">
+                  Filter by Status
+                </label>
+                <select
+                  id="filter"
+                  value={filter}
+                  onChange={(e) => setFilter(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[color:var(--color-primary-olive)] focus:border-[color:var(--color-primary-olive)]"
                 >
-                  <X className="w-6 h-6" />
-                </button>
+                  <option value="all">All</option>
+                  <option value="active">Active</option>
+                  <option value="inactive">Inactive</option>
+                </select>
               </div>
-
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Title
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.title}
-                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                    className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary-olive)]"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Content
-                  </label>
-                  <textarea
-                    value={formData.content}
-                    onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                    rows="4"
-                    className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary-olive)]"
-                    required
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Priority
-                    </label>
-                    <select
-                      value={formData.priority}
-                      onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
-                      className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary-olive)]"
-                    >
-                      <option value="high">High</option>
-                      <option value="normal">Normal</option>
-                      <option value="low">Low</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Status
-                    </label>
-                    <select
-                      value={formData.status}
-                      onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                      className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary-olive)]"
-                    >
-                      <option value="active">Active</option>
-                      <option value="inactive">Inactive</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div className="flex justify-end gap-3 mt-6">
-                  <button
-                    type="button"
-                    onClick={() => setShowModal(false)}
-                    className="px-4 py-2 text-gray-700 hover:text-gray-900"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="bg-[color:var(--color-primary-light-brown)] text-white px-4 py-2 rounded-lg hover:bg-[color:var(--color-primary-olive)] transition-colors"
-                  >
-                    Create Announcement
-                  </button>
-                </div>
-              </form>
+              <div className="flex-1">
+                <label htmlFor="sort" className="block text-sm font-medium text-gray-700 mb-1">
+                  Sort by
+                </label>
+                <select
+                  id="sort"
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[color:var(--color-primary-olive)] focus:border-[color:var(--color-primary-olive)]"
+                >
+                  <option value="date">Date</option>
+                  <option value="priority">Priority</option>
+                </select>
+              </div>
             </div>
           </div>
+
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Title
+                  </th>
+               
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Priority
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Status
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Date
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {loading ? (
+                  <tr>
+                    <td colSpan="6" className="px-6 py-4 text-center text-sm text-gray-500">
+                      Loading announcements...
+                    </td>
+                  </tr>
+                ) : sortedAnnouncements.length === 0 ? (
+                  <tr>
+                    <td colSpan="6" className="px-6 py-4 text-center text-sm text-gray-500">
+                      No announcements found
+                    </td>
+                  </tr>
+                ) : (
+                  sortedAnnouncements.map((announcement) => (
+                    <tr key={announcement.id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        {announcement.title}
+                      </td>
+                   
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                          announcement.priority === 'high' 
+                            ? 'bg-red-100 text-red-800'
+                            : announcement.priority === 'normal'
+                            ? 'bg-yellow-100 text-yellow-800'
+                            : 'bg-green-100 text-green-800'
+                        }`}>
+                          {announcement.priority}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                          announcement.status === 'active'
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-gray-100 text-gray-800'
+                        }`}>
+                          {announcement.status}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {announcement.timestamp?.toLocaleDateString()}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <div className="flex justify-end space-x-2">
+                          <button
+                            onClick={() => handleEdit(announcement)}
+                            className="text-[color:var(--color-primary-light-brown)] hover:text-[color:var(--color-primary-olive)]"
+                          >
+                            <EditIcon className="h-5 w-5" />
+                          </button>
+                          <button
+                            onClick={() => handleToggleStatus(announcement.id, announcement.status)}
+                            className="text-gray-600 hover:text-gray-900"
+                          >
+                            {announcement.status === 'active' ? (
+                              <EyeOffIcon className="h-5 w-5" />
+                            ) : (
+                              <EyeIcon className="h-5 w-5" />
+                            )}
+                          </button>
+                          <button
+                            onClick={() => handleDelete(announcement.id)}
+                            className="text-red-600 hover:text-red-900"
+                          >
+                            <Trash2Icon className="h-5 w-5" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
+      </div>
+
+      {showModal && (
+        <AnnouncementForm
+          onClose={() => {
+            setShowModal(false);
+            setSelectedAnnouncement(null);
+          }}
+          onAnnouncementAdded={fetchAnnouncements}
+          editData={selectedAnnouncement}
+        />
       )}
     </div>
   );

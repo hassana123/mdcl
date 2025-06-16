@@ -1,15 +1,27 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { collection, getDocs, query, where } from 'firebase/firestore';
+import { collection, getDocs, query, where, orderBy } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { X, Bell } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
+const categoryMap = {
+  'research': 'research',
+  'project-management': 'project-management',
+  'capacity-development': 'capacity-development'
+};
+
+const getProjectCategorySlug = (cat) => {
+  if (!cat) return 'projects-&-programmes';
+  const normalized = cat.toLowerCase().replace(/ /g, '-');
+  return categoryMap[normalized] || normalized;
+};
+
 const BlogPopupModal = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [blogPost, setBlogPost] = useState(null);
+  const [announcement, setAnnouncement] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -18,58 +30,103 @@ const BlogPopupModal = () => {
     const hasSeenPopup = sessionStorage.getItem('hasSeenBlogPopup');
     
     if (!hasSeenPopup) {
-      const fetchRandomBlogPost = async () => {
+      const fetchActiveAnnouncement = async () => {
         try {
           setLoading(true);
-          const blogsRef = collection(db, 'blogs');
-          const q = query(blogsRef);
+          const announcementsRef = collection(db, 'announcements');
+          const q = query(
+            announcementsRef,
+            where('status', '==', 'active'),
+            orderBy('timestamp', 'desc')
+          );
           const querySnapshot = await getDocs(q);
-          const blogsList = querySnapshot.docs.map(doc => ({
+          const announcementsList = querySnapshot.docs.map(doc => ({
             id: doc.id,
             ...doc.data()
           }));
 
-          if (blogsList.length > 0) {
-            const randomIndex = Math.floor(Math.random() * blogsList.length);
-            setBlogPost(blogsList[randomIndex]);
+          if (announcementsList.length > 0) {
+            // Get the most recent active announcement
+            setAnnouncement(announcementsList[0]);
             setIsOpen(true);
           } else {
-            setBlogPost(null);
+            setAnnouncement(null);
             setIsOpen(false);
           }
           setLoading(false);
         } catch (err) {
-          console.error("Error fetching random blog post:", err);
-          setError("Failed to load blog post.");
+          console.error("Error fetching announcement:", err);
+          setError("Failed to load announcement.");
           setLoading(false);
         }
       };
 
-      fetchRandomBlogPost();
+      fetchActiveAnnouncement();
     }
   }, []);
 
   const handleClose = () => {
     setIsOpen(false);
-    // Set flag in sessionStorage to indicate popup has been seen
-    sessionStorage.setItem('hasSeenBlogPopup', 'true');
+    // Mark popup as seen in this session
+   sessionStorage.setItem('hasSeenBlogPopup', 'true');
   };
+//sessionStorage.clear()
+  // const handleReadMore = (e) => {
+  //   e?.preventDefault?.();
+  //   handleClose();
+  //   // Navigate to the appropriate page based on source type
+  //   if (announcement?.sourceType) {
+  //     const sourceType = announcement.sourceType.toLowerCase();
+  //     const sourceId = announcement.sourceId;
+  //     switch (sourceType) {
+  //       case 'blog':
+  //         window.location.href = `/blog/${sourceId}`;
+  //         break;
+  //       case 'newsletter':
+  //         const pdfAttachment = announcement.attachments?.find(a => a.type === 'pdf');
+  //         if (pdfAttachment?.url) {
+  //           window.open(pdfAttachment.url, '_blank');
+  //         }
+  //         break;
+  //       case 'project':
+  //         // Use the stored category for the route
+  //         window.location.href = `/projects-&-programmes/${announcement.category}/${sourceId}`;
+  //         break;
+  //     }
+  //   }
+  // };
 
-  const handleReadMore = () => {
-    setIsOpen(false);
-    // Set flag in sessionStorage to indicate popup has been seen
-    sessionStorage.setItem('hasSeenBlogPopup', 'true');
-  };
-
-  // Keep modal open after loading unless manually closed
-  if (!isOpen || loading || !blogPost) return null;
-
-  // Function to truncate description
   const truncateDescription = (text, length) => {
     if (!text) return '';
-    if (text.length <= length) return text;
-    return text.substring(0, length) + ' [...]';
+    return text.length > length ? text.substring(0, length) + '...' : text;
   };
+
+  const handleReadMoreUrl = () => {
+    if (!announcement?.sourceType) return '#';
+    const sourceType = announcement.sourceType.toLowerCase();
+    const sourceId = announcement.sourceId;
+   sessionStorage.setItem('hasSeenBlogPopup', 'true');
+
+    switch (sourceType) {
+      case 'blog':
+        return `/blog/${sourceId}`;
+      case 'project':
+        return `/projects-&-programmes/${getProjectCategorySlug(announcement.category)}/${sourceId}`;
+      default:
+        return '#';
+    }
+
+  };
+
+  const getNewsletterPdfUrl = () => {
+    if (announcement?.sourceType?.toLowerCase() === 'newsletter') {
+      const pdfAttachment = announcement.attachments?.find(a => a.type === 'pdf');
+      if (pdfAttachment?.url) return pdfAttachment.url;
+    }
+    return null;
+  };
+
+  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-[100]">
@@ -90,31 +147,32 @@ const BlogPopupModal = () => {
         </div>
 
         {loading ? (
-          <p>Loading blog post...</p>
+          <p>Loading announcement...</p>
         ) : error ? (
           <p className="text-red-500">{error}</p>
-        ) : blogPost ? (
+        ) : announcement ? (
           <>
             <div className="flex mb-10 items-center gap-4 w-[100%]">
               {/* Text Content */}
               <div className="w-full">
-                <h3 className="text-3xl underline font-bold text-gray-800 mb-2 leading-snug">
-                  {blogPost.title || 'Untitled Blog Post'}
+                <h3 className="text-2xl font-bold text-gray-800 mb-1 leading-snug">
+                  {announcement.title || 'Untitled Announcement'}
                 </h3>
-                <p className="text-gray-600 text-sm leading-relaxed">
-                  {blogPost.sections && blogPost.sections.length > 0 && blogPost.sections[0].description
-                    ? truncateDescription(blogPost.sections[0].description, 150)
-                    : 'No description available.'
-                  }
+                {announcement.sourceType === 'project' && announcement.projectCategory && (
+                  <div className="text-xs text-gray-500 mb-2">
+                    {announcement.projectCategory}
+                  </div>
+                )}
+                <p className="text-gray-600 text-sm leading-relaxed mb-2">
+                  {truncateDescription(announcement.content, 150) || 'No description available.'}
                 </p>
               </div>
-
               {/* Image */}
-              {blogPost.image && (
+              {announcement.coverImage && (
                 <div className="w-[90%] relative rounded overflow-hidden">
                   <Image
-                    src={blogPost.image}
-                    alt={blogPost.title || 'Blog Cover'}
+                    src={announcement.coverImage}
+                    alt={announcement.title || 'Announcement Cover'}
                     width={1000}
                     height={1000}
                     className="object-cover"
@@ -122,18 +180,29 @@ const BlogPopupModal = () => {
                 </div>
               )}
             </div>
-
             {/* Read More Button */}
             <div className="mt-6 text-center">
-              <Link href={`/blog/${blogPost.id}`} onClick={handleReadMore}>
-                <button className="bg-[var(--color-primary-light-brown)] w-full text-white py-3 rounded-md hover:bg-[var(--color-primary-brown)] transition-colors">
+              {announcement.sourceType === 'newsletter' && getNewsletterPdfUrl() ? (
+                <a
+                  href={getNewsletterPdfUrl()}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-[var(--color-primary-light-brown)] w-full block text-white py-3 rounded-md hover:bg-[var(--color-primary-brown)] transition-colors text-center"
+                >
                   Read More
-                </button>
-              </Link>
+                </a>
+              ) : (
+                <Link
+                  href={handleReadMoreUrl()}
+                  className="bg-[var(--color-primary-light-brown)] w-full block text-white py-3 rounded-md hover:bg-[var(--color-primary-brown)] transition-colors text-center"
+                >
+                  Read More
+                </Link>
+              )}
             </div>
           </>
         ) : (
-          <p>No blog posts available.</p>
+          <p>No announcements available.</p>
         )}
       </div>
     </div>

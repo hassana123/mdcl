@@ -16,7 +16,8 @@ function getHeaderTitle(pathname) {
     'gallery': 'Gallery',
     'resources': 'Resources',
     'login': 'Login',
-    'signup': 'Sign Up'
+    'signup': 'Sign Up',
+    'announcements': 'Announcements'
   };
 
   return titles[path] || 'Dashboard';
