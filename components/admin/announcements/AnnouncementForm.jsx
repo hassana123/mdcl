@@ -101,68 +101,84 @@ const AnnouncementForm = ({ onClose, onAnnouncementAdded, editData = null }) => 
     }
   };
 
-  const handleContentSelect = (content) => {
-    let announcementData = {
-      title: content.title || '',
-      content: '',
-      priority: 'normal',
-      status: 'active',
-      sourceId: content.id,
-      sourceType: activeTab.slice(0, -1), // Remove 's' from blogs/newsletters/projects
-      sourceTitle: content.title || '',
-      attachments: [],
-      coverImage: null,
-      link: '',
-      category: content?.category ||""
-    };
-
-    // Set content based on type
-    switch (activeTab) {
-      case 'blogs': {
-        const desc = content.description || '';
-        const sectionDesc = content.sections && content.sections[0]?.description ? content.sections[0].description : '';
-        let combined = desc;
-        if (sectionDesc) combined += (desc ? '\n\n' : '') + sectionDesc;
-        announcementData.content = combined.trim() || 'No description available.';
-        announcementData.coverImage = content.image || null;
-        break;
-      }
-      case 'newsletters': {
-        announcementData.content = (content.description || 'No description available.').trim();
-        announcementData.coverImage = content.coverImage || null;
-        if (content.pdfUrl) {
-          announcementData.attachments = [{
-            type: 'pdf',
-            url: content.pdfUrl,
-            name: `${content.title || 'Newsletter'}.pdf`
-          }];
-        }
-        break;
-      }
-      case 'projects': {
-        const excerpt = content.excerpt || '';
-        const sectionDesc = content.sections && content.sections[0]?.description ? content.sections[0].description : '';
-        let combined = excerpt;
-        if (sectionDesc) combined += (excerpt ? '\n\n' : '') + sectionDesc;
-        announcementData.content = combined.trim() || 'No description available.';
-        announcementData.coverImage = content.coverImage || null;
-        // Store normalized category for routing
-        announcementData.category = (content.category)
-        // Store original project category as well
-        announcementData.projectCategory = content.category || '';
-        if (content.sections) {
-          announcementData.attachments = content.sections.map((section, index) => ({
-            type: 'section',
-            title: section.title || `Section ${index + 1}`,
-            content: section.description || ''
-          }));
-        }
-        break;
-      }
-    }
-
-    setFormData(announcementData);
+ const handleContentSelect = (content) => {
+  let announcementData = {
+    title: content.title || '',
+    content: '',
+    priority: 'normal',
+    status: 'active',
+    sourceId: content.id,
+    sourceType: activeTab.slice(0, -1), // Remove 's' from blogs/newsletters/projects
+    sourceTitle: content.title || '',
+    attachments: [],
+    coverImage: null,
+    link: '',
+    category: content?.category ||""
   };
+
+  // Set content based on type
+  switch (activeTab) {
+    case 'blogs': {
+      let contentText = '';
+      
+      if (content.layoutType === 'standard') {
+        contentText = content.content || '';
+      } else if (content.layoutType === 'sectioned') {
+        contentText = content.sections?.[0]?.description || '';
+      } else if (content.layoutType === 'introduction-conclusion') {
+        contentText = content.introduction || '';
+        // Optionally append first section if available
+        const firstSectionDesc = content.sections?.[0]?.description;
+        if (firstSectionDesc) {
+          contentText += (contentText ? '\n\n' : '') + firstSectionDesc;
+        }
+      } else {
+        // Fallback for unknown layout types
+        contentText = content.content || 
+                     content.introduction || 
+                     content.sections?.[0]?.description || '';
+      }
+      
+      announcementData.content = contentText.trim() || 'No description available.';
+      announcementData.coverImage = content.image || null;
+      break;
+    }
+    case 'newsletters': {
+      announcementData.content = (content.description || 'No description available.').trim();
+      announcementData.coverImage = content.coverImage || null;
+      if (content.pdfUrl) {
+        announcementData.attachments = [{
+          type: 'pdf',
+          url: content.pdfUrl,
+          name: `${content.title || 'Newsletter'}.pdf`
+        }];
+      }
+      break;
+    }
+    case 'projects': {
+      const excerpt = content.excerpt || '';
+      const sectionDesc = content.sections && content.sections[0]?.description ? content.sections[0].description : '';
+      let combined = excerpt;
+      if (sectionDesc) combined += (excerpt ? '\n\n' : '') + sectionDesc;
+      announcementData.content = combined.trim() || 'No description available.';
+      announcementData.coverImage = content.coverImage || null;
+      // Store normalized category for routing
+      announcementData.category = (content.category)
+      // Store original project category as well
+      announcementData.projectCategory = content.category || '';
+      if (content.sections) {
+        announcementData.attachments = content.sections.map((section, index) => ({
+          type: 'section',
+          title: section.title || `Section ${index + 1}`,
+          content: section.description || ''
+        }));
+      }
+      break;
+    }
+  }
+
+  setFormData(announcementData);
+};
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -235,15 +251,31 @@ const AnnouncementForm = ({ onClose, onAnnouncementAdded, editData = null }) => 
   };
 
   const getContentDescription = (content) => {
-    if (content.type === 'project') {
-      return content.excerpt || (content.sections?.[0]?.description || 'No description available');
-    } else if (content.type === 'blog') {
+  if (content.type === 'project') {
+    return content.excerpt || (content.sections?.[0]?.description || 'No description available');
+  } else if (content.type === 'blog') {
+    // Handle different blog layout types
+    if (content.layoutType === 'standard') {
+      // For standard layout, use the content field
+      return content.content || 'No description available';
+    } else if (content.layoutType === 'sectioned') {
+      // For sectioned layout, use the first section's description
       return content.sections?.[0]?.description || 'No description available';
-    } else if (content.type === 'newsletter') {
-      return content.description || 'No description available';
+    } else if (content.layoutType === 'introduction-conclusion') {
+      // For introduction-conclusion layout, prioritize introduction, then first section
+      return content.introduction || content.sections?.[0]?.description || 'No description available';
+    } else {
+      // Fallback for unknown layout types - try all possible fields
+      return content.content || 
+             content.introduction || 
+             content.sections?.[0]?.description || 
+             'No description available';
     }
-    return 'No description available';
-  };
+  } else if (content.type === 'newsletter') {
+    return content.description || 'No description available';
+  }
+  return 'No description available';
+};
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
