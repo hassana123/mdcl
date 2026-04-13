@@ -1,10 +1,10 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { storage, db } from '@/lib/firebase';
-import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
+import { db } from '@/lib/firebase';
 import { doc, updateDoc, getDocs, collection } from 'firebase/firestore';
 import { useAuth } from '@/app/(admin)/admin/AuthProvider';
+import { buildCloudinaryAsset, deleteCloudinaryAsset, uploadToCloudinary } from '@/lib/cloudinary';
 
 const EditBlogModal = ({ blog, onClose, onBlogUpdated }) => {
   const { user } = useAuth();
@@ -42,6 +42,7 @@ const EditBlogModal = ({ blog, onClose, onBlogUpdated }) => {
   });
   const [coverImageFile, setCoverImageFile] = useState(null); // For new file uploads
   const [existingCoverImageUrl, setExistingCoverImageUrl] = useState(blog.image || null); // To display and manage existing image
+  const [existingCoverImageAsset, setExistingCoverImageAsset] = useState(blog.imageAsset || null);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [blogCategories, setBlogCategories] = useState([]); // State for blog categories (if needed)
 
@@ -133,21 +134,17 @@ const EditBlogModal = ({ blog, onClose, onBlogUpdated }) => {
   };
 
   const handleRemoveExistingImage = async () => {
-    if (existingCoverImageUrl) {
+    if (existingCoverImageAsset?.publicId) {
       try {
-        // Remove file from Firebase Storage
-        const imageRef = ref(storage, existingCoverImageUrl);
-        await deleteObject(imageRef);
-        console.log('Existing cover image deleted successfully from storage:', existingCoverImageUrl);
-
+        await deleteCloudinaryAsset(existingCoverImageAsset);
       } catch (error) {
-        console.error('Error deleting existing cover image from storage:', error);
-        setError('Failed to delete old cover image from storage.'); // Optional: inform user
+        console.error('Error deleting existing cover image:', error);
+        setError('Failed to delete old cover image.');
       }
     }
 
-    // Always update state to remove the image preview, even if storage deletion fails
     setExistingCoverImageUrl(null);
+    setExistingCoverImageAsset(null);
     setCoverImageFile(null); // Also clear any pending new file upload
     setError(''); // Clear any previous error
   };
@@ -253,33 +250,30 @@ const EditBlogModal = ({ blog, onClose, onBlogUpdated }) => {
   const uploadCoverImage = async () => {
     if (coverImageFile) {
        try {
-         const storageRef = ref(storage, `blog_covers/${Date.now()}_${coverImageFile.name}`);
-         const snapshot = await uploadBytes(storageRef, coverImageFile);
-         const downloadURL = await getDownloadURL(snapshot.ref);
+         setUploadProgress(25);
+         const uploadResult = await uploadToCloudinary(coverImageFile, {
+           folder: 'mdcl/blog_covers',
+         });
+         const uploadedAsset = buildCloudinaryAsset(uploadResult);
 
-         // If there was an existing image, delete it after the new one is uploaded
-         if (existingCoverImageUrl) {
+         if (existingCoverImageAsset?.publicId) {
            try {
-             const oldImageRef = ref(storage, existingCoverImageUrl);
-             await deleteObject(oldImageRef);
-             console.log('Old cover image deleted successfully from storage:', existingCoverImageUrl);
+             await deleteCloudinaryAsset(existingCoverImageAsset);
            } catch (deleteError) {
-             console.error('Error deleting old cover image from storage:', existingCoverImageUrl, deleteError);
-             // Continue even if deletion fails, new image is already uploaded
+             console.error('Error deleting old cover image:', existingCoverImageUrl, deleteError);
            }
          }
 
-         return downloadURL;
+         setUploadProgress(100);
+         return uploadedAsset;
        } catch (error) {
          console.error('Error uploading cover image:', error);
          throw new Error('Failed to upload new cover image');
        }
     } else if (existingCoverImageUrl === null) {
-       // If existing image was removed and no new file selected, return null
        return null;
     } else {
-       // If no new file selected and existing image remains, return existing URL
-       return existingCoverImageUrl;
+       return existingCoverImageAsset || { url: existingCoverImageUrl };
     }
   };
 
@@ -329,14 +323,15 @@ const EditBlogModal = ({ blog, onClose, onBlogUpdated }) => {
     setError('');
 
     try {
-      const coverImageUrl = await uploadCoverImage();
+      const coverImageAsset = await uploadCoverImage();
 
       // Prepare blog data based on layout type
       const blogData = {
         title: formData.title,
         // excerpt: formData.excerpt.trim(), // Commented out excerpt
         layoutType: formData.layoutType,
-        image: coverImageUrl, // Can be null
+        image: coverImageAsset?.url || null,
+        imageAsset: coverImageAsset,
         publishDate: new Date(formData.publishDate),
         updatedAt: new Date(),
         updatedBy: user.uid,

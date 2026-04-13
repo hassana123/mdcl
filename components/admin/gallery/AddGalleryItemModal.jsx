@@ -1,9 +1,9 @@
 "use client";
 import React, { useState } from 'react';
 import { collection, addDoc, Timestamp } from 'firebase/firestore';
-import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
-import { db, storage } from '@/lib/firebase';
+import { db } from '@/lib/firebase';
 import { PlusIcon } from 'lucide-react';
+import { buildCloudinaryAsset, uploadToCloudinary } from '@/lib/cloudinary';
 
 const AddGalleryItemModal = ({ isOpen, onClose, onGalleryItemAdded }) => {
   const [title, setTitle] = useState('');
@@ -51,35 +51,34 @@ const AddGalleryItemModal = ({ isOpen, onClose, onGalleryItemAdded }) => {
     setError(null);
     const imageUrls = [];
     const videoUrls = [];
+    const imageAssets = [];
+    const videoAssets = [];
     const uploadPromises = filesToUpload.map(file => {
       return new Promise((resolve, reject) => {
         const isImage = file.type.startsWith('image/');
         const isVideo = file.type.startsWith('video/');
-        const storagePath = `gallery/${title}/${isImage ? 'images' : 'videos'}/${file.name}`;
-        const storageRef = ref(storage, storagePath);
-        const uploadTask = uploadBytesResumable(storageRef, file);
+        setUploadProgress(prev => ({ ...prev, [file.name]: 25 }));
 
-        uploadTask.on(
-          'state_changed',
-          (snapshot) => {
-            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-            setUploadProgress(prev => ({ ...prev, [file.name]: progress }));
-          },
-          (error) => {
+        uploadToCloudinary(file, {
+          folder: `mdcl/gallery/${title}/${isImage ? 'images' : 'videos'}`,
+          resourceType: isVideo ? 'video' : 'image',
+        })
+          .then((uploadResult) => {
+            const asset = buildCloudinaryAsset(uploadResult);
+            if (isImage) {
+              imageUrls.push(asset?.url);
+              imageAssets.push(asset);
+            } else if (isVideo) {
+              videoUrls.push(asset?.url);
+              videoAssets.push(asset);
+            }
+            setUploadProgress(prev => ({ ...prev, [file.name]: 100 }));
+            resolve();
+          })
+          .catch((error) => {
             console.error("Upload error:", error);
             reject(error);
-          },
-          () => {
-            getDownloadURL(uploadTask.snapshot.ref).then(downloadURL => {
-              if (isImage) {
-                imageUrls.push(downloadURL);
-              } else if (isVideo) {
-                videoUrls.push(downloadURL);
-              }
-              resolve();
-            }).catch(reject);
-          }
-        );
+          });
       });
     });
 
@@ -90,7 +89,9 @@ const AddGalleryItemModal = ({ isOpen, onClose, onGalleryItemAdded }) => {
         title,
         description,
         images: imageUrls,
+        imageAssets,
         videos: videoUrls,
+        videoAssets,
         createdAt: Timestamp.now(),
       });
 

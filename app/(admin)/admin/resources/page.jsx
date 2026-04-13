@@ -1,13 +1,13 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import { collection, getDocs, query, orderBy, deleteDoc, doc } from 'firebase/firestore';
-import { ref, deleteObject } from 'firebase/storage';
-import { db, storage } from '@/lib/firebase';
+import { db } from '@/lib/firebase';
 import { ChevronLeftIcon, ChevronRightIcon, PlusIcon, Edit2Icon, Trash2Icon } from 'lucide-react';
 import Image from 'next/image';
 import AddNewsletterModal from '@/components/admin/resources/AddNewsletterModal';
 import AddFactsModal from '@/components/admin/resources/AddFactsModal';
 import AddPolicyModal from '@/components/admin/resources/AddPolicyModal';
+import { deleteCloudinaryAsset } from '@/lib/cloudinary';
 
 export default function AdminResourcesPage() {
   const [resources, setResources] = useState([]);
@@ -68,17 +68,13 @@ export default function AdminResourcesPage() {
 
     setDeleteLoading(true);
     try {
-      // Delete files from storage
-      if (item.coverImage) {
-        const coverImageRef = ref(storage, item.coverImage);
-        await deleteObject(coverImageRef);
+      if (item.coverImageAsset?.publicId) {
+        await deleteCloudinaryAsset(item.coverImageAsset);
       }
-      if (item.pdfUrl) {
-        const pdfRef = ref(storage, item.pdfUrl);
-        await deleteObject(pdfRef);
+      if (item.pdfAsset?.publicId) {
+        await deleteCloudinaryAsset(item.pdfAsset);
       }
 
-      // Delete document from Firestore
       await deleteDoc(doc(db, 'resources', item.id));
       
       // Refresh the resources list
@@ -196,7 +192,7 @@ export default function AdminResourcesPage() {
             Facts
           </button>
           <button
-            onClick={() => setSelectedCategory('other')}
+            onClick={() => setSelectedCategory('others')}
             className={`px-4 py-2 rounded-md ${
               selectedCategory === 'others'
                 ? 'bg-green-700 text-white'

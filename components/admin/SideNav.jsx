@@ -15,6 +15,7 @@ const SideNav = () => {
         { href: "/admin/projects", label: "Projects & Programmes", icon: FolderOpen },
         { href: "/admin/blogs", label: "Blog", icon: FileText },
         { href: "/admin/gallery", label: "Gallery", icon: ImageIcon },
+        { href: "/admin/team", label: "Team", icon: Users },
         { href: "/admin/resources", label: "Resources", icon: BookOpen },
         { href: "/admin/subscribers", label: "Subscribers", icon: Users },
         { href: "/admin/contact-messages", label: "Contact Messages", icon: MessageSquare },

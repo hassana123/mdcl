@@ -1,10 +1,10 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import { doc, updateDoc } from 'firebase/firestore';
-import { ref, uploadBytesResumable, getDownloadURL, deleteObject } from 'firebase/storage';
-import { db, storage } from '@/lib/firebase';
+import { db } from '@/lib/firebase';
 import { PlusIcon, XIcon } from 'lucide-react';
 import Image from 'next/image';
+import { buildCloudinaryAsset, deleteCloudinaryAsset, uploadToCloudinary } from '@/lib/cloudinary';
 
 const EditGalleryItemModal = ({ isOpen, onClose, onGalleryItemUpdated, item }) => {
   const [title, setTitle] = useState('');
@@ -16,6 +16,8 @@ const EditGalleryItemModal = ({ isOpen, onClose, onGalleryItemUpdated, item }) =
   const [videoFiles, setVideoFiles] = useState([]);
   const [existingImages, setExistingImages] = useState([]);
   const [existingVideos, setExistingVideos] = useState([]);
+  const [existingImageAssets, setExistingImageAssets] = useState([]);
+  const [existingVideoAssets, setExistingVideoAssets] = useState([]);
   const [uploadProgress, setUploadProgress] = useState({});
 
   useEffect(() => {
@@ -24,6 +26,8 @@ const EditGalleryItemModal = ({ isOpen, onClose, onGalleryItemUpdated, item }) =
       setDescription(item.description || '');
       setExistingImages(item.images || []);
       setExistingVideos(item.videos || []);
+      setExistingImageAssets(item.imageAssets || []);
+      setExistingVideoAssets(item.videoAssets || []);
     }
   }, [item]);
 
@@ -52,15 +56,19 @@ const EditGalleryItemModal = ({ isOpen, onClose, onGalleryItemUpdated, item }) =
 
   const handleRemoveExistingFile = async (fileUrl, fileType) => {
     try {
-      // Delete from storage
-      const fileRef = ref(storage, fileUrl);
-      await deleteObject(fileRef);
+      const assets = fileType === 'image' ? existingImageAssets : existingVideoAssets;
+      const assetToDelete = assets.find((asset) => asset?.url === fileUrl);
 
-      // Update state
+      if (assetToDelete?.publicId) {
+        await deleteCloudinaryAsset(assetToDelete);
+      }
+
       if (fileType === 'image') {
         setExistingImages(prev => prev.filter(url => url !== fileUrl));
+        setExistingImageAssets(prev => prev.filter(asset => asset?.url !== fileUrl));
       } else if (fileType === 'video') {
         setExistingVideos(prev => prev.filter(url => url !== fileUrl));
+        setExistingVideoAssets(prev => prev.filter(asset => asset?.url !== fileUrl));
       }
     } catch (error) {
       console.error('Error removing file:', error);
@@ -78,50 +86,49 @@ const EditGalleryItemModal = ({ isOpen, onClose, onGalleryItemUpdated, item }) =
     setError(null);
     const newImageUrls = [];
     const newVideoUrls = [];
+    const newImageAssets = [];
+    const newVideoAssets = [];
 
     try {
-      // Upload new files
       const uploadPromises = [...imageFiles, ...videoFiles].map(file => {
         return new Promise((resolve, reject) => {
           const isImage = file.type.startsWith('image/');
           const isVideo = file.type.startsWith('video/');
-          const storagePath = `gallery/${title}/${isImage ? 'images' : 'videos'}/${file.name}`;
-          const storageRef = ref(storage, storagePath);
-          const uploadTask = uploadBytesResumable(storageRef, file);
+          setUploadProgress(prev => ({ ...prev, [file.name]: 25 }));
 
-          uploadTask.on(
-            'state_changed',
-            (snapshot) => {
-              const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-              setUploadProgress(prev => ({ ...prev, [file.name]: progress }));
-            },
-            (error) => {
+          uploadToCloudinary(file, {
+            folder: `mdcl/gallery/${title}/${isImage ? 'images' : 'videos'}`,
+            resourceType: isVideo ? 'video' : 'image',
+          })
+            .then((uploadResult) => {
+              const asset = buildCloudinaryAsset(uploadResult);
+              if (isImage) {
+                newImageUrls.push(asset?.url);
+                newImageAssets.push(asset);
+              } else if (isVideo) {
+                newVideoUrls.push(asset?.url);
+                newVideoAssets.push(asset);
+              }
+              setUploadProgress(prev => ({ ...prev, [file.name]: 100 }));
+              resolve();
+            })
+            .catch((error) => {
               console.error("Upload error:", error);
               reject(error);
-            },
-            () => {
-              getDownloadURL(uploadTask.snapshot.ref).then(downloadURL => {
-                if (isImage) {
-                  newImageUrls.push(downloadURL);
-                } else if (isVideo) {
-                  newVideoUrls.push(downloadURL);
-                }
-                resolve();
-              }).catch(reject);
-            }
-          );
+            });
         });
       });
 
       await Promise.all(uploadPromises);
 
-      // Update Firestore document
       const galleryRef = doc(db, 'gallery', item.id);
       await updateDoc(galleryRef, {
         title,
         description,
         images: [...existingImages, ...newImageUrls],
+        imageAssets: [...existingImageAssets, ...newImageAssets],
         videos: [...existingVideos, ...newVideoUrls],
+        videoAssets: [...existingVideoAssets, ...newVideoAssets],
       });
 
       onGalleryItemUpdated();

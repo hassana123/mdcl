@@ -10,7 +10,8 @@ const nextConfig = {
     domains: [
       'firebasestorage.googleapis.com',
       'lh3.googleusercontent.com',
-      'storage.googleapis.com'
+      'storage.googleapis.com',
+      'res.cloudinary.com'
     ],
     remotePatterns: [
       {
@@ -21,6 +22,11 @@ const nextConfig = {
       {
         protocol: 'https',
         hostname: 'storage.googleapis.com',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'res.cloudinary.com',
         pathname: '/**',
       },
     ],

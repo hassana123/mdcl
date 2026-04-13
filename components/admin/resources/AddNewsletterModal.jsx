@@ -1,13 +1,13 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import { collection, addDoc, Timestamp, doc, updateDoc, deleteDoc } from 'firebase/firestore';
-import { ref, uploadBytesResumable, getDownloadURL, deleteObject } from 'firebase/storage';
-import { db, storage } from '@/lib/firebase';
+import { db } from '@/lib/firebase';
 import { PlusIcon, Trash2Icon } from 'lucide-react';
 import Image from 'next/image';
 import { pdfjs, Document, Page } from 'react-pdf';
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
+import { buildCloudinaryAsset, deleteCloudinaryAsset, uploadToCloudinary } from '@/lib/cloudinary';
 
 
 const capturePdfCover = () => {
@@ -91,73 +91,56 @@ const AddNewsletterModal = ({ isOpen, onClose, onResourceAdded, editData = null 
     try {
       let pdfUrl = editData?.pdfUrl;
       let coverImageUrl = editData?.coverImage;
+      let pdfAsset = editData?.pdfAsset || null;
+      let coverImageAsset = editData?.coverImageAsset || null;
 
-      // Upload PDF if new one is selected
       if (pdfFile) {
-        const pdfPath = `resources/newsletters/${title}/pdf/${pdfFile.name}`;
-        const pdfRef = ref(storage, pdfPath);
-        const pdfUpload = uploadBytesResumable(pdfRef, pdfFile);
-
-        // Track upload progress
-        pdfUpload.on('state_changed',
-          (snapshot) => {
-            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-            setUploadProgress(prev => ({ ...prev, pdf: progress }));
-          },
-          (error) => {
-            console.error("PDF upload error:", error);
-            throw error;
-          }
-        );
-
-        // Wait for upload to complete
-        await new Promise((resolve, reject) => {
-          pdfUpload.on('state_changed',
-            null,
-            reject,
-            () => resolve()
-          );
+        setUploadProgress(prev => ({ ...prev, pdf: 25 }));
+        const uploadedPdf = await uploadToCloudinary(pdfFile, {
+          folder: `mdcl/resources/newsletters/${title}`,
+          resourceType: 'auto',
         });
+        pdfAsset = buildCloudinaryAsset(uploadedPdf);
+        pdfUrl = pdfAsset?.url || null;
+        setUploadProgress(prev => ({ ...prev, pdf: 100 }));
 
-        pdfUrl = await getDownloadURL(pdfRef);
-
-        // Upload preview image
         if (pdfFile && pdfPreview) {
-          const previewBlob = await capturePdfCover(); // ← we use the helper function
-          const previewPath = `resources/newsletters/${title}/preview/preview.jpg`;
-          const previewRef = ref(storage, previewPath);
-          await uploadBytesResumable(previewRef, previewBlob);
-          coverImageUrl = await getDownloadURL(previewRef);
+          const previewBlob = await capturePdfCover();
+          const uploadedPreview = await uploadToCloudinary(previewBlob, {
+            folder: `mdcl/resources/newsletters/${title}/preview`,
+            resourceType: 'image',
+          });
+          coverImageAsset = buildCloudinaryAsset(uploadedPreview);
+          coverImageUrl = coverImageAsset?.url || null;
         }
 
-        // Delete old files if they exist
-        if (editData?.pdfUrl) {
-          const oldPdfRef = ref(storage, editData.pdfUrl);
-          await deleteObject(oldPdfRef);
+        if (editData?.pdfAsset?.publicId) {
+          await deleteCloudinaryAsset(editData.pdfAsset);
         }
-        if (editData?.coverImage) {
-          const oldPreviewRef = ref(storage, editData.coverImage);
-          await deleteObject(oldPreviewRef);
+        if (editData?.coverImageAsset?.publicId) {
+          await deleteCloudinaryAsset(editData.coverImageAsset);
         }
       }
 
       if (editData) {
-        // Update existing newsletter
         const newsletterRef = doc(db, 'resources', editData.id);
         await updateDoc(newsletterRef, {
           title,
           description,
           coverImage: coverImageUrl,
+          coverImageAsset,
           pdfUrl,
+          pdfAsset,
           updatedAt: Timestamp.now(),
         });
       } else {
-        // Add new newsletter
         await addDoc(collection(db, 'resources'), {
           title,
           description,
           coverImage: coverImageUrl,
+          coverImageAsset,
           pdfUrl,
+          pdfAsset,
           category: 'newsletter',
           createdAt: Timestamp.now(),
         });
@@ -186,17 +169,13 @@ const AddNewsletterModal = ({ isOpen, onClose, onResourceAdded, editData = null 
 
     setLoading(true);
     try {
-      // Delete files from storage
-      if (editData.coverImage) {
-        const coverImageRef = ref(storage, editData.coverImage);
-        await deleteObject(coverImageRef);
+      if (editData.coverImageAsset?.publicId) {
+        await deleteCloudinaryAsset(editData.coverImageAsset);
       }
-      if (editData.pdfUrl) {
-        const pdfRef = ref(storage, editData.pdfUrl);
-        await deleteObject(pdfRef);
+      if (editData.pdfAsset?.publicId) {
+        await deleteCloudinaryAsset(editData.pdfAsset);
       }
 
-      // Delete document from Firestore
       await deleteDoc(doc(db, 'resources', editData.id));
 
       onResourceAdded();

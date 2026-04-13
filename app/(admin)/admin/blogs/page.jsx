@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { collection, getDocs, query, orderBy, doc, deleteDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useAuth } from '../AuthProvider';
-import { ref, deleteObject } from 'firebase/storage';
+import { deleteCloudinaryAsset } from '@/lib/cloudinary';
 // import BlogList from '@/components/admin/blogs/BlogList'; // Future component
 import AddBlogModal from '@/components/admin/blogs/AddBlogModal';
 import EditBlogModal from '@/components/admin/blogs/EditBlogModal';
@@ -102,19 +102,14 @@ const AdminBlogsPage = () => {
 
     setDeleteLoading(true);
     try {
-      // Delete cover image from Firebase Storage if it exists
-      if (deletingBlog.image) {
+      if (deletingBlog.imageAsset?.publicId) {
         try {
-          const imageRef = ref(storage, deletingBlog.image);
-          await deleteObject(imageRef);
-          console.log('Cover image deleted successfully from storage:', deletingBlog.image);
+          await deleteCloudinaryAsset(deletingBlog.imageAsset);
         } catch (storageError) {
-          console.error('Error deleting cover image from storage:', deletingBlog.image, storageError);
-          // Continue with deleting the document even if image deletion fails
+          console.error('Error deleting cover image:', deletingBlog.image, storageError);
         }
       }
 
-      // Then delete the blog document from Firestore
       const blogRef = doc(db, 'blogs', deletingBlog.id);
       await deleteDoc(blogRef);
       

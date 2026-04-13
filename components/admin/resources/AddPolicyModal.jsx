@@ -1,17 +1,24 @@
 "use client";
-import React, { useState } from 'react';
-import { collection, addDoc, Timestamp } from 'firebase/firestore';
-import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
-import { db, storage } from '@/lib/firebase';
+import React, { useEffect, useState } from 'react';
+import { collection, addDoc, Timestamp, doc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 import { PlusIcon } from 'lucide-react';
+import { buildCloudinaryAsset, deleteCloudinaryAsset, uploadToCloudinary } from '@/lib/cloudinary';
 
-const AddPolicyModal = ({ isOpen, onClose, onResourceAdded }) => {
+const AddPolicyModal = ({ isOpen, onClose, onResourceAdded, editData = null }) => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [pdfFile, setPdfFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [uploadProgress, setUploadProgress] = useState({});
+
+  useEffect(() => {
+    if (editData) {
+      setTitle(editData.title || '');
+      setDescription(editData.description || '');
+    }
+  }, [editData]);
 
   const handlePdfChange = (e) => {
     const file = e.target.files[0];
@@ -22,7 +29,7 @@ const AddPolicyModal = ({ isOpen, onClose, onResourceAdded }) => {
   };
 
   const handleUpload = async () => {
-    if (!title || !pdfFile) {
+    if (!title || (!pdfFile && !editData?.pdfUrl)) {
       setError("Please provide a title and PDF file.");
       return;
     }
@@ -31,43 +38,43 @@ const AddPolicyModal = ({ isOpen, onClose, onResourceAdded }) => {
     setError(null);
 
     try {
-      // Upload PDF
-      const pdfPath = `resources/policies/${title}/${pdfFile.name}`;
-      const pdfRef = ref(storage, pdfPath);
-      const pdfUpload = uploadBytesResumable(pdfRef, pdfFile);
+      let pdfUrl = editData?.pdfUrl || null;
+      let pdfAsset = editData?.pdfAsset || null;
 
-      // Track upload progress
-      pdfUpload.on('state_changed',
-        (snapshot) => {
-          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          setUploadProgress(prev => ({ ...prev, pdf: progress }));
-        },
-        (error) => {
-          console.error("PDF upload error:", error);
-          throw error;
+      if (pdfFile) {
+        setUploadProgress(prev => ({ ...prev, pdf: 25 }));
+        const uploadedPdf = await uploadToCloudinary(pdfFile, {
+          folder: `mdcl/resources/others/${title}`,
+          resourceType: 'auto',
+        });
+        pdfAsset = buildCloudinaryAsset(uploadedPdf);
+        pdfUrl = pdfAsset?.url || null;
+        setUploadProgress(prev => ({ ...prev, pdf: 100 }));
+
+        if (editData?.pdfAsset?.publicId) {
+          await deleteCloudinaryAsset(editData.pdfAsset);
         }
-      );
+      }
 
-      // Wait for upload to complete
-      await new Promise((resolve, reject) => {
-        pdfUpload.on('state_changed',
-          null,
-          reject,
-          () => resolve()
-        );
-      });
-
-      // Get download URL
-      const pdfUrl = await getDownloadURL(pdfRef);
-
-      // Add to Firestore
-      await addDoc(collection(db, 'resources'), {
-        title,
-        description,
-        pdfUrl,
-        category: 'policy',
-        createdAt: Timestamp.now(),
-      });
+      if (editData) {
+        await updateDoc(doc(db, 'resources', editData.id), {
+          title,
+          description,
+          pdfUrl,
+          pdfAsset,
+          category: 'others',
+          updatedAt: Timestamp.now(),
+        });
+      } else {
+        await addDoc(collection(db, 'resources'), {
+          title,
+          description,
+          pdfUrl,
+          pdfAsset,
+          category: 'others',
+          createdAt: Timestamp.now(),
+        });
+      }
 
       // Reset form
       setTitle('');
@@ -86,12 +93,32 @@ const AddPolicyModal = ({ isOpen, onClose, onResourceAdded }) => {
     }
   };
 
+  const handleDelete = async () => {
+    if (!editData) return;
+
+    setLoading(true);
+    try {
+      if (editData.pdfAsset?.publicId) {
+        await deleteCloudinaryAsset(editData.pdfAsset);
+      }
+
+      await deleteDoc(doc(db, 'resources', editData.id));
+      onResourceAdded();
+      onClose();
+    } catch (err) {
+      console.error("Error deleting resource:", err);
+      setError("Failed to delete resource. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-gray-700/30 flex items-center justify-center z-50">
       <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-md">
-        <h3 className="text-lg font-semibold text-gray-800 mb-4">Add Policy</h3>
+        <h3 className="text-lg font-semibold text-gray-800 mb-4">{editData ? 'Edit Resource' : 'Add Resource'}</h3>
         <div className="space-y-4">
           <div>
             <label htmlFor="title" className="block text-sm font-medium text-gray-700">Title</label>
@@ -151,12 +178,21 @@ const AddPolicyModal = ({ isOpen, onClose, onResourceAdded }) => {
           >
             Cancel
           </button>
+          {editData && (
+            <button
+              onClick={handleDelete}
+              className="px-4 py-2 rounded-md bg-red-600 text-white hover:bg-red-700 transition-colors"
+              disabled={loading}
+            >
+              Delete
+            </button>
+          )}
           <button
             onClick={handleUpload}
             className="px-4 py-2 rounded-md bg-green-700 text-white hover:bg-green-800 transition-colors disabled:opacity-50"
             disabled={loading}
           >
-            {loading ? 'Adding...' : 'Add Policy'}
+            {loading ? 'Saving...' : editData ? 'Update Resource' : 'Add Resource'}
           </button>
         </div>
       </div>

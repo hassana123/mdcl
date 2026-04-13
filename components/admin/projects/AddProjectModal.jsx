@@ -1,10 +1,10 @@
 'use client';
 
 import React, { useState } from 'react';
-import { storage, db } from '@/lib/firebase';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { db } from '@/lib/firebase';
 import { collection, addDoc } from 'firebase/firestore';
 import { useAuth } from '@/app/(admin)/admin/AuthProvider';
+import { buildCloudinaryAsset, uploadToCloudinary } from '@/lib/cloudinary';
 
 const AddProjectModal = ({ onClose }) => {
   const { user } = useAuth();
@@ -148,20 +148,13 @@ const AddProjectModal = ({ onClose }) => {
     }
 
     try {
-      // Create a sanitized project folder name
       const sanitizedTitle = title.toLowerCase().replace(/[^a-z0-9]/g, '-');
-      const projectFolder = `${category}/${sanitizedTitle}`;
-
-      // Create a unique filename with timestamp
-      const timestamp = Date.now();
-      const sanitizedFilename = coverImage.name.toLowerCase().replace(/[^a-z0-9.]/g, '-');
-      const storagePath = `projects/${projectFolder}/cover-${timestamp}-${sanitizedFilename}`;
-      
-      const storageRef = ref(storage, storagePath);
-      const snapshot = await uploadBytes(storageRef, coverImage);
-      const downloadURL = await getDownloadURL(snapshot.ref);
-      
-      return downloadURL;
+      setUploadProgress(25);
+      const uploadResult = await uploadToCloudinary(coverImage, {
+        folder: `mdcl/projects/${category}/${sanitizedTitle}`,
+      });
+      setUploadProgress(100);
+      return buildCloudinaryAsset(uploadResult);
     } catch (error) {
       console.error('Error uploading cover image:', error);
       throw new Error('Failed to upload cover image');
@@ -204,8 +197,7 @@ const AddProjectModal = ({ onClose }) => {
     setError('');
 
     try {
-      // Upload cover image first
-      const coverImageUrl = await uploadCoverImage(formData);
+      const coverImageAsset = await uploadCoverImage(formData);
 
       // Clean up sections data
       const cleanedSections = sections.map(section => {
@@ -231,7 +223,8 @@ const AddProjectModal = ({ onClose }) => {
       const projectData = {
         ...formData,
         sections: cleanedSections,
-        coverImage: coverImageUrl,
+        coverImage: coverImageAsset?.url || null,
+        coverImageAsset,
         createdAt: new Date(),
         createdBy: user.uid,
         status: 'active'

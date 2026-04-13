@@ -14,6 +14,7 @@ function getHeaderTitle(pathname) {
     'projects': 'Projects & Programmes',
     'blogs': 'Blog',
     'gallery': 'Gallery',
+    'team': 'Team',
     'resources': 'Resources',
     'login': 'Login',
     'signup': 'Sign Up',

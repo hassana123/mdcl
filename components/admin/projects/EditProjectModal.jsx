@@ -1,10 +1,10 @@
 'use client';
 
 import React, { useState } from 'react';
-import { storage, db } from '@/lib/firebase';
-import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
+import { db } from '@/lib/firebase';
 import { doc, updateDoc } from 'firebase/firestore';
 import { useAuth } from '@/app/(admin)/admin/AuthProvider';
+import { buildCloudinaryAsset, deleteCloudinaryAsset, uploadToCloudinary } from '@/lib/cloudinary';
 
 const EditProjectModal = ({ project, onClose }) => {
   const { user } = useAuth();
@@ -35,6 +35,7 @@ const EditProjectModal = ({ project, onClose }) => {
   }]);
   const [coverImage, setCoverImage] = useState(null);
   const [existingCoverImage, setExistingCoverImage] = useState(project.coverImage || null);
+  const [existingCoverImageAsset, setExistingCoverImageAsset] = useState(project.coverImageAsset || null);
   const [uploadProgress, setUploadProgress] = useState(0);
 
   const handleAddSection = () => {
@@ -84,44 +85,22 @@ const EditProjectModal = ({ project, onClose }) => {
     if (!existingCoverImage) return;
 
     try {
-      // Extract the path from the URL
-      let imagePath;
-      try {
-        // Handle different URL formats
-        if (existingCoverImage.includes('/o/')) {
-          // URL format: https://firebasestorage.googleapis.com/v0/b/[bucket]/o/[path]?[token]
-          imagePath = decodeURIComponent(existingCoverImage.split('/o/')[1].split('?')[0]);
-        } else {
-          // If it's already a path
-          imagePath = existingCoverImage;
-        }
-
-        // Remove any leading/trailing slashes
-        imagePath = imagePath.replace(/^\/+|\/+$/g, '');
-
-        console.log('Attempting to delete image at path:', imagePath);
-        const imageRef = ref(storage, imagePath);
-        
+      if (existingCoverImageAsset?.publicId) {
         try {
-          await deleteObject(imageRef);
-          console.log('Successfully deleted image:', imagePath);
-          setExistingCoverImage(null);
+          await deleteCloudinaryAsset(existingCoverImageAsset);
         } catch (deleteError) {
-          if (deleteError.code === 'storage/object-not-found') {
-            console.warn('Image not found in storage, removing from state anyway:', imagePath);
-            setExistingCoverImage(null);
-          } else {
-            throw deleteError;
-          }
+          console.error('Error deleting image:', deleteError);
+          setError('Failed to delete image. It will be removed from the project anyway.');
         }
-      } catch (pathError) {
-        console.error('Error processing image path:', pathError);
-        setExistingCoverImage(null);
       }
+
+      setExistingCoverImage(null);
+      setExistingCoverImageAsset(null);
     } catch (error) {
       console.error('Error in handleRemoveExistingImage:', error);
       setError('Failed to delete image. It will be removed from the project anyway.');
       setExistingCoverImage(null);
+      setExistingCoverImageAsset(null);
     }
   };
 
@@ -135,20 +114,22 @@ const EditProjectModal = ({ project, onClose }) => {
     }
 
     try {
-      // Create a sanitized project folder name
       const sanitizedTitle = title.toLowerCase().replace(/[^a-z0-9]/g, '-');
-      const projectFolder = `${category}/${sanitizedTitle}`;
+      setUploadProgress(25);
+      const uploadResult = await uploadToCloudinary(coverImage, {
+        folder: `mdcl/projects/${category}/${sanitizedTitle}`,
+      });
 
-      // Create a unique filename with timestamp
-      const timestamp = Date.now();
-      const sanitizedFilename = coverImage.name.toLowerCase().replace(/[^a-z0-9.]/g, '-');
-      const storagePath = `projects/${projectFolder}/cover-${timestamp}-${sanitizedFilename}`;
-      
-      const storageRef = ref(storage, storagePath);
-      const snapshot = await uploadBytes(storageRef, coverImage);
-      const downloadURL = await getDownloadURL(snapshot.ref);
-      
-      return downloadURL;
+      if (existingCoverImageAsset?.publicId) {
+        try {
+          await deleteCloudinaryAsset(existingCoverImageAsset);
+        } catch (deleteError) {
+          console.error('Error deleting previous cover image:', deleteError);
+        }
+      }
+
+      setUploadProgress(100);
+      return buildCloudinaryAsset(uploadResult);
     } catch (error) {
       console.error('Error uploading cover image:', error);
       throw new Error('Failed to upload cover image');
@@ -255,7 +236,7 @@ const EditProjectModal = ({ project, onClose }) => {
 
     try {
       // Upload new cover image if one was selected
-      const coverImageUrl = await uploadCoverImage(formData);
+      const coverImageAsset = await uploadCoverImage(formData);
 
       // Clean up sections data
       const cleanedSections = sections.map(section => {
@@ -281,7 +262,8 @@ const EditProjectModal = ({ project, onClose }) => {
       const projectData = {
         ...formData,
         sections: cleanedSections,
-        coverImage: coverImageUrl,
+        coverImage: coverImageAsset?.url || existingCoverImage || null,
+        coverImageAsset: coverImageAsset || existingCoverImageAsset || null,
         updatedAt: new Date(),
         updatedBy: user.uid
       };

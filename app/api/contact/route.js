@@ -2,12 +2,18 @@ import { NextResponse, NextRequest } from "next/server";
 import { log } from "node:console";
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 export async function POST(req) {
    const body = await req.json();
 
   try {
+    if (!process.env.RESEND_API_KEY) {
+      return NextResponse.json(
+        { message: "RESEND_API_KEY is not configured." },
+        { status: 500 }
+      );
+    }
+
+    const resend = new Resend(process.env.RESEND_API_KEY);
     const { firstName, lastName, email, message } = body;
     const emailHtml = `
       <div style="background:#f6f8fa;padding:40px 0;min-height:100vh;font-family:Segoe UI,Arial,sans-serif;">
@@ -25,18 +31,12 @@ export async function POST(req) {
         </div>
       </div>
     `;
-    await resend.emails.send({
+    const data = await resend.emails.send({
       from: `MicroDevelopment Consulting Limited <microdevelopmentng.com>`,
       to: "hassanaabdll1@gmail.com",
       subject: `New MicroDevelopment Message from ${firstName}`,
       react: emailHtml,
     });
-     if (error) {
-      return NextResponse.json(
-        { message: "Email sending failed", error },
-        { status: 400 }
-      );
-    }
 
     return NextResponse.json(
       { message: "Email sent successfully", data },

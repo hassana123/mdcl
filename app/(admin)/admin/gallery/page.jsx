@@ -1,40 +1,60 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { collection, getDocs, query, orderBy } from 'firebase/firestore';
+import { collection, getDocs, query, orderBy, doc, deleteDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react'; // Assuming Heroicons are available
 import Image from 'next/image';
+import AddGalleryItemModal from '@/components/admin/gallery/AddGalleryItemModal';
+import EditGalleryItemModal from '@/components/admin/gallery/EditGalleryItemModal';
+import { deleteCloudinaryAsset } from '@/lib/cloudinary';
 
 export default function AdminGalleryPage() {
   const [galleryItems, setGalleryItems] = useState([]);
-  
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  const [isAddOpen, setIsAddOpen] = useState(false);
+  const [editingItem, setEditingItem] = useState(null);
   const itemsPerPage = 6; // As requested
 
-  useEffect(() => {
-    const fetchGalleryItems = async () => {
-      try {
-        const galleryRef = collection(db, 'gallery');
-        // You might want to order these, e.g., by upload date
-        const q = query(galleryRef, orderBy('createdAt', 'desc'));
-        const querySnapshot = await getDocs(q);
-        const itemsList = querySnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        }));
-        setGalleryItems(itemsList);
-      } catch (error) {
-        console.error('Error fetching gallery items:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchGalleryItems = async () => {
+    try {
+      const galleryRef = collection(db, 'gallery');
+      const q = query(galleryRef, orderBy('createdAt', 'desc'));
+      const querySnapshot = await getDocs(q);
+      const itemsList = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      setGalleryItems(itemsList);
+    } catch (error) {
+      console.error('Error fetching gallery items:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchGalleryItems();
   }, []);
+
+  const handleDelete = async (item) => {
+    if (!window.confirm(`Delete "${item.title}"?`)) {
+      return;
+    }
+
+    try {
+      await Promise.all([
+        ...(item.imageAssets || []).map((asset) => deleteCloudinaryAsset(asset).catch(() => null)),
+        ...(item.videoAssets || []).map((asset) => deleteCloudinaryAsset(asset).catch(() => null)),
+      ]);
+      await deleteDoc(doc(db, 'gallery', item.id));
+      fetchGalleryItems();
+    } catch (error) {
+      console.error('Error deleting gallery item:', error);
+    }
+  };
 
   // Filter items based on search query
   const filteredItems = galleryItems.filter(item =>
@@ -55,9 +75,12 @@ export default function AdminGalleryPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-2xl font-bold text-gray-800">Manage your Gallery</h1>
-        <Link href="#" className="px-4 py-2 bg-green-700 text-white rounded-md hover:bg-green-800 transition-colors">
+        <button
+          onClick={() => setIsAddOpen(true)}
+          className="px-4 py-2 bg-green-700 text-white rounded-md hover:bg-green-800 transition-colors"
+        >
           Add to Gallery
-        </Link>
+        </button>
       </div>
 
       {/* Search Bar */}
@@ -115,10 +138,17 @@ export default function AdminGalleryPage() {
               
               <div className="p-4">
                 <h3 className="font-semibold text-gray-800 mb-2 line-clamp-2">{item.title || 'No Title'}</h3>
-                {/* Link to view images - placeholder */}
-                <Link href={`/admin/gallery/${item.id}`} className="text-sm text-green-700 hover:underline">
-                  View Images
-                </Link>
+                <div className="flex items-center gap-4 text-sm">
+                  <Link href={`/admin/gallery/${item.id}`} className="text-green-700 hover:underline">
+                    View
+                  </Link>
+                  <button onClick={() => setEditingItem(item)} className="text-blue-700 hover:underline">
+                    Edit
+                  </button>
+                  <button onClick={() => handleDelete(item)} className="text-red-600 hover:underline">
+                    Delete
+                  </button>
+                </div>
               </div>
             </div>
           ))}
@@ -148,6 +178,18 @@ export default function AdminGalleryPage() {
         </div>
       )}
 
+      <AddGalleryItemModal
+        isOpen={isAddOpen}
+        onClose={() => setIsAddOpen(false)}
+        onGalleryItemAdded={fetchGalleryItems}
+      />
+      <EditGalleryItemModal
+        isOpen={Boolean(editingItem)}
+        onClose={() => setEditingItem(null)}
+        onGalleryItemUpdated={fetchGalleryItems}
+        item={editingItem}
+      />
+
     </div>
   );
-} 
+}

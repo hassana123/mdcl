@@ -1,10 +1,10 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { storage, db } from '@/lib/firebase';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { db } from '@/lib/firebase';
 import { collection, addDoc, getDocs } from 'firebase/firestore';
 import { useAuth } from '@/app/(admin)/admin/AuthProvider';
+import { buildCloudinaryAsset, uploadToCloudinary } from '@/lib/cloudinary';
 
 const AddBlogModal = ({ onClose, onBlogAdded }) => {
   const { user } = useAuth();
@@ -186,10 +186,12 @@ const AddBlogModal = ({ onClose, onBlogAdded }) => {
     if (!coverImage) return null;
 
     try {
-      const storageRef = ref(storage, `blog_covers/${Date.now()}_${coverImage.name}`);
-      const snapshot = await uploadBytes(storageRef, coverImage);
-      const downloadURL = await getDownloadURL(snapshot.ref);
-      return downloadURL;
+      setUploadProgress(25);
+      const uploadResult = await uploadToCloudinary(coverImage, {
+        folder: 'mdcl/blog_covers',
+      });
+      setUploadProgress(100);
+      return buildCloudinaryAsset(uploadResult);
     } catch (error) {
       console.error('Error uploading cover image:', error);
       throw new Error('Failed to upload cover image');
@@ -248,14 +250,15 @@ const AddBlogModal = ({ onClose, onBlogAdded }) => {
     setError('');
 
     try {
-      const coverImageUrl = await uploadCoverImage();
+      const coverImageAsset = await uploadCoverImage();
 
       // Prepare blog data based on layout type
       const blogData = {
         title: formData.title,
         // excerpt: formData.excerpt.trim(), // Commented out excerpt
         layoutType: formData.layoutType,
-        image: coverImageUrl,
+        image: coverImageAsset?.url || null,
+        imageAsset: coverImageAsset,
         publishDate: new Date(formData.publishDate),
         createdAt: new Date(),
         updatedAt: new Date(),

@@ -6,7 +6,7 @@ import { db } from '@/lib/firebase';
 import { X } from 'lucide-react';
 import Image from 'next/image';
 import { Timestamp } from 'firebase/firestore';
-import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { buildCloudinaryAsset, uploadToCloudinary } from '@/lib/cloudinary';
 
 const AnnouncementForm = ({ onClose, onAnnouncementAdded, editData = null }) => {
   const [formType, setFormType] = useState('new');
@@ -194,10 +194,11 @@ const AnnouncementForm = ({ onClose, onAnnouncementAdded, editData = null }) => 
 
   const uploadImage = async (file) => {
     if (!file) return null;
-    const storage = getStorage();
-    const storageRef = ref(storage, `announcements/${Date.now()}_${file.name}`);
-    await uploadBytes(storageRef, file);
-    return await getDownloadURL(storageRef);
+    const uploadResult = await uploadToCloudinary(file, {
+      folder: 'mdcl/announcements',
+      resourceType: 'image',
+    });
+    return buildCloudinaryAsset(uploadResult);
   };
 
   const handleSubmit = async (e) => {
@@ -209,6 +210,8 @@ const AnnouncementForm = ({ onClose, onAnnouncementAdded, editData = null }) => 
     setError(null);
 
     try {
+      const uploadedImageAsset = imageFile ? await uploadImage(imageFile) : null;
+
       const announcementData = {
         title: formData.title.trim(),
         content: formData.content.trim(),
@@ -219,7 +222,8 @@ const AnnouncementForm = ({ onClose, onAnnouncementAdded, editData = null }) => 
         sourceId: formData.sourceId || '',
         sourceTitle: formData.sourceTitle || '',
         attachments: formData.attachments || [],
-        coverImage: formData.coverImage || null,
+        coverImage: uploadedImageAsset?.url || imagePreview || formData.coverImage || null,
+        coverImageAsset: uploadedImageAsset || formData.coverImageAsset || null,
         link: formData.link || '',
         category:formData?.category || ''
       };

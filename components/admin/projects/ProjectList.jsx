@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { collection, getDocs, doc, deleteDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import EditProjectModal from './EditProjectModal';
-import { ref, deleteObject } from 'firebase/storage';
+import { deleteCloudinaryAsset } from '@/lib/cloudinary';
 
 const DeleteConfirmationModal = ({ project, onClose, onConfirm, loading }) => {
   return (
@@ -76,24 +76,14 @@ const ProjectList = ({
 
     setDeleteLoading(true);
     try {
-      // Delete images from Firebase Storage first
-      if (deletingProject.images && deletingProject.images.length > 0) {
-        const deletePromises = deletingProject.images.map(async (imageUrl) => {
-          try {
-            // Extract the path from the URL
-            const imagePath = decodeURIComponent(imageUrl.split('/o/')[1].split('?')[0]);
-            const imageRef = ref(storage, imagePath);
-            await deleteObject(imageRef);
-            console.log('Successfully deleted image:', imagePath);
-          } catch (error) {
-            console.error('Error deleting image:', error);
-            // Continue with other deletions even if one fails
-          }
-        });
-        await Promise.all(deletePromises);
+      if (deletingProject.coverImageAsset?.publicId) {
+        try {
+          await deleteCloudinaryAsset(deletingProject.coverImageAsset);
+        } catch (error) {
+          console.error('Error deleting project cover image:', error);
+        }
       }
 
-      // Then delete the project document from Firestore
       const projectRef = doc(db, 'projects', deletingProject.id);
       await deleteDoc(projectRef);
       

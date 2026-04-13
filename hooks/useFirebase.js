@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { collection, getDocs, addDoc, deleteDoc, doc, updateDoc } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { db, storage } from '@/lib/firebase';
+import { db } from '@/lib/firebase';
+import { buildCloudinaryAsset, uploadToCloudinary } from '@/lib/cloudinary';
 
 export function useFirebase(collectionName) {
   const [items, setItems] = useState([]);
@@ -31,9 +31,12 @@ export function useFirebase(collectionName) {
     try {
       let imageUrl = '';
       if (imageFile) {
-        const storageRef = ref(storage, `${collectionName}/${imageFile.name}`);
-        await uploadBytes(storageRef, imageFile);
-        imageUrl = await getDownloadURL(storageRef);
+        const uploadedAsset = buildCloudinaryAsset(
+          await uploadToCloudinary(imageFile, {
+            folder: `mdcl/${collectionName}`,
+          })
+        );
+        imageUrl = uploadedAsset?.url || '';
       }
 
       const itemData = {
@@ -56,9 +59,12 @@ export function useFirebase(collectionName) {
     try {
       let imageUrl = data.imageUrl;
       if (imageFile) {
-        const storageRef = ref(storage, `${collectionName}/${imageFile.name}`);
-        await uploadBytes(storageRef, imageFile);
-        imageUrl = await getDownloadURL(storageRef);
+        const uploadedAsset = buildCloudinaryAsset(
+          await uploadToCloudinary(imageFile, {
+            folder: `mdcl/${collectionName}`,
+          })
+        );
+        imageUrl = uploadedAsset?.url || imageUrl;
       }
 
       const itemData = {

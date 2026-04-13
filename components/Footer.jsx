@@ -8,6 +8,8 @@ import {
 } from "lucide-react"; // Lucide icons
 
 const Footer = () => {
+  const currentYear = new Date().getFullYear();
+
   return (
     <footer className="w-full text-[16px] py-2 bg-[var(--color-primary-light-olive)]">
       {/* Top Row: Email and Phone */}
@@ -26,7 +28,7 @@ const Footer = () => {
       {/* Copyright and Socials */}
       <div className="flex flex-col items-center gap-2">
         <div className="text-center ">
-          &copy; Copyright 2023 |{" "}
+          &copy; Copyright {currentYear} |{" "}
           <span className="font-bold">
             MicroDevelopment Consulting Limited
           </span>
