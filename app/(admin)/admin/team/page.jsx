@@ -16,6 +16,7 @@ import { db } from "@/lib/firebase";
 import { buildCloudinaryAsset, deleteCloudinaryAsset, uploadToCloudinary } from "@/lib/cloudinary";
 import { teamMembersSeed } from "@/data/teamMembersSeed";
 import { sortTeamMembersByHierarchy } from "@/lib/teamHierarchy";
+import UploadDropzone from "@/components/admin/UploadDropzone";
 
 const emptyForm = {
   name: "",
@@ -162,6 +163,14 @@ export default function AdminTeamPage() {
     }
   };
 
+  const handleTeamImageSelected = (files) => {
+    const file = files?.[0];
+    if (file) {
+      setSelectedFile(file);
+      setPreview(URL.createObjectURL(file));
+    }
+  };
+
   const handleImportStaticMembers = async () => {
     if (!window.confirm("Import the original static team members into Firestore? Existing team members will be replaced.")) {
       return;
@@ -258,17 +267,12 @@ export default function AdminTeamPage() {
               onChange={(e) => setFormData((prev) => ({ ...prev, order: e.target.value }))}
               className="border border-gray-300 rounded-md px-4 py-2"
             />
-            <input
-              type="file"
+            <UploadDropzone
               accept="image/*"
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                setSelectedFile(file || null);
-                if (file) {
-                  setPreview(URL.createObjectURL(file));
-                }
-              }}
-              className="border border-gray-300 rounded-md px-4 py-2"
+              disabled={loading}
+              onFilesSelected={handleTeamImageSelected}
+              title="Click to upload a team photo or drag and drop"
+              subtitle="Use a portrait image for best display"
             />
           </div>
 

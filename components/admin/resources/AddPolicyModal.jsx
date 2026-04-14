@@ -4,6 +4,7 @@ import { collection, addDoc, Timestamp, doc, updateDoc, deleteDoc } from 'fireba
 import { db } from '@/lib/firebase';
 import { PlusIcon } from 'lucide-react';
 import { buildCloudinaryAsset, deleteCloudinaryAsset, uploadToCloudinary } from '@/lib/cloudinary';
+import UploadDropzone from '@/components/admin/UploadDropzone';
 
 const AddPolicyModal = ({ isOpen, onClose, onResourceAdded, editData = null }) => {
   const [title, setTitle] = useState('');
@@ -26,6 +27,13 @@ const AddPolicyModal = ({ isOpen, onClose, onResourceAdded, editData = null }) =
       setPdfFile(file);
     }
     e.target.value = null;
+  };
+
+  const handlePdfSelected = (files) => {
+    const file = files?.[0];
+    if (file) {
+      setPdfFile(file);
+    }
   };
 
   const handleUpload = async () => {
@@ -144,17 +152,14 @@ const AddPolicyModal = ({ isOpen, onClose, onResourceAdded, editData = null }) =
           {/* PDF Upload */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Policy PDF</label>
-            <div className="mt-1 border-2 border-dashed border-gray-300 rounded-md p-4 text-center">
-              <input
-                type="file"
-                id="pdf-upload"
-                onChange={handlePdfChange}
-                className="sr-only"
-                accept=".pdf"
+            <div className="mt-1">
+              <UploadDropzone
+                accept=".pdf,application/pdf"
+                disabled={loading}
+                onFilesSelected={handlePdfSelected}
+                title="Click to upload a PDF or drag and drop"
+                subtitle="Policy or resource PDF"
               />
-              <label htmlFor="pdf-upload" className="cursor-pointer text-green-700 hover:text-green-800 font-semibold flex items-center justify-center">
-                <PlusIcon className="h-5 w-5 mr-2" /> Select PDF File
-              </label>
               {pdfFile && (
                 <div className="mt-2">
                   <p className="text-sm text-gray-600">{pdfFile.name}</p>

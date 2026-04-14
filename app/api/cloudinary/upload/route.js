@@ -41,6 +41,10 @@ export async function POST(request) {
       return NextResponse.json({ error: "file is required." }, { status: 400 });
     }
 
+    if (typeof file === "string") {
+      return NextResponse.json({ error: "Invalid file payload." }, { status: 400 });
+    }
+
     const timestamp = Math.floor(Date.now() / 1000);
     const paramsToSign = {
       folder,
@@ -49,8 +53,12 @@ export async function POST(request) {
     };
 
     const signature = signParams(paramsToSign, CLOUDINARY_API_SECRET);
+    const fileBuffer = Buffer.from(await file.arrayBuffer());
+    const upstreamFile = new File([fileBuffer], file.name || "upload", {
+      type: file.type || "application/octet-stream",
+    });
     const formData = new FormData();
-    formData.append("file", file);
+    formData.append("file", upstreamFile);
     formData.append("api_key", CLOUDINARY_API_KEY);
     formData.append("timestamp", String(timestamp));
     formData.append("signature", signature);

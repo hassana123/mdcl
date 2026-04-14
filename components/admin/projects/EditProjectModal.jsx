@@ -5,6 +5,7 @@ import { db } from '@/lib/firebase';
 import { doc, updateDoc } from 'firebase/firestore';
 import { useAuth } from '@/app/(admin)/admin/AuthProvider';
 import { buildCloudinaryAsset, deleteCloudinaryAsset, uploadToCloudinary } from '@/lib/cloudinary';
+import UploadDropzone from '@/components/admin/UploadDropzone';
 
 const EditProjectModal = ({ project, onClose }) => {
   const { user } = useAuth();
@@ -67,7 +68,14 @@ const EditProjectModal = ({ project, onClose }) => {
   };
 
   const handleFileChange = (e) => {
-    const file = e.target.files[0];
+    const file = e.target.files?.[0];
+    if (file) {
+      setCoverImage(file);
+    }
+  };
+
+  const handleCoverImageSelected = (files) => {
+    const file = files?.[0];
     if (file) {
       setCoverImage(file);
     }
@@ -581,12 +589,12 @@ const EditProjectModal = ({ project, onClose }) => {
           {/* Upload New Cover Image */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Upload New Cover Image</label>
-            <input
-              type="file"
+            <UploadDropzone
               accept="image/*"
-              onChange={handleFileChange}
-              className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100"
               disabled={loading}
+              onFilesSelected={handleCoverImageSelected}
+              title="Click to upload a new cover image or drag and drop"
+              subtitle="PNG, JPG, WEBP and other image formats"
             />
             {coverImage && (
               <div className="mt-2">

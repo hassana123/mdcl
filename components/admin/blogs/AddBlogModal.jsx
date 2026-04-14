@@ -5,6 +5,7 @@ import { db } from '@/lib/firebase';
 import { collection, addDoc, getDocs } from 'firebase/firestore';
 import { useAuth } from '@/app/(admin)/admin/AuthProvider';
 import { buildCloudinaryAsset, uploadToCloudinary } from '@/lib/cloudinary';
+import UploadDropzone from '@/components/admin/UploadDropzone';
 
 const AddBlogModal = ({ onClose, onBlogAdded }) => {
   const { user } = useAuth();
@@ -75,6 +76,13 @@ const AddBlogModal = ({ onClose, onBlogAdded }) => {
   const handleCoverImageChange = (e) => {
     if (e.target.files[0]) {
       setCoverImage(e.target.files[0]);
+    }
+  };
+
+  const handleCoverImageSelected = (files) => {
+    const file = files?.[0];
+    if (file) {
+      setCoverImage(file);
     }
   };
 
@@ -429,13 +437,12 @@ const AddBlogModal = ({ onClose, onBlogAdded }) => {
           {/* Cover Image Upload */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Cover Image <span className="text-red-500">*</span></label>
-            <input
-              type="file"
+            <UploadDropzone
               accept="image/*"
-              onChange={handleCoverImageChange}
-              className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100"
               disabled={loading}
-              required
+              onFilesSelected={handleCoverImageSelected}
+              title="Click to upload a cover image or drag and drop"
+              subtitle="A cover image is required for the blog post"
             />
             <p className="text-sm text-gray-500 mt-1">A cover image is required for the blog post</p>
           </div>

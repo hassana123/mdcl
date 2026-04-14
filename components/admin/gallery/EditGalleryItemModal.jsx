@@ -5,6 +5,7 @@ import { db } from '@/lib/firebase';
 import { PlusIcon, XIcon } from 'lucide-react';
 import Image from 'next/image';
 import { buildCloudinaryAsset, deleteCloudinaryAsset, uploadToCloudinary } from '@/lib/cloudinary';
+import UploadDropzone from '@/components/admin/UploadDropzone';
 
 const EditGalleryItemModal = ({ isOpen, onClose, onGalleryItemUpdated, item }) => {
   const [title, setTitle] = useState('');
@@ -39,6 +40,14 @@ const EditGalleryItemModal = ({ isOpen, onClose, onGalleryItemUpdated, item }) =
       setVideoFiles(prevFiles => [...prevFiles, ...newFiles]);
     }
     e.target.value = null;
+  };
+
+  const handleDroppedFiles = (newFiles, fileType) => {
+    if (fileType === 'image') {
+      setImageFiles(prevFiles => [...prevFiles, ...newFiles]);
+    } else if (fileType === 'video') {
+      setVideoFiles(prevFiles => [...prevFiles, ...newFiles]);
+    }
   };
 
   const handleRemoveFile = (fileName, fileType) => {
@@ -231,17 +240,14 @@ const EditGalleryItemModal = ({ isOpen, onClose, onGalleryItemUpdated, item }) =
           {selectedFileType === 'image' && (
             <div>
               <div className="mt-1 border-2 border-dashed border-gray-300 rounded-md p-4 text-center">
-                <input
-                  type="file"
-                  id="image-upload"
-                  multiple
-                  onChange={(e) => handleFileChange(e, 'image')}
-                  className="sr-only"
+                <UploadDropzone
                   accept="image/*"
+                  multiple
+                  disabled={loading}
+                  onFilesSelected={(files) => handleDroppedFiles(files, 'image')}
+                  title="Click to upload images or drag and drop"
+                  subtitle="Add one or more images"
                 />
-                <label htmlFor="image-upload" className="cursor-pointer text-green-700 hover:text-green-800 font-semibold flex items-center justify-center">
-                  <PlusIcon className="h-5 w-5 mr-2" /> Add Images
-                </label>
                 <div className="mt-2 text-sm text-gray-600">
                   {imageFiles.length > 0 && (
                     <ul className="mt-2 text-sm text-gray-800 text-left">
@@ -269,17 +275,14 @@ const EditGalleryItemModal = ({ isOpen, onClose, onGalleryItemUpdated, item }) =
           {selectedFileType === 'video' && (
             <div>
               <div className="mt-1 border-2 border-dashed border-gray-300 rounded-md p-4 text-center">
-                <input
-                  type="file"
-                  id="video-upload"
-                  multiple
-                  onChange={(e) => handleFileChange(e, 'video')}
-                  className="sr-only"
+                <UploadDropzone
                   accept="video/*"
+                  multiple
+                  disabled={loading}
+                  onFilesSelected={(files) => handleDroppedFiles(files, 'video')}
+                  title="Click to upload videos or drag and drop"
+                  subtitle="Add one or more videos"
                 />
-                <label htmlFor="video-upload" className="cursor-pointer text-green-700 hover:text-green-800 font-semibold flex items-center justify-center">
-                  <PlusIcon className="h-5 w-5 mr-2" /> Add Videos
-                </label>
                 <div className="mt-2 text-sm text-gray-600">
                   {videoFiles.length > 0 && (
                     <ul className="mt-2 text-sm text-gray-800 text-left">

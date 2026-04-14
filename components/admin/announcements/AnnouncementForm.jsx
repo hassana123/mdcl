@@ -7,6 +7,7 @@ import { X } from 'lucide-react';
 import Image from 'next/image';
 import { Timestamp } from 'firebase/firestore';
 import { buildCloudinaryAsset, uploadToCloudinary } from '@/lib/cloudinary';
+import UploadDropzone from '@/components/admin/UploadDropzone';
 
 const AnnouncementForm = ({ onClose, onAnnouncementAdded, editData = null }) => {
   const [formType, setFormType] = useState('new');
@@ -182,6 +183,18 @@ const AnnouncementForm = ({ onClose, onAnnouncementAdded, editData = null }) => 
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
+    if (file) {
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleImageSelected = (files) => {
+    const file = files?.[0];
     if (file) {
       setImageFile(file);
       const reader = new FileReader();
@@ -375,20 +388,16 @@ const AnnouncementForm = ({ onClose, onAnnouncementAdded, editData = null }) => 
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Cover Image
                 </label>
-                <div className="mt-1 flex items-center gap-4">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageChange}
-                    className="hidden"
-                    id="image-upload"
-                  />
-                  <label
-                    htmlFor="image-upload"
-                    className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 cursor-pointer"
-                  >
-                    Choose Image
-                  </label>
+                <div className="mt-1 flex items-start gap-4">
+                  <div className="flex-1">
+                    <UploadDropzone
+                      accept="image/*"
+                      disabled={loading}
+                      onFilesSelected={handleImageSelected}
+                      title="Click to upload an image or drag and drop"
+                      subtitle="Optional announcement cover image"
+                    />
+                  </div>
                   {imagePreview && (
                     <div className="relative w-32 h-32 rounded-lg overflow-hidden">
                       <Image

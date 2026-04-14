@@ -5,6 +5,7 @@ import { db } from '@/lib/firebase';
 import { doc, updateDoc, getDocs, collection } from 'firebase/firestore';
 import { useAuth } from '@/app/(admin)/admin/AuthProvider';
 import { buildCloudinaryAsset, deleteCloudinaryAsset, uploadToCloudinary } from '@/lib/cloudinary';
+import UploadDropzone from '@/components/admin/UploadDropzone';
 
 const EditBlogModal = ({ blog, onClose, onBlogUpdated }) => {
   const { user } = useAuth();
@@ -130,6 +131,14 @@ const EditBlogModal = ({ blog, onClose, onBlogUpdated }) => {
     if (e.target.files[0]) {
       setCoverImageFile(e.target.files[0]);
        setError(''); // Clear any previous error
+    }
+  };
+
+  const handleCoverImageSelected = (files) => {
+    const file = files?.[0];
+    if (file) {
+      setCoverImageFile(file);
+      setError('');
     }
   };
 
@@ -515,12 +524,12 @@ const EditBlogModal = ({ blog, onClose, onBlogUpdated }) => {
                  </button>
                </div>
             )}
-            <input
-              type="file"
+            <UploadDropzone
               accept="image/*"
-              onChange={handleCoverImageFileChange}
-              className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100"
               disabled={loading}
+              onFilesSelected={handleCoverImageSelected}
+              title="Click to upload a cover image or drag and drop"
+              subtitle="Replace the current image by dropping a new one here"
             />
           </div>
 

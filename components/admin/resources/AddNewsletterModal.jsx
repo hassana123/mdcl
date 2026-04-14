@@ -8,6 +8,7 @@ import { pdfjs, Document, Page } from 'react-pdf';
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 import { buildCloudinaryAsset, deleteCloudinaryAsset, uploadToCloudinary } from '@/lib/cloudinary';
+import UploadDropzone from '@/components/admin/UploadDropzone';
 
 
 const capturePdfCover = () => {
@@ -77,6 +78,18 @@ const AddNewsletterModal = ({ isOpen, onClose, onResourceAdded, editData = null 
       }
     }
     e.target.value = null;
+  };
+
+  const handlePdfSelected = async (files) => {
+    const file = files?.[0];
+    if (!file) return;
+    setPdfFile(file);
+    try {
+      await generatePdfPreview(file);
+    } catch (err) {
+      console.error('Error generating preview:', err);
+      setError('Failed to generate PDF preview. Please try again.');
+    }
   };
 
   const handleUpload = async () => {
@@ -243,17 +256,14 @@ const AddNewsletterModal = ({ isOpen, onClose, onResourceAdded, editData = null 
           {/* PDF Upload */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Newsletter PDF</label>
-            <div className="mt-1 border-2 border-dashed border-gray-300 rounded-md p-4 text-center">
-              <input
-                type="file"
-                id="pdf-upload"
-                onChange={handlePdfChange}
-                className="sr-only"
-                accept=".pdf"
+            <div className="mt-1">
+              <UploadDropzone
+                accept=".pdf,application/pdf"
+                disabled={loading}
+                onFilesSelected={handlePdfSelected}
+                title="Click to upload a PDF or drag and drop"
+                subtitle="Newsletter PDF"
               />
-              <label htmlFor="pdf-upload" className="cursor-pointer text-green-700 hover:text-green-800 font-semibold flex items-center justify-center">
-                <PlusIcon className="h-5 w-5 mr-2" /> Select PDF File
-              </label>
               {pdfFile && (
                 <div className="mt-2">
                   <p className="text-sm text-gray-600">{pdfFile.name}</p>
